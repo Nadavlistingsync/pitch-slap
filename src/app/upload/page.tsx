@@ -8,22 +8,62 @@ import { useRouter } from 'next/navigation';
 export default function UploadPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [commentary, setCommentary] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: {
       'application/pdf': ['.pdf'],
-      'application/vnd.openxmlformats-officedocument.presentationml.presentation': ['.pptx'],
     },
     maxFiles: 1,
-    onDrop: (acceptedFiles) => {
+    onDrop: async (acceptedFiles) => {
       if (acceptedFiles.length > 0) {
         setFile(acceptedFiles[0]);
-        // In a real app, we would upload the file here
-        // For now, we'll just simulate a delay and redirect
-        setTimeout(() => {
-          router.push('/branding');
-        }, 1500);
+        setIsProcessing(true);
+        setError(null);
+
+        // Upload the file
+        const formData = new FormData();
+        formData.append('file', acceptedFiles[0]);
+
+        try {
+          const uploadResponse = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData,
+          });
+
+          if (!uploadResponse.ok) {
+            throw new Error('Failed to upload file');
+          }
+
+          const uploadData = await uploadResponse.json();
+
+          // Process the PDF
+          const processResponse = await fetch('/api/process', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              fileName: uploadData.fileName,
+              feedbackStyle: localStorage.getItem('feedbackStyle') || 'helpful',
+            }),
+          });
+
+          if (!processResponse.ok) {
+            throw new Error('Failed to process file');
+          }
+
+          const processData = await processResponse.json();
+          setCommentary(processData.commentary);
+          setIsProcessing(false);
+        } catch (error) {
+          console.error('Error:', error);
+          setError('Failed to process the file. Please try again.');
+          setIsProcessing(false);
+        }
       }
     },
   });
@@ -36,14 +76,14 @@ export default function UploadPage() {
             Upload Your Pitch Deck
           </h1>
           <p className="text-lg text-gray-600">
-            Drag and drop your PDF or PPTX file to get started
+            Drag and drop your PDF to get instant VC feedback
           </p>
         </div>
 
         <motion.div
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="w-full"
+          className="w-full mb-8"
         >
           <div
             {...getRootProps()}
@@ -69,22 +109,63 @@ export default function UploadPage() {
                 />
               </svg>
               <p className="mt-4 text-lg text-gray-600">
-                {file ? `Selected: ${file.name}` : 'Drag and drop your file here, or click to select'}
+                {file ? `Selected: ${file.name}` : 'Drag and drop your PDF here, or click to select'}
               </p>
               <p className="mt-2 text-sm text-gray-500">
-                Supports PDF and PPTX files
+                Only PDF files are supported
               </p>
             </div>
           </div>
         </motion.div>
 
-        {file && (
+        {isProcessing && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mt-8 text-center"
+            className="text-center mb-8"
           >
-            <p className="text-indigo-600">Processing your file...</p>
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+            <p className="text-indigo-600">Analyzing your pitch deck...</p>
+          </motion.div>
+        )}
+
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-red-50 border border-red-200 rounded-lg p-4 mb-8"
+          >
+            <p className="text-red-600">{error}</p>
+          </motion.div>
+        )}
+
+        {commentary && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-lg shadow-lg p-6"
+          >
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">VC Feedback</h2>
+            <div className="prose max-w-none">
+              {commentary.split('\n').map((paragraph, index) => (
+                <p key={index} className="mb-4 text-gray-700">
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+            <div className="mt-8 flex justify-end">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => {
+                  setFile(null);
+                  setCommentary(null);
+                }}
+                className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors duration-200"
+              >
+                Upload Another Deck
+              </motion.button>
+            </div>
           </motion.div>
         )}
       </div>
