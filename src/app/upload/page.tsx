@@ -11,10 +11,16 @@ export default function UploadPage() {
   useEffect(() => {
     const storedVC = localStorage.getItem('selectedVC');
     if (!storedVC) {
-      router.push('/select');
+      router.push('/feedback-style');
       return;
     }
-    setSelectedVC(JSON.parse(storedVC));
+    try {
+      const parsedVC = JSON.parse(storedVC);
+      setSelectedVC(parsedVC);
+    } catch (error) {
+      console.error('Error parsing stored VC:', error);
+      router.push('/feedback-style');
+    }
   }, [router]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {

@@ -8,31 +8,31 @@ const vcs = [
   {
     city: 'Paris',
     people: [
-      { name: 'Jean de La Rochebrochard', firm: 'Kima Ventures', desc: 'Candid insights, active on Twitter and LinkedIn.' },
-      { name: 'Alice Zagury', firm: 'The Family', desc: 'Vocal advocate for entrepreneurs, startup culture.' },
-      { name: 'Marie Ekeland', firm: '2050', desc: 'Thoughtful on sustainable innovation and VC trends.' },
-      { name: 'Nicolas Debock', firm: 'Cathay Innovation', desc: 'Global investment strategies, startup growth.' },
-      { name: 'Pauline Roux', firm: 'Elaia Partners', desc: 'AI, deep tech investments.' },
-      { name: 'Roxanne Varza', firm: 'Station F', desc: 'Central in Paris startup scene, innovation.' },
-      { name: 'Marc Simoncini', firm: 'Jaïna Capital', desc: 'Entrepreneurial background, investment insights.' },
-      { name: 'Oussama Ammar', firm: 'The Family', desc: 'Provocative takes on startups and VC.' },
-      { name: 'Céline Lazorthes', firm: 'Leetchi / Mangopay', desc: 'Fintech, entrepreneurship.' },
-      { name: 'Xavier Niel', firm: 'Iliad / Station F', desc: 'Influential in French tech ecosystem.' },
+      { name: 'Jean de La Rochebrochard', firm: 'Kima Ventures', desc: 'Direct, constructive criticism focused on market fit and execution.' },
+      { name: 'Alice Zagury', firm: 'The Family', desc: 'Strategic feedback on business model and growth potential.' },
+      { name: 'Marie Ekeland', firm: '2050', desc: 'Critical analysis of sustainability and long-term viability.' },
+      { name: 'Nicolas Debock', firm: 'Cathay Innovation', desc: 'Detailed feedback on market positioning and competitive advantage.' },
+      { name: 'Pauline Roux', firm: 'Elaia Partners', desc: 'Technical and market validation feedback.' },
+      { name: 'Roxanne Varza', firm: 'Station F', desc: 'Comprehensive ecosystem and market opportunity analysis.' },
+      { name: 'Marc Simoncini', firm: 'Jaïna Capital', desc: 'Entrepreneurial perspective on execution and scaling.' },
+      { name: 'Oussama Ammar', firm: 'The Family', desc: 'Challenging questions on business fundamentals.' },
+      { name: 'Céline Lazorthes', firm: 'Leetchi / Mangopay', desc: 'Fintech-specific market and regulatory feedback.' },
+      { name: 'Xavier Niel', firm: 'Iliad / Station F', desc: 'Strategic market positioning and competitive analysis.' },
     ],
   },
   {
     city: 'New York',
     people: [
-      { name: 'Fred Wilson', firm: 'Union Square Ventures', desc: 'Daily blog, deep tech/investing insights.' },
-      { name: 'Alexis Ohanian', firm: 'Seven Seven Six', desc: 'Startups, tech, social issues.' },
-      { name: 'Rebecca Kaden', firm: 'Union Square Ventures', desc: 'Consumer tech, venture investing.' },
-      { name: 'Ben Sun', firm: 'Primary Venture Partners', desc: 'Early-stage investing, NYC startups.' },
-      { name: 'Angela Lee', firm: '37 Angels', desc: 'Diversity in tech, educational content.' },
-      { name: "Charlie O'Donnell", firm: 'Brooklyn Bridge Ventures', desc: 'Transparent VC, active blogging.' },
-      { name: 'Anu Duggal', firm: 'Female Founders Fund', desc: 'Women-led startups, related content.' },
-      { name: 'Hunter Walk', firm: 'Homebrew', desc: 'Venture trends, broad influence.' },
-      { name: 'Jenny Fielding', firm: 'The Fund', desc: 'Early-stage investing, startup advice.' },
-      { name: 'David Tisch', firm: 'BoxGroup', desc: 'Early-stage tech, investment thoughts.' },
+      { name: 'Fred Wilson', firm: 'Union Square Ventures', desc: 'Deep technical and market analysis feedback.' },
+      { name: 'Alexis Ohanian', firm: 'Seven Seven Six', desc: 'Consumer-focused market validation feedback.' },
+      { name: 'Rebecca Kaden', firm: 'Union Square Ventures', desc: 'Detailed analysis of market opportunity and execution.' },
+      { name: 'Ben Sun', firm: 'Primary Venture Partners', desc: 'Early-stage market validation and team assessment.' },
+      { name: 'Angela Lee', firm: '37 Angels', desc: 'Comprehensive market and team evaluation feedback.' },
+      { name: "Charlie O'Donnell", firm: 'Brooklyn Bridge Ventures', desc: 'Transparent feedback on market opportunity and execution.' },
+      { name: 'Anu Duggal', firm: 'Female Founders Fund', desc: 'Market opportunity and execution strategy feedback.' },
+      { name: 'Hunter Walk', firm: 'Homebrew', desc: 'Detailed product-market fit analysis.' },
+      { name: 'Jenny Fielding', firm: 'The Fund', desc: 'Early-stage market validation and execution feedback.' },
+      { name: 'David Tisch', firm: 'BoxGroup', desc: 'Comprehensive market and team evaluation.' },
     ],
   },
 ];
@@ -43,7 +43,8 @@ export default function FeedbackStylePage() {
 
   const handleContinue = () => {
     if (!selected) return;
-    localStorage.setItem('selectedVC', selected);
+    const [name, firm] = selected.split(' | ');
+    localStorage.setItem('selectedVC', JSON.stringify({ name, firm }));
     router.push('/upload');
   };
 
@@ -55,7 +56,7 @@ export default function FeedbackStylePage() {
             Choose Your VC Feedback Style
           </h1>
           <p className="text-lg text-gray-600">
-            Select a VC whose style you want the AI to emulate in its feedback.
+            Select a VC whose critical feedback style you want to receive. Each VC has their own unique approach to providing constructive criticism and market analysis.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
