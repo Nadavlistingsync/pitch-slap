@@ -42,24 +42,26 @@ export async function POST(request: NextRequest) {
     // Generate VC-style commentary
     // vcStyle format: 'Name | Firm | Description'
     let prompt = '';
+    let model = 'gpt-4o-mini'; // Default model
     if (vcStyle) {
       const [vcName, vcFirm] = vcStyle.split(' | ');
       const vcPrompt = vcPrompts.find(
         (vc) => vc.name === vcName && vc.firm === vcFirm
       );
       if (vcPrompt) {
-        prompt = `${vcPrompt.prompt}\n\nPitch deck content:\n${extractedText}`;
+        prompt = `${vcPrompt.prompt}\n\nReview the following pitch deck and provide critical feedback. Focus on identifying weaknesses, gaps, and areas for improvement. Be specific and constructive in your criticism.\n\nPitch deck content:\n${extractedText}`;
+        model = vcPrompt.model;
       } else {
         prompt = `You are ${vcName ? vcName : 'a top venture capitalist'}${vcFirm ? ` from ${vcFirm}` : ''}.
-Review the following pitch deck and provide feedback in your unique style.\n\nPitch deck content:\n${extractedText}`;
+Review the following pitch deck and provide critical feedback. Focus on identifying weaknesses, gaps, and areas for improvement. Be specific and constructive in your criticism.\n\nPitch deck content:\n${extractedText}`;
       }
     } else {
-      prompt = `You are a top venture capitalist. Review the following pitch deck and provide feedback.\n\nPitch deck content:\n${extractedText}`;
+      prompt = `You are a top venture capitalist. Review the following pitch deck and provide critical feedback. Focus on identifying weaknesses, gaps, and areas for improvement. Be specific and constructive in your criticism.\n\nPitch deck content:\n${extractedText}`;
     }
 
     const completion = await openai.chat.completions.create({
       messages: [{ role: "user", content: prompt }],
-      model: "gpt-4-turbo-preview",
+      model: model,
       temperature: 0.7,
       max_tokens: 1000,
     });
@@ -69,7 +71,8 @@ Review the following pitch deck and provide feedback in your unique style.\n\nPi
     return NextResponse.json({ 
       success: true, 
       commentary,
-      vcStyle 
+      vcStyle,
+      model 
     });
 
   } catch (error) {
