@@ -1,187 +1,95 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useDropzone } from 'react-dropzone';
-import { motion } from 'framer-motion';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useDropzone } from 'react-dropzone';
 
 export default function UploadPage() {
-  const [isDragging, setIsDragging] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [commentary, setCommentary] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const [selectedVC, setSelectedVC] = useState<{ name: string; firm: string } | null>(null);
 
   useEffect(() => {
-    if (!localStorage.getItem('selectedVC')) {
-      router.replace('/feedback-style');
+    const storedVC = localStorage.getItem('selectedVC');
+    if (!storedVC) {
+      router.push('/select');
+      return;
+    }
+    setSelectedVC(JSON.parse(storedVC));
+  }, [router]);
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    if (acceptedFiles.length > 0) {
+      // Store the file in localStorage or state management
+      const file = acceptedFiles[0];
+      const reader = new FileReader();
+      reader.onload = () => {
+        localStorage.setItem('pitchDeck', reader.result as string);
+        router.push('/processing');
+      };
+      reader.readAsDataURL(file);
     }
   }, [router]);
 
-  const { getRootProps, getInputProps } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
     accept: {
       'application/pdf': ['.pdf'],
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation': ['.pptx'],
     },
-    maxFiles: 1,
-    onDrop: async (acceptedFiles) => {
-      if (acceptedFiles.length > 0) {
-        setFile(acceptedFiles[0]);
-        setIsProcessing(true);
-        setError(null);
-
-        // Upload the file
-        const formData = new FormData();
-        formData.append('file', acceptedFiles[0]);
-
-        try {
-          const uploadResponse = await fetch('/api/upload', {
-            method: 'POST',
-            body: formData,
-          });
-
-          if (!uploadResponse.ok) {
-            throw new Error('Failed to upload file');
-          }
-
-          const uploadData = await uploadResponse.json();
-
-          // Process the PDF
-          const processResponse = await fetch('/api/process', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              fileName: uploadData.fileName,
-              vcStyle: localStorage.getItem('selectedVC') || '',
-            }),
-          });
-
-          if (!processResponse.ok) {
-            throw new Error('Failed to process file');
-          }
-
-          const processData = await processResponse.json();
-          setCommentary(processData.commentary);
-          setIsProcessing(false);
-        } catch (error) {
-          console.error('Error:', error);
-          setError('Failed to process the file. Please try again.');
-          setIsProcessing(false);
-        }
-      }
-    },
+    multiple: false,
   });
 
+  if (!selectedVC) {
+    return null;
+  }
+
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="text-center mb-6">
-          <button
-            onClick={() => router.push('/feedback-style')}
-            className="mb-4 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
-          >
-            Change VC
-          </button>
-        </div>
+    <main className="min-h-screen bg-gray-50 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Upload Your Pitch Deck
           </h1>
-          <p className="text-lg text-gray-600">
-            Drag and drop your PDF to get instant VC feedback
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            {selectedVC.name} from {selectedVC.firm} is ready to review your pitch deck.
           </p>
         </div>
 
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          className="w-full mb-8"
+        <div
+          {...getRootProps()}
+          className={`max-w-2xl mx-auto p-12 border-2 border-dashed rounded-lg text-center cursor-pointer transition-colors ${
+            isDragActive
+              ? 'border-indigo-500 bg-indigo-50'
+              : 'border-gray-300 hover:border-indigo-500 hover:bg-gray-50'
+          }`}
         >
-          <div
-            {...getRootProps()}
-            className={`border-2 border-dashed rounded-lg p-12 cursor-pointer transition-colors
-              ${isDragging ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300 hover:border-indigo-400'}`}
-            onDragEnter={() => setIsDragging(true)}
-            onDragLeave={() => setIsDragging(false)}
-          >
-            <input {...getInputProps()} />
-            <div className="text-center">
-              <svg
-                className="mx-auto h-12 w-12 text-gray-400"
-                stroke="currentColor"
-                fill="none"
-                viewBox="0 0 48 48"
-                aria-hidden="true"
-              >
-                <path
-                  d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <p className="mt-4 text-lg text-gray-600">
-                {file ? `Selected: ${file.name}` : 'Drag and drop your PDF here, or click to select'}
+          <input {...getInputProps()} />
+          <div className="space-y-4">
+            <svg
+              className="mx-auto h-12 w-12 text-gray-400"
+              stroke="currentColor"
+              fill="none"
+              viewBox="0 0 48 48"
+              aria-hidden="true"
+            >
+              <path
+                d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <div className="text-gray-600">
+              <p className="text-lg font-medium">
+                {isDragActive ? 'Drop your file here' : 'Drag and drop your pitch deck here'}
               </p>
-              <p className="mt-2 text-sm text-gray-500">
-                Only PDF files are supported
-              </p>
+              <p className="text-sm">or click to select a file</p>
             </div>
+            <p className="text-xs text-gray-500">
+              Supports PDF and PPTX files
+            </p>
           </div>
-        </motion.div>
-
-        {isProcessing && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-8"
-          >
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-            <p className="text-indigo-600">Analyzing your pitch deck...</p>
-          </motion.div>
-        )}
-
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-red-50 border border-red-200 rounded-lg p-4 mb-8"
-          >
-            <p className="text-red-600">{error}</p>
-          </motion.div>
-        )}
-
-        {commentary && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-lg shadow-lg p-6"
-          >
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">VC Feedback</h2>
-            <div className="prose max-w-none">
-              {commentary.split('\n').map((paragraph, index) => (
-                <p key={index} className="mb-4 text-gray-700">
-                  {paragraph}
-                </p>
-              ))}
-            </div>
-            <div className="mt-8 flex justify-end">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => {
-                  setFile(null);
-                  setCommentary(null);
-                }}
-                className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors duration-200"
-              >
-                Upload Another Deck
-              </motion.button>
-            </div>
-          </motion.div>
-        )}
+        </div>
       </div>
     </main>
   );

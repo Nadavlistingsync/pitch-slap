@@ -1,93 +1,112 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-
-const steps = [
-  'Analyzing your deck structure...',
-  'Extracting content and images...',
-  'Applying your branding...',
-  'Optimizing layouts...',
-  'Finalizing design...',
-];
 
 export default function ProcessingPage() {
   const router = useRouter();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [progress, setProgress] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  const [commentary, setCommentary] = useState<string | null>(null);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(timer);
-          router.push('/preview');
-          return 100;
-        }
-        return prev + 1;
-      });
-    }, 50);
+    const processPitchDeck = async () => {
+      const pitchDeck = localStorage.getItem('pitchDeck');
+      const selectedVC = localStorage.getItem('selectedVC');
 
-    const stepTimer = setInterval(() => {
-      setCurrentStep((prev) => {
-        if (prev >= steps.length - 1) {
-          clearInterval(stepTimer);
-          return prev;
-        }
-        return prev + 1;
-      });
-    }, 2000);
+      if (!pitchDeck || !selectedVC) {
+        router.push('/select');
+        return;
+      }
 
-    return () => {
-      clearInterval(timer);
-      clearInterval(stepTimer);
+      try {
+        const response = await fetch('/api/process', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            pitchDeck,
+            vcStyle: JSON.parse(selectedVC).name,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to process pitch deck');
+        }
+
+        const data = await response.json();
+        setCommentary(data.commentary);
+      } catch (err) {
+        setError('Failed to process your pitch deck. Please try again.');
+        console.error('Error:', err);
+      }
     };
+
+    processPitchDeck();
   }, [router]);
 
-  return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-8">
-            Transforming Your Deck
-          </h1>
+  if (error) {
+    return (
+      <main className="min-h-screen bg-gray-50 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              Oops! Something went wrong
+            </h1>
+            <p className="text-xl text-gray-600 mb-8">{error}</p>
+            <button
+              onClick={() => router.push('/select')}
+              className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
-          <div className="mb-12">
-            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-              <motion.div
-                className="h-full bg-indigo-600"
-                initial={{ width: 0 }}
-                animate={{ width: `${progress}%` }}
-                transition={{ duration: 0.5 }}
-              />
+  if (commentary) {
+    return (
+      <main className="min-h-screen bg-gray-50 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl mx-auto">
+            <div className="bg-white rounded-lg shadow-lg p-8">
+              <h1 className="text-3xl font-bold text-gray-900 mb-6">VC Feedback</h1>
+              <div className="prose max-w-none">
+                {commentary.split('\n').map((paragraph, index) => (
+                  <p key={index} className="mb-4 text-gray-700">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+              <div className="mt-8 flex justify-end">
+                <button
+                  onClick={() => router.push('/select')}
+                  className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors"
+                >
+                  Get Another Review
+                </button>
+              </div>
             </div>
           </div>
+        </div>
+      </main>
+    );
+  }
 
-          <motion.div
-            key={currentStep}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="text-xl text-gray-600 mb-12"
-          >
-            {steps[currentStep]}
-          </motion.div>
-
-          <div className="grid grid-cols-2 gap-4">
-            {[1, 2, 3, 4].map((slide) => (
-              <motion.div
-                key={slide}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: slide * 0.1 }}
-                className="bg-white p-4 rounded-lg shadow-sm border border-gray-200"
-              >
-                <div className="aspect-[4/3] bg-gray-100 rounded flex items-center justify-center">
-                  <span className="text-gray-400">Slide {slide}</span>
-                </div>
-              </motion.div>
-            ))}
+  return (
+    <main className="min-h-screen bg-gray-50 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            Analyzing Your Pitch Deck
+          </h1>
+          <p className="text-xl text-gray-600 mb-8">
+            Our AI is reviewing your pitch deck and preparing detailed feedback...
+          </p>
+          <div className="flex justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
           </div>
         </div>
       </div>
