@@ -48,7 +48,7 @@ export default function UploadPage() {
             },
             body: JSON.stringify({
               fileName: uploadData.fileName,
-              feedbackStyle: localStorage.getItem('feedbackStyle') || 'helpful',
+              vcStyle: localStorage.getItem('selectedVC') || '',
             }),
           });
 

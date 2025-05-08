@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const { fileName, feedbackStyle } = await request.json();
+    const { fileName, vcStyle } = await request.json();
 
     if (!fileName) {
       return NextResponse.json(
@@ -39,16 +39,19 @@ export async function POST(request: NextRequest) {
     const extractedText = pdfData.text;
 
     // Generate VC-style commentary
-    const prompt = `As a venture capitalist, review this pitch deck and provide feedback in a ${feedbackStyle} style. Focus on:
-    1. Market opportunity and size
-    2. Business model and revenue potential
-    3. Team and execution capability
-    4. Competitive advantage
-    5. Financial projections and funding needs
-    6. Overall pitch effectiveness
+    // vcStyle format: 'Name | Firm | Description'
+    const [vcName, vcFirm, vcDesc] = (vcStyle || '').split(' | ');
+    const prompt = `You are ${vcName ? vcName : 'a top venture capitalist'}${vcFirm ? ` from ${vcFirm}` : ''}${vcDesc ? `, known for ${vcDesc}` : ''}.
+Review the following pitch deck and provide feedback in your unique style. Focus on:
+1. Market opportunity and size
+2. Business model and revenue potential
+3. Team and execution capability
+4. Competitive advantage
+5. Financial projections and funding needs
+6. Overall pitch effectiveness
 
-    Pitch deck content:
-    ${extractedText}`;
+Pitch deck content:
+${extractedText}`;
 
     const completion = await openai.chat.completions.create({
       messages: [{ role: "user", content: prompt }],
@@ -62,7 +65,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       success: true, 
       commentary,
-      feedbackStyle 
+      vcStyle 
     });
 
   } catch (error) {
