@@ -23,16 +23,27 @@ export default function UploadPage() {
     }
   }, [router]);
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
+  const onDrop = useCallback(async (acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
-      // Store the file in localStorage or state management
       const file = acceptedFiles[0];
-      const reader = new FileReader();
-      reader.onload = () => {
-        localStorage.setItem('pitchDeck', reader.result as string);
-        router.push('/processing');
-      };
-      reader.readAsDataURL(file);
+      const formData = new FormData();
+      formData.append('file', file);
+      try {
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        const data = await response.json();
+        if (data.success && data.fileName) {
+          localStorage.setItem('pitchDeck', data.fileName);
+          router.push('/processing');
+        } else {
+          alert(data.error || 'Failed to upload file.');
+        }
+      } catch (err) {
+        alert('Failed to upload file.');
+        console.error('Upload error:', err);
+      }
     }
   }, [router]);
 
