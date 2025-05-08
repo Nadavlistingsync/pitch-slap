@@ -76,8 +76,8 @@ export default function ProcessingPage() {
               <h1 className="text-3xl font-bold text-gray-900 mb-6">VC Feedback</h1>
               <div className="prose max-w-none">
                 {commentary.split('\n').map((paragraph, index) => (
-                  <p key={index} className="mb-4 text-gray-700">
-                    {paragraph}
+                  <p key={index} className="mb-4 text-gray-700 whitespace-pre-wrap">
+                    {paragraph.replace(/[#*]/g, '')}
                   </p>
                 ))}
               </div>
