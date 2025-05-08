@@ -40,8 +40,8 @@ export async function POST(request: NextRequest) {
     const extractedText = pdfData.text;
 
     // Find the VC prompt based on the vcId
-    const prompts = Array.from(vcPrompts) as Array<{ id: string; name: string; prompt: string; model: string }>;
-    const vcPrompt = prompts.find(vc => vc.id === vcId);
+    const prompts = Array.from(vcPrompts);
+    const vcPrompt = prompts.find(vc => vc.name === vcName);
     
     let prompt = '';
     let model = 'gpt-4'; // Default model
