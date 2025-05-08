@@ -72,9 +72,9 @@ Review the following pitch deck and provide critical feedback. Focus on identify
 
   } catch (error) {
     console.error('Error processing PDF:', error);
-    // DEBUG: Return the actual error message for troubleshooting (REMOVE IN PRODUCTION)
+    // Always return the error details for debugging
     return NextResponse.json(
-      { error: 'Failed to process PDF.', details: error instanceof Error ? error.message : String(error) },
+      { error: 'Failed to process PDF.', details: error && (error instanceof Error ? error.message : String(error)), stack: error && error.stack ? error.stack : undefined },
       { status: 500 }
     );
   }
