@@ -31,7 +31,7 @@ body {
 
 @layer components {
   .btn-primary {
-    @apply bg-primary text-white px-6 py-3 rounded-2xl font-semibold hover:bg-primary/90 transition-colors shadow-custom;
+    @apply bg-[#ff4154] text-white px-6 py-3 rounded-2xl font-semibold hover:bg-[#ff4154]/90 transition-colors shadow-custom;
   }
   
   .card {
@@ -39,7 +39,7 @@ body {
   }
 
   .input-field {
-    @apply w-full px-4 py-3 rounded-2xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all;
+    @apply w-full px-4 py-3 rounded-2xl border border-gray-200 focus:border-[#ff4154] focus:ring-2 focus:ring-[#ff4154]/20 outline-none transition-all;
   }
 }
 
