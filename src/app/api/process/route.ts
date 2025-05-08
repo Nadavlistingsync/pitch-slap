@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 import OpenAI from 'openai';
-import { vcPrompts } from '@/lib/vcPrompts';
+import { vcPrompts, VCPrompt } from '@/lib/vcPrompts';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -40,7 +40,8 @@ export async function POST(request: NextRequest) {
     const extractedText = pdfData.text;
 
     // Find the VC prompt based on the vcId
-    const vcPrompt = vcPrompts.find(vc => vc.id === vcId);
+    const prompts = Array.from(vcPrompts) as Array<{ id: string; name: string; prompt: string; model: string }>;
+    const vcPrompt = prompts.find(vc => vc.id === vcId);
     
     let prompt = '';
     let model = 'gpt-4'; // Default model

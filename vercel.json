@@ -1,5 +1,12 @@
 {
   "version": 2,
   "framework": "nextjs",
-  "regions": ["iad1"]
+  "buildCommand": "next build",
+  "devCommand": "next dev",
+  "installCommand": "npm install",
+  "regions": ["iad1"],
+  "github": {
+    "enabled": true,
+    "silent": true
+  }
 } 

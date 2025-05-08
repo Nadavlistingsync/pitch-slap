@@ -1,11 +1,11 @@
-interface VCPrompt {
+export interface VCPrompt {
   id: string;
   name: string;
   prompt: string;
   model: string;
 }
 
-export const vcPrompts: VCPrompt[] = [
+const vcPromptsData: VCPrompt[] = [
   {
     id: 'sequoia',
     name: 'Sequoia Capital',
@@ -66,4 +66,6 @@ Review the following pitch deck with these key criteria in mind:
 Be direct, specific, and focus on the most critical aspects that would make or break the investment decision.`,
     model: 'gpt-4'
   }
-]; 
+];
+
+export const vcPrompts: readonly VCPrompt[] = vcPromptsData; 
