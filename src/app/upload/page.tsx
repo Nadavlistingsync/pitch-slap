@@ -1,49 +1,20 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { useRouter } from 'next/navigation';
 
 export default function UploadPage() {
   const router = useRouter();
-  const [selectedVC, setSelectedVC] = useState<{ name: string; firm: string } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
 
-  useEffect(() => {
-    const storedVC = localStorage.getItem('selectedVC');
-    if (!storedVC) {
-      router.push('/feedback-style');
-      return;
-    }
-    try {
-      const parsedVC = JSON.parse(storedVC);
-      setSelectedVC(parsedVC);
-    } catch (error) {
-      console.error('Error parsing stored VC:', error);
-      router.push('/feedback-style');
-    }
-  }, [router]);
-
-  const onDrop = useCallback(async (acceptedFiles: File[]) => {
-    if (acceptedFiles.length > 0) {
-      const file = acceptedFiles[0];
-      const formData = new FormData();
-      formData.append('file', file);
-      try {
-        const response = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData,
-        });
-        const data = await response.json();
-        if (data.success && data.fileName) {
-          localStorage.setItem('pitchDeck', data.fileName);
-          router.push('/processing');
-        } else {
-          alert(data.error || 'Failed to upload file.');
-        }
-      } catch (err) {
-        alert('Failed to upload file.');
-        console.error('Upload error:', err);
-      }
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    const file = acceptedFiles[0];
+    if (file) {
+      setFile(file);
+      localStorage.setItem('pitchDeck', file.name);
+      router.push('/select');
     }
   }, [router]);
 
@@ -52,60 +23,53 @@ export default function UploadPage() {
     accept: {
       'application/pdf': ['.pdf'],
       'application/vnd.openxmlformats-officedocument.presentationml.presentation': ['.pptx'],
+      'application/vnd.ms-powerpoint': ['.ppt']
     },
-    multiple: false,
+    maxFiles: 1,
+    multiple: false
   });
 
-  if (!selectedVC) {
-    return null;
-  }
-
   return (
-    <main className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Upload Your Pitch Deck
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            {selectedVC.name} from {selectedVC.firm} is ready to review your pitch deck.
+          <h1 className="text-4xl font-bold text-[#2e2e2e] mb-4">Upload Your Pitch Deck</h1>
+          <p className="text-xl text-gray-600">
+            Drag and drop your pitch deck or click to browse
           </p>
         </div>
 
         <div
           {...getRootProps()}
-          className={`max-w-2xl mx-auto p-12 border-2 border-dashed rounded-lg text-center cursor-pointer transition-colors ${
-            isDragActive
-              ? 'border-indigo-500 bg-indigo-50'
-              : 'border-gray-300 hover:border-indigo-500 hover:bg-gray-50'
-          }`}
+          className={`card border-2 border-dashed transition-all duration-200 cursor-pointer
+            ${isDragActive ? 'border-[#ff4154] bg-[#ff4154]/5' : 'border-gray-300 hover:border-[#ff4154]/50'}
+            ${isDragging ? 'scale-105' : ''}`}
+          onDragEnter={() => setIsDragging(true)}
+          onDragLeave={() => setIsDragging(false)}
         >
-          <input {...getInputProps()} />
-          <div className="space-y-4">
-            <svg
-              className="mx-auto h-12 w-12 text-gray-400"
-              stroke="currentColor"
-              fill="none"
-              viewBox="0 0 48 48"
-              aria-hidden="true"
-            >
-              <path
-                d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <div className="text-gray-600">
-              <p className="text-lg font-medium">
-                {isDragActive ? 'Drop your file here' : 'Drag and drop your pitch deck here'}
-              </p>
-              <p className="text-sm">or click to select a file</p>
+          <div className="text-center py-12">
+            <div className="w-16 h-16 bg-[#ff4154]/10 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-8 h-8 text-[#ff4154]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
             </div>
-            <p className="text-xs text-gray-500">
-              Supports PDF and PPTX files
+            <input {...getInputProps()} />
+            <p className="text-lg font-semibold text-[#2e2e2e] mb-2">
+              {isDragActive ? 'Drop your pitch deck here' : 'Drag & drop your pitch deck'}
+            </p>
+            <p className="text-gray-500">
+              Supports PDF, PPT, and PPTX files
             </p>
           </div>
+        </div>
+
+        <div className="mt-8 text-center">
+          <p className="text-sm text-gray-500">
+            By uploading your pitch deck, you agree to our{' '}
+            <a href="#" className="text-[#ff4154] hover:underline">Terms of Service</a>
+            {' '}and{' '}
+            <a href="#" className="text-[#ff4154] hover:underline">Privacy Policy</a>
+          </p>
         </div>
       </div>
     </main>
