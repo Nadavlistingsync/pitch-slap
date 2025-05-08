@@ -25,7 +25,7 @@ export default function ProcessingPage() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            pitchDeck,
+            fileName: pitchDeck,
             vcStyle: JSON.parse(selectedVC).name,
           }),
         });
@@ -35,10 +35,11 @@ export default function ProcessingPage() {
         }
 
         const data = await response.json();
+        console.log('API response:', data);
         setCommentary(data.commentary);
       } catch (err) {
         setError('Failed to process your pitch deck. Please try again.');
-        console.error('Error:', err);
+        console.error('Error during pitch deck processing:', err);
       }
     };
 
