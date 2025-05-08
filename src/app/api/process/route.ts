@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 import OpenAI from 'openai';
+import { vcPrompts } from '@/lib/vcPrompts';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -40,18 +41,21 @@ export async function POST(request: NextRequest) {
 
     // Generate VC-style commentary
     // vcStyle format: 'Name | Firm | Description'
-    const [vcName, vcFirm, vcDesc] = (vcStyle || '').split(' | ');
-    const prompt = `You are ${vcName ? vcName : 'a top venture capitalist'}${vcFirm ? ` from ${vcFirm}` : ''}${vcDesc ? `, known for ${vcDesc}` : ''}.
-Review the following pitch deck and provide feedback in your unique style. Focus on:
-1. Market opportunity and size
-2. Business model and revenue potential
-3. Team and execution capability
-4. Competitive advantage
-5. Financial projections and funding needs
-6. Overall pitch effectiveness
-
-Pitch deck content:
-${extractedText}`;
+    let prompt = '';
+    if (vcStyle) {
+      const [vcName, vcFirm] = vcStyle.split(' | ');
+      const vcPrompt = vcPrompts.find(
+        (vc) => vc.name === vcName && vc.firm === vcFirm
+      );
+      if (vcPrompt) {
+        prompt = `${vcPrompt.prompt}\n\nPitch deck content:\n${extractedText}`;
+      } else {
+        prompt = `You are ${vcName ? vcName : 'a top venture capitalist'}${vcFirm ? ` from ${vcFirm}` : ''}.
+Review the following pitch deck and provide feedback in your unique style.\n\nPitch deck content:\n${extractedText}`;
+      }
+    } else {
+      prompt = `You are a top venture capitalist. Review the following pitch deck and provide feedback.\n\nPitch deck content:\n${extractedText}`;
+    }
 
     const completion = await openai.chat.completions.create({
       messages: [{ role: "user", content: prompt }],
