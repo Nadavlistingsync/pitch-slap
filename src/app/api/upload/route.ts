@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(bytes);
 
     const fileName = generateUniqueFileName(file.name);
-    const filePath = join(process.cwd(), 'uploads', fileName);
+    const filePath = '/tmp/uploads/' + fileName;
 
     await writeFile(filePath, buffer);
 

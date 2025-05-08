@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const filePath = join(process.cwd(), 'uploads', fileName);
+    const filePath = '/tmp/uploads/' + fileName;
     const dataBuffer = await readFile(filePath);
     
     // Dynamically import pdf-parse only when needed
