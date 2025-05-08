@@ -4,6 +4,21 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import confetti from 'canvas-confetti';
 
+const getVCName = (vcId: string) => {
+  switch (vcId) {
+    case 'sequoia':
+      return 'Sequoia Capital';
+    case 'andreessen':
+      return 'Andreessen Horowitz';
+    case 'accel':
+      return 'Accel';
+    case 'ycombinator':
+      return 'Y Combinator';
+    default:
+      return 'VC';
+  }
+};
+
 export default function ProcessingPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -16,7 +31,7 @@ export default function ProcessingPage() {
       const selectedVC = localStorage.getItem('selectedVC');
 
       if (!pitchDeck || !selectedVC) {
-        router.push('/select');
+        router.push('/');
         return;
       }
 
@@ -39,7 +54,8 @@ export default function ProcessingPage() {
           },
           body: JSON.stringify({
             fileName: pitchDeck,
-            vcStyle: JSON.parse(selectedVC).name,
+            vcId: selectedVC,
+            vcName: getVCName(selectedVC),
           }),
         });
 
@@ -77,7 +93,7 @@ export default function ProcessingPage() {
             </h1>
             <p className="text-xl text-gray-600 mb-8">{error}</p>
             <button
-              onClick={() => router.push('/select')}
+              onClick={() => router.push('/')}
               className="btn-primary"
             >
               Try Again
@@ -89,12 +105,18 @@ export default function ProcessingPage() {
   }
 
   if (commentary) {
+    const selectedVC = localStorage.getItem('selectedVC');
+    const vcName = getVCName(selectedVC || '');
+
     return (
       <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto">
             <div className="card">
-              <h1 className="text-3xl font-bold text-[#2e2e2e] mb-6">VC Feedback</h1>
+              <div className="flex items-center justify-between mb-6">
+                <h1 className="text-3xl font-bold text-[#2e2e2e]">VC Feedback</h1>
+                <span className="text-lg font-medium text-[#ff4154]">{vcName}</span>
+              </div>
               <div className="prose max-w-none">
                 {commentary.split('\n').map((paragraph, index) => (
                   <p key={index} className="mb-4 text-gray-700 whitespace-pre-wrap">
@@ -104,7 +126,7 @@ export default function ProcessingPage() {
               </div>
               <div className="mt-8 flex justify-end">
                 <button
-                  onClick={() => router.push('/select')}
+                  onClick={() => router.push('/')}
                   className="btn-primary"
                 >
                   Get Another Review

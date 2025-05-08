@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const { fileName, vcStyle } = await request.json();
+    const { fileName, vcId, vcName } = await request.json();
 
     if (!fileName) {
       return NextResponse.json(
@@ -39,24 +39,18 @@ export async function POST(request: NextRequest) {
     const pdfData = await pdfParse(dataBuffer);
     const extractedText = pdfData.text;
 
-    // Generate VC-style commentary
-    // vcStyle format: 'Name | Firm | Description'
+    // Find the VC prompt based on the vcId
+    const vcPrompt = vcPrompts.find(vc => vc.id === vcId);
+    
     let prompt = '';
-    let model = 'gpt-4o-mini'; // Default model
-    if (vcStyle) {
-      const [vcName, vcFirm] = vcStyle.split(' | ');
-      const vcPrompt = vcPrompts.find(
-        (vc) => vc.name === vcName && vc.firm === vcFirm
-      );
-      if (vcPrompt) {
-        prompt = `${vcPrompt.prompt}\n\nReview the following pitch deck and provide critical feedback. Focus on identifying weaknesses, gaps, and areas for improvement. Be specific and constructive in your criticism.\n\nPitch deck content:\n${extractedText}`;
-        model = vcPrompt.model;
-      } else {
-        prompt = `You are ${vcName ? vcName : 'a top venture capitalist'}${vcFirm ? ` from ${vcFirm}` : ''}.
-Review the following pitch deck and provide critical feedback. Focus on identifying weaknesses, gaps, and areas for improvement. Be specific and constructive in your criticism.\n\nPitch deck content:\n${extractedText}`;
-      }
+    let model = 'gpt-4'; // Default model
+
+    if (vcPrompt) {
+      prompt = `${vcPrompt.prompt}\n\nReview the following pitch deck and provide critical feedback. Focus on identifying weaknesses, gaps, and areas for improvement. Be specific and constructive in your criticism.\n\nPitch deck content:\n${extractedText}`;
+      model = vcPrompt.model;
     } else {
-      prompt = `You are a top venture capitalist. Review the following pitch deck and provide critical feedback. Focus on identifying weaknesses, gaps, and areas for improvement. Be specific and constructive in your criticism.\n\nPitch deck content:\n${extractedText}`;
+      prompt = `You are ${vcName || 'a top venture capitalist'}.
+Review the following pitch deck and provide critical feedback. Focus on identifying weaknesses, gaps, and areas for improvement. Be specific and constructive in your criticism.\n\nPitch deck content:\n${extractedText}`;
     }
 
     const completion = await openai.chat.completions.create({
@@ -71,7 +65,7 @@ Review the following pitch deck and provide critical feedback. Focus on identify
     return NextResponse.json({ 
       success: true, 
       commentary,
-      vcStyle,
+      vcName,
       model 
     });
 

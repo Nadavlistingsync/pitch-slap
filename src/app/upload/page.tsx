@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useRouter } from 'next/navigation';
 
@@ -8,13 +8,23 @@ export default function UploadPage() {
   const router = useRouter();
   const [isDragging, setIsDragging] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [selectedVC, setSelectedVC] = useState<string | null>(null);
+
+  useEffect(() => {
+    const vc = localStorage.getItem('selectedVC');
+    if (!vc) {
+      router.push('/');
+    } else {
+      setSelectedVC(vc);
+    }
+  }, [router]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (file) {
       setFile(file);
       localStorage.setItem('pitchDeck', file.name);
-      router.push('/select');
+      router.push('/processing');
     }
   }, [router]);
 
@@ -29,13 +39,20 @@ export default function UploadPage() {
     multiple: false
   });
 
+  if (!selectedVC) {
+    return null;
+  }
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-[#2e2e2e] mb-4">Upload Your Pitch Deck</h1>
           <p className="text-xl text-gray-600">
-            Drag and drop your pitch deck or click to browse
+            Get feedback from {selectedVC === 'sequoia' ? 'Sequoia Capital' :
+              selectedVC === 'andreessen' ? 'Andreessen Horowitz' :
+              selectedVC === 'accel' ? 'Accel' :
+              'Y Combinator'}
           </p>
         </div>
 

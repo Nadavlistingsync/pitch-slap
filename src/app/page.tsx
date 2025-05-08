@@ -1,18 +1,23 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import Link from 'next/link';
+import VCSelector from './components/VCSelector';
 
 export default function Home() {
   const router = useRouter();
+  const [selectedVC, setSelectedVC] = useState<string>('');
+  const [showUpload, setShowUpload] = useState(false);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
+      // Store the selected VC in localStorage for use in the upload process
+      localStorage.setItem('selectedVC', selectedVC);
       router.push('/upload');
     }
-  }, [router]);
+  }, [router, selectedVC]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -22,6 +27,11 @@ export default function Home() {
     },
     multiple: false,
   });
+
+  const handleVCSelect = (vcId: string) => {
+    setSelectedVC(vcId);
+    setShowUpload(true);
+  };
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -42,14 +52,51 @@ export default function Home() {
             <p className="mt-6 text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto">
               Upload your pitch deck and get brutally honest feedback from AI-powered VCs. Transform your pitch and increase your chances of getting funded.
             </p>
-            <div className="mt-10">
-              <Link href="/upload" className="btn-primary text-lg px-8 py-4">
-                Upload Your Pitch Deck
-              </Link>
-            </div>
           </div>
         </div>
       </div>
+
+      {/* VC Selection Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <VCSelector onSelect={handleVCSelect} />
+      </div>
+
+      {/* Upload Section */}
+      {showUpload && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="text-center">
+            <div
+              {...getRootProps()}
+              className={`mt-10 p-12 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+                isDragActive ? 'border-[#ff4154] bg-[#ff4154]/5' : 'border-gray-300 hover:border-[#ff4154]'
+              }`}
+            >
+              <input {...getInputProps()} />
+              <div className="space-y-4">
+                <svg
+                  className="mx-auto h-12 w-12 text-gray-400"
+                  stroke="currentColor"
+                  fill="none"
+                  viewBox="0 0 48 48"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                <div className="text-gray-600">
+                  <p className="text-lg font-medium">Drop your pitch deck here</p>
+                  <p className="text-sm">or click to select a file</p>
+                  <p className="text-xs mt-2">Supports PDF and PPTX files</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Features Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
