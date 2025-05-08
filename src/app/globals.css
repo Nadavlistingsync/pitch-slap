@@ -31,11 +31,11 @@ body {
 
 @layer components {
   .btn-primary {
-    @apply bg-[#ff4154] text-white px-6 py-3 rounded-2xl font-semibold hover:bg-[#ff4154]/90 transition-colors shadow-custom;
+    @apply bg-[#ff4154] text-white px-6 py-3 rounded-2xl font-semibold hover:bg-[#ff4154]/90 transition-colors shadow-[0_4px_20px_rgba(0,0,0,0.2)];
   }
   
   .card {
-    @apply bg-white rounded-2xl shadow-custom p-6;
+    @apply bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.2)] p-6;
   }
 
   .input-field {
