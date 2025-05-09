@@ -7,10 +7,12 @@ import { vcPrompts } from '@/lib/vcPrompts';
 export default function SelectPage() {
   const router = useRouter();
   const [selectedVC, setSelectedVC] = useState<string | null>(null);
+  const [roastIntensity, setRoastIntensity] = useState<'gentle' | 'balanced' | 'brutal'>('balanced');
 
   const handleSelect = (vc: typeof vcPrompts[0]) => {
     setSelectedVC(vc.id);
     localStorage.setItem('selectedVC', vc.id);
+    localStorage.setItem('roastIntensity', roastIntensity);
     router.push('/upload');
   };
 
@@ -24,15 +26,23 @@ export default function SelectPage() {
           </p>
         </div>
 
-        {/* Roast Intensity Meter */}
+        {/* Roast Intensity Selector */}
         <div className="max-w-md mx-auto mb-12">
           <div className="card">
             <h3 className="text-lg font-semibold mb-4">Roast Intensity</h3>
-            <div className="relative h-4 bg-gray-200 rounded-full overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-green-400 via-yellow-400 to-[#ff4154]"></div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-2 h-8 bg-white rounded-full shadow-lg"></div>
-              </div>
+            <div className="flex justify-between items-center mb-2">
+              <label className={`cursor-pointer px-3 py-1 rounded-lg ${roastIntensity === 'gentle' ? 'bg-green-400 text-white' : 'bg-gray-100 text-gray-700'}`}> 
+                <input type="radio" name="roastIntensity" value="gentle" checked={roastIntensity === 'gentle'} onChange={() => setRoastIntensity('gentle')} className="mr-2" />
+                Gentle
+              </label>
+              <label className={`cursor-pointer px-3 py-1 rounded-lg ${roastIntensity === 'balanced' ? 'bg-yellow-400 text-white' : 'bg-gray-100 text-gray-700'}`}> 
+                <input type="radio" name="roastIntensity" value="balanced" checked={roastIntensity === 'balanced'} onChange={() => setRoastIntensity('balanced')} className="mr-2" />
+                Balanced
+              </label>
+              <label className={`cursor-pointer px-3 py-1 rounded-lg ${roastIntensity === 'brutal' ? 'bg-[#ff4154] text-white' : 'bg-gray-100 text-gray-700'}`}> 
+                <input type="radio" name="roastIntensity" value="brutal" checked={roastIntensity === 'brutal'} onChange={() => setRoastIntensity('brutal')} className="mr-2" />
+                Brutal
+              </label>
             </div>
             <div className="flex justify-between mt-2 text-sm text-gray-600">
               <span>Gentle</span>
