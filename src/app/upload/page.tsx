@@ -19,27 +19,29 @@ export default function UploadPage() {
     }
   }, [router]);
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
+  const onDrop = useCallback(async (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
-    if (file) {
-      setFile(file);
-      // Read file as array buffer and store in sessionStorage
-      const reader = new FileReader();
-      reader.onload = () => {
-        const arrayBuffer = reader.result as ArrayBuffer;
-        const uint8Array = new Uint8Array(arrayBuffer);
-        // Store file data, name, and type in sessionStorage
-        window.sessionStorage.setItem('pitchDeckFile', JSON.stringify({
-          name: file.name,
-          type: file.type,
-          data: Array.from(uint8Array)
-        }));
-        // Navigate to processing page
+    if (file && selectedVC) {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('vcName', selectedVC);
+
+      // Optionally show a loading state here
+      const response = await fetch('/api/process', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        // Optionally store the result or commentary in sessionStorage/localStorage
+        // and route to /processing
+        window.sessionStorage.setItem('processingResult', await response.text());
         router.push('/processing');
-      };
-      reader.readAsArrayBuffer(file);
+      } else {
+        alert('Failed to process your pitch deck. Please try again.');
+      }
     }
-  }, [router]);
+  }, [router, selectedVC]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,

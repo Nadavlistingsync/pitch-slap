@@ -26,62 +26,19 @@ export default function ProcessingPage() {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const processPitchDeck = async () => {
-      // Get file and VC from sessionStorage (or however you store them)
-      const fileData = window.sessionStorage.getItem('pitchDeckFile');
-      const selectedVC = window.sessionStorage.getItem('selectedVC');
-      if (!fileData || !selectedVC) {
-        router.push('/');
-        return;
-      }
-      // Reconstruct the File object from base64 (if needed)
-      const file = JSON.parse(fileData);
-      const realFile = new File([Uint8Array.from(file.data)], file.name, { type: file.type });
-
+    // Read the result from sessionStorage and display it
+    const result = window.sessionStorage.getItem('processingResult');
+    if (result) {
       try {
-        // Simulate progress
-        const interval = setInterval(() => {
-          setProgress(prev => {
-            if (prev >= 90) {
-              clearInterval(interval);
-              return 90;
-            }
-            return prev + 10;
-          });
-        }, 1000);
-
-        const formData = new FormData();
-        formData.append('file', realFile);
-        formData.append('vcName', selectedVC);
-
-        const response = await fetch('/api/process', {
-          method: 'POST',
-          body: formData,
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to process pitch deck');
-        }
-
-        const data = await response.json();
-        setProgress(100);
-        clearInterval(interval);
+        const data = JSON.parse(result);
         setCommentary(data.commentary);
-
-        // Trigger confetti when processing is complete
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 }
-        });
-      } catch (err) {
-        setError('Failed to process your pitch deck. Please try again.');
-        console.error('Error during pitch deck processing:', err);
+      } catch (e) {
+        setError('Failed to parse processing result.');
       }
-    };
-
-    processPitchDeck();
-  }, [router]);
+    } else {
+      setError('No processing result found.');
+    }
+  }, []);
 
   if (error) {
     return (
