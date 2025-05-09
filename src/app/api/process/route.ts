@@ -6,6 +6,15 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+// Map old VC IDs to new IDs in vcPrompts
+const idMap: Record<string, string> = {
+  sequoia: 'jean-de-la-rochebrochard',
+  andreessen: 'alice-zagury',
+  accel: 'marie-ekeland',
+  yc: 'nicolas-debock',
+  // Add more mappings as needed
+};
+
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
@@ -43,9 +52,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unsupported file type.' }, { status: 400 });
     }
 
-    // Find the VC prompt by id
-    const vcPrompt = vcPrompts.find(vc => vc.id === vcId);
-    console.log('[API/process] VC prompt lookup:', { vcId, found: !!vcPrompt });
+    // Map old VC IDs to new ones if needed
+    const realVcId = idMap[vcId ?? ''] || vcId;
+    const vcPrompt = vcPrompts.find(vc => vc.id === realVcId);
+    console.log('[API/process] VC prompt lookup:', { vcId, realVcId, found: !!vcPrompt });
 
     let prompt = '';
     let model = 'gpt-4';
