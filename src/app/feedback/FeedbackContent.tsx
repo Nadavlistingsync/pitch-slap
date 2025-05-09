@@ -3,30 +3,59 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import FeedbackDisplay from '../components/FeedbackDisplay';
+import { vcPrompts } from '@/lib/vcPrompts';
 
 export default function FeedbackContent() {
   const searchParams = useSearchParams();
   const [feedback, setFeedback] = useState('');
   const vcId = searchParams.get('vcId') || '';
+  const vcPrompt = vcPrompts.find(vc => vc.id === vcId);
 
   useEffect(() => {
-    // Simulate getting feedback from the API
-    const mockFeedback = `LMAO, just finished reviewing your deck and... where do I even begin? 😂
+    // Get random vulgar feedback templates
+    const feedbackTemplates = [
+      `yo wtf is this shit? 🤦‍♂️ just looked at ur deck and holy fuck, where do I even start?
 
-Your market sizing is straight up delusional. "Billion dollar market" my ass! You're not even close to product-market fit, and your burn rate is giving me anxiety.
+ur market sizing is straight bullshit. "billion dollar market" my ass! ur not even close to product-market fit and ur burn rate is giving me fucking anxiety
 
-But hey, I actually like your team. They seem smart enough to not completely fuck this up. Just... maybe don't quit your day job yet? 
+ngl tho, ur team doesn't look completely useless. might actually have half a brain. but don't quit ur day jobs yet lmao 
 
-Here's what you need to fix:
-1. Your go-to-market strategy is basically "we'll figure it out" - that's not gonna cut it
-2. Your competition slide is missing like 5 major players
-3. Your financial projections are making me laugh harder than a Frenchman watching American football
+fix this shit:
+1. ur go-to-market strategy is basically "trust me bro" - fuck outta here with that
+2. competition slide missing like 5 major players. do u even google?
+3. financial projections so wild im dying 💀
 
-Keep it real, and maybe we'll talk again when you've got some actual traction.`;
+get ur shit together and maybe we'll talk when u have actual users, not just ur mom testing the app`,
 
-    // Simulate typing delay
+      `bruh... 😩 just wasted 10 mins of my life on this deck
+
+ur valuation is smoking crack fr fr. who told u this was worth $50M? ur imaginary friends?
+
+look, im gonna keep it 💯 with u:
+1. ur unit economics are fucked sideways
+2. customer acquisition cost is higher than my ex's shopping bills
+3. ur tech stack is held together with duct tape and prayers
+
+hit me back when u stop playing startup and get serious`,
+
+      `bruhhh what did i just read? 🤣
+
+ur pitch deck got me rolling but not in a good way. this shit's more delusional than my crypto portfolio in 2021
+
+real talk:
+1. tf is this revenue model? u pulling numbers out ur ass?
+2. ur market research is weaker than gas station wifi
+3. competitive advantage = "we're different" ... bitch how??
+
+slide in my dms when u fix this trainwreck`
+    ];
+
+    // Pick a random template
+    const randomTemplate = feedbackTemplates[Math.floor(Math.random() * feedbackTemplates.length)];
+
+    // Simulate API delay
     setTimeout(() => {
-      setFeedback(mockFeedback);
+      setFeedback(randomTemplate);
     }, 1000);
   }, []);
 

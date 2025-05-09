@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { vcPrompts } from '@/lib/vcPrompts';
+import Image from 'next/image';
 
 interface FeedbackDisplayProps {
   feedback: string;
@@ -10,60 +11,54 @@ interface FeedbackDisplayProps {
 
 export default function FeedbackDisplay({ feedback, vcId }: FeedbackDisplayProps) {
   const [displayedFeedback, setDisplayedFeedback] = useState('');
-  const [isTyping, setIsTyping] = useState(true);
-  const vc = vcPrompts.find(v => v.id === vcId);
+  const [isTyping, setIsTyping] = useState(false);
+  const vcPrompt = vcPrompts.find(vc => vc.id === vcId);
 
   useEffect(() => {
     if (!feedback) return;
-    
-    // Split feedback into sentences for more natural typing effect
-    const sentences = feedback.split(/(?<=[.!?])\s+/);
-    let currentIndex = 0;
-    
-    const typeNextSentence = () => {
-      if (currentIndex < sentences.length) {
-        setDisplayedFeedback(prev => prev + (currentIndex === 0 ? '' : ' ') + sentences[currentIndex]);
-        currentIndex++;
-        setTimeout(typeNextSentence, Math.random() * 1000 + 500); // Random typing speed
-      } else {
-        setIsTyping(false);
-      }
-    };
 
-    typeNextSentence();
+    setIsTyping(true);
+    let currentText = '';
+    const words = feedback.split(' ');
+    let currentIndex = 0;
+
+    const typingInterval = setInterval(() => {
+      if (currentIndex >= words.length) {
+        clearInterval(typingInterval);
+        setIsTyping(false);
+        return;
+      }
+
+      currentText += (currentIndex === 0 ? '' : ' ') + words[currentIndex];
+      setDisplayedFeedback(currentText);
+      currentIndex++;
+    }, 100); // Adjust speed as needed
+
+    return () => clearInterval(typingInterval);
   }, [feedback]);
 
-  if (!vc) return null;
-
   return (
-    <div className="max-w-2xl mx-auto p-4">
-      <div className="bg-gray-100 rounded-2xl p-4 shadow-lg">
-        {/* VC Profile Header */}
-        <div className="flex items-center space-x-3 mb-4">
-          <div className="w-12 h-12 bg-[#ff4154]/10 rounded-full flex items-center justify-center flex-shrink-0">
-            <span className="text-lg font-bold text-[#ff4154]">
-              {vc.name.split(' ').map(n => n[0]).join('')}
+    <div className="max-w-2xl mx-auto bg-gray-100 rounded-lg p-4">
+      <div className="flex items-center space-x-4 mb-4">
+        <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">
+          {vcPrompt?.name.charAt(0) || 'V'}
+        </div>
+        <div>
+          <h3 className="font-bold text-lg">{vcPrompt?.name || 'VC'}</h3>
+          <p className="text-sm text-gray-600">{vcPrompt?.firm || ''}</p>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <div className="bg-blue-500 text-white p-4 rounded-2xl rounded-tl-none max-w-[80%] whitespace-pre-wrap">
+          {displayedFeedback}
+          {isTyping && (
+            <span className="inline-block">
+              <span className="animate-pulse">•</span>
+              <span className="animate-pulse delay-100">•</span>
+              <span className="animate-pulse delay-200">•</span>
             </span>
-          </div>
-          <div>
-            <h3 className="font-semibold text-gray-900">{vc.name}</h3>
-            <p className="text-sm text-gray-500">{vc.firm}</p>
-          </div>
-        </div>
-
-        {/* Message Bubble */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm mb-2">
-          <div className="text-gray-800 whitespace-pre-wrap">
-            {displayedFeedback}
-            {isTyping && (
-              <span className="inline-block w-2 h-4 bg-gray-400 ml-1 animate-pulse"></span>
-            )}
-          </div>
-        </div>
-
-        {/* Message Time */}
-        <div className="text-xs text-gray-500 text-right">
-          {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          )}
         </div>
       </div>
     </div>
