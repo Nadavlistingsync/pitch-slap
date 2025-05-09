@@ -23,8 +23,21 @@ export default function UploadPage() {
     const file = acceptedFiles[0];
     if (file) {
       setFile(file);
-      localStorage.setItem('pitchDeck', file.name);
-      router.push('/processing');
+      // Read file as array buffer and store in sessionStorage
+      const reader = new FileReader();
+      reader.onload = () => {
+        const arrayBuffer = reader.result as ArrayBuffer;
+        const uint8Array = new Uint8Array(arrayBuffer);
+        // Store file data, name, and type in sessionStorage
+        window.sessionStorage.setItem('pitchDeckFile', JSON.stringify({
+          name: file.name,
+          type: file.type,
+          data: Array.from(uint8Array)
+        }));
+        // Navigate to processing page
+        router.push('/processing');
+      };
+      reader.readAsArrayBuffer(file);
     }
   }, [router]);
 

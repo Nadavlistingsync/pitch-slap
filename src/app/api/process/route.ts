@@ -1,84 +1,75 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readFile } from 'fs/promises';
-import { join } from 'path';
 import OpenAI from 'openai';
-import { vcPrompts, VCPrompt } from '@/lib/vcPrompts';
+import { vcPrompts } from '@/lib/vcPrompts';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Skip PDF processing during build time
-const isBuildTime = process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV;
-
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    // Skip processing during build time
-    if (isBuildTime) {
-      return NextResponse.json({ 
-        success: true, 
-        commentary: "API is ready for processing",
-        feedbackStyle: "default"
-      });
+    const formData = await req.formData();
+    const file = formData.get('file') as File | null;
+    const vcName = formData.get('vcName') as string | null;
+
+    if (!file) {
+      return NextResponse.json({ error: 'No file uploaded.' }, { status: 400 });
     }
 
-    const { fileName, vcId, vcName } = await request.json();
+    // Read the file buffer directly
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
-    if (!fileName) {
-      return NextResponse.json(
-        { error: 'No file name provided.' },
-        { status: 400 }
-      );
+    let extractedText = '';
+    if (file.type === 'application/pdf') {
+      try {
+        const pdfParse = (await import('pdf-parse')).default;
+        const pdfData = await pdfParse(buffer);
+        extractedText = pdfData.text;
+      } catch (err) {
+        return NextResponse.json({ error: 'Failed to parse PDF.' }, { status: 400 });
+      }
+    } else if (file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') {
+      // Optionally: handle PPTX parsing here if needed
+      extractedText = `PPTX file uploaded: ${file.name}`;
+    } else {
+      return NextResponse.json({ error: 'Unsupported file type.' }, { status: 400 });
     }
 
-    const filePath = '/tmp/uploads/' + fileName;
-    const dataBuffer = await readFile(filePath);
-    
-    // Dynamically import pdf-parse only when needed
-    const pdfParse = (await import('pdf-parse')).default;
-    const pdfData = await pdfParse(dataBuffer);
-    const extractedText = pdfData.text;
-
-    // Find the VC prompt based on the vcId
+    // Find the VC prompt
     const prompts = Array.from(vcPrompts);
     const vcPrompt = prompts.find(vc => vc.name === vcName);
-    
+
     let prompt = '';
-    let model = 'gpt-4'; // Default model
+    let model = 'gpt-4';
 
     if (vcPrompt) {
-      prompt = `${vcPrompt.prompt}\n\nReview the following pitch deck and provide critical feedback. Focus on identifying weaknesses, gaps, and areas for improvement. Be specific and constructive in your criticism.\n\nPitch deck content:\n${extractedText}`;
+      prompt = `${vcPrompt.prompt}\n\nPitch deck content:\n${extractedText}`;
       model = vcPrompt.model;
     } else {
-      prompt = `You are ${vcName || 'a top venture capitalist'}.
-Review the following pitch deck and provide critical feedback. Focus on identifying weaknesses, gaps, and areas for improvement. Be specific and constructive in your criticism.\n\nPitch deck content:\n${extractedText}`;
+      prompt = `You are ${vcName || 'a top venture capitalist'}.\nPitch deck content:\n${extractedText}`;
     }
 
+    // Call OpenAI
     const completion = await openai.chat.completions.create({
-      messages: [{ role: "user", content: prompt }],
+      messages: [{ role: 'user', content: prompt }],
       model: model,
       temperature: 0.7,
       max_tokens: 1000,
     });
 
-    const commentary = completion.choices[0].message.content;
+    const commentary = completion.choices[0]?.message?.content;
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       commentary,
       vcName,
-      model 
+      model,
     });
-
   } catch (error) {
-    console.error('Error processing PDF:', error);
-    // Always return the error details for debugging
+    console.error('Error processing file:', error);
     return NextResponse.json(
-      { 
-        error: 'Failed to process PDF.', 
-        details: error && (error instanceof Error ? error.message : String(error)), 
-        stack: error instanceof Error ? error.stack : undefined 
-      },
+      { error: 'Failed to process file.' },
       { status: 500 }
     );
   }

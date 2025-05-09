@@ -27,13 +27,16 @@ export default function ProcessingPage() {
 
   useEffect(() => {
     const processPitchDeck = async () => {
-      const pitchDeck = localStorage.getItem('pitchDeck');
-      const selectedVC = localStorage.getItem('selectedVC');
-
-      if (!pitchDeck || !selectedVC) {
+      // Get file and VC from sessionStorage (or however you store them)
+      const fileData = window.sessionStorage.getItem('pitchDeckFile');
+      const selectedVC = window.sessionStorage.getItem('selectedVC');
+      if (!fileData || !selectedVC) {
         router.push('/');
         return;
       }
+      // Reconstruct the File object from base64 (if needed)
+      const file = JSON.parse(fileData);
+      const realFile = new File([Uint8Array.from(file.data)], file.name, { type: file.type });
 
       try {
         // Simulate progress
@@ -47,16 +50,13 @@ export default function ProcessingPage() {
           });
         }, 1000);
 
+        const formData = new FormData();
+        formData.append('file', realFile);
+        formData.append('vcName', selectedVC);
+
         const response = await fetch('/api/process', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            fileName: pitchDeck,
-            vcId: selectedVC,
-            vcName: getVCName(selectedVC),
-          }),
+          body: formData,
         });
 
         if (!response.ok) {
