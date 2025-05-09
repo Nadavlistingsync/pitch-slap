@@ -1,8 +1,10 @@
 import { FC } from 'react';
 import UploadCard from './UploadCard';
 import TrustBar from './TrustBar';
+import { useRouter } from 'next/navigation';
 
 const Hero: FC = () => {
+  const router = useRouter();
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-16">
       <div className="max-w-4xl mx-auto text-center">
@@ -13,10 +15,9 @@ const Hero: FC = () => {
           Upload your pitch deck and get brutally honest feedback from real VCs. 
           No sugar coating, just straight talk to help you raise your next round.
         </p>
-        <button className="btn-primary text-lg mb-12">
+        <button className="btn-primary text-lg mb-12" onClick={() => router.push('/upload')}>
           Upload Your Deck
         </button>
-        <UploadCard />
         <TrustBar />
       </div>
     </div>
