@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import confetti from 'canvas-confetti';
+import { motion } from 'framer-motion';
 
 const getVCName = (vcId: string) => {
   switch (vcId) {
@@ -106,24 +107,69 @@ export default function ProcessingPage() {
           <p className="text-xl text-gray-600 mb-8">
             Our AI is reviewing your pitch deck and preparing detailed feedback...
           </p>
-          
-          {/* Progress Bar */}
+
+          {/* Modern Animated Progress Bar */}
           <div className="max-w-md mx-auto">
-            <div className="relative h-4 bg-gray-200 rounded-full overflow-hidden mb-4">
-              <div 
-                className="absolute inset-y-0 left-0 bg-[#ff4154] transition-all duration-500 ease-out"
+            <motion.div
+              className="relative h-6 bg-gray-200 rounded-full overflow-hidden mb-4 shadow-lg"
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+              style={{ width: `${progress}%` }}
+            >
+              <motion.div
+                className="absolute inset-y-0 left-0 bg-gradient-to-r from-[#ff4154] via-[#ff6b6b] to-[#ff4154] animate-gradient-x"
                 style={{ width: `${progress}%` }}
-              ></div>
-            </div>
+                initial={{ width: 0 }}
+                animate={{ width: `${progress}%` }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+              />
+            </motion.div>
             <p className="text-sm text-gray-600">{progress}% complete</p>
           </div>
 
-          {/* Loading Animation */}
+          {/* Modern Morphing SVG Animation */}
           <div className="mt-12 flex justify-center">
-            <div className="relative">
-              <div className="w-16 h-16 border-4 border-[#ff4154]/20 rounded-full"></div>
-              <div className="w-16 h-16 border-4 border-[#ff4154] rounded-full absolute top-0 left-0 animate-spin border-t-transparent"></div>
-            </div>
+            <motion.svg
+              width="96"
+              height="96"
+              viewBox="0 0 96 96"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              initial={{ scale: 0.8, rotate: 0 }}
+              animate={{ scale: 1, rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
+            >
+              <motion.path
+                d="M48 8C62 8 88 24 88 48C88 72 62 88 48 88C34 88 8 72 8 48C8 24 34 8 48 8Z"
+                fill="#ff4154"
+                initial={{ pathLength: 0.7 }}
+                animate={{ pathLength: 1 }}
+                transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut', repeatType: 'reverse' }}
+                opacity={0.15}
+              />
+              <motion.circle
+                cx="48"
+                cy="48"
+                r="32"
+                stroke="#ff4154"
+                strokeWidth="8"
+                initial={{ r: 28 }}
+                animate={{ r: 32 }}
+                transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut', repeatType: 'reverse' }}
+                opacity={0.5}
+              />
+              <motion.circle
+                cx="48"
+                cy="48"
+                r="16"
+                fill="#ff4154"
+                initial={{ r: 12 }}
+                animate={{ r: 16 }}
+                transition={{ repeat: Infinity, duration: 1, ease: 'easeInOut', repeatType: 'reverse' }}
+                opacity={0.8}
+              />
+            </motion.svg>
           </div>
         </div>
       </div>
