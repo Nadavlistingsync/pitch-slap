@@ -11,11 +11,11 @@ export default function UploadPage() {
   const [selectedVC, setSelectedVC] = useState<string | null>(null);
 
   useEffect(() => {
-    const vc = localStorage.getItem('selectedVC');
-    if (!vc) {
+    const vcId = localStorage.getItem('selectedVC');
+    if (!vcId) {
       router.push('/');
     } else {
-      setSelectedVC(vc);
+      setSelectedVC(vcId);
     }
   }, [router]);
 
@@ -24,7 +24,7 @@ export default function UploadPage() {
     if (file && selectedVC) {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('vcName', selectedVC);
+      formData.append('vcId', selectedVC);
 
       // Optionally show a loading state here
       const response = await fetch('/api/process', {

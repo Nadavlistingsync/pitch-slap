@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
-    const vcName = formData.get('vcName') as string | null;
+    const vcId = formData.get('vcId') as string | null;
 
     if (!file) {
       return NextResponse.json({ error: 'No file uploaded.' }, { status: 400 });
@@ -36,9 +36,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unsupported file type.' }, { status: 400 });
     }
 
-    // Find the VC prompt
-    const prompts = Array.from(vcPrompts);
-    const vcPrompt = prompts.find(vc => vc.name === vcName);
+    // Find the VC prompt by id
+    const vcPrompt = vcPrompts.find(vc => vc.id === vcId);
 
     let prompt = '';
     let model = 'gpt-4';
@@ -47,7 +46,7 @@ export async function POST(req: NextRequest) {
       prompt = `${vcPrompt.prompt}\n\nPitch deck content:\n${extractedText}`;
       model = vcPrompt.model;
     } else {
-      prompt = `You are ${vcName || 'a top venture capitalist'}.\nPitch deck content:\n${extractedText}`;
+      prompt = `You are a top venture capitalist.\nPitch deck content:\n${extractedText}`;
     }
 
     // Call OpenAI
@@ -63,7 +62,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       commentary,
-      vcName,
+      vcId,
       model,
     });
   } catch (error) {
