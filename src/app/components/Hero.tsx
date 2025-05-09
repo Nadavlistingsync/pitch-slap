@@ -15,7 +15,7 @@ const Hero: FC = () => {
           Upload your pitch deck and get brutally honest feedback from real VCs. 
           No sugar coating, just straight talk to help you raise your next round.
         </p>
-        <button className="btn-primary text-lg mb-12" onClick={() => router.push('/upload')}>
+        <button className="btn-primary text-lg mb-12" onClick={() => router.push('/select')}>
           Upload Your Deck
         </button>
         <TrustBar />
