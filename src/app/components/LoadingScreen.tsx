@@ -3,7 +3,6 @@ import React from 'react';
 const LoadingScreen: React.FC = () => (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80">
     <svg
-      className="animate-spin"
       width="80"
       height="80"
       viewBox="0 0 80 80"
@@ -11,6 +10,7 @@ const LoadingScreen: React.FC = () => (
       xmlns="http://www.w3.org/2000/svg"
     >
       <circle
+        className="animate-spin"
         cx="40"
         cy="40"
         r="32"

@@ -4,12 +4,15 @@ import LoadingScreen from './LoadingScreen';
 
 const UploadCard: FC = () => {
   const [loading, setLoading] = useState(false);
+  const [uploaded, setUploaded] = useState(false);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setLoading(true);
+    setUploaded(false);
     // Simulate upload delay
     setTimeout(() => {
       setLoading(false);
+      setUploaded(true);
       // TODO: handle upload result, navigate, etc.
       console.log(acceptedFiles);
     }, 2000);
@@ -61,6 +64,13 @@ const UploadCard: FC = () => {
           </p>
         </div>
       </div>
+      {uploaded && !loading && (
+        <div className="mt-4 text-center">
+          <div className="inline-block bg-green-100 text-green-800 px-4 py-2 rounded-2xl font-semibold shadow-sm">
+            ✅ Upload complete! Your deck was received.
+          </div>
+        </div>
+      )}
     </div>
   );
 };
