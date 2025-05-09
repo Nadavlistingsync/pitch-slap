@@ -20,6 +20,7 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
     const vcId = formData.get('vcId') as string | null;
+    const roastIntensity = formData.get('roastIntensity') as string | null;
 
     console.log('[API/process] Incoming request:', { vcId, fileType: file?.type, fileName: file?.name });
 
@@ -60,11 +61,21 @@ export async function POST(req: NextRequest) {
     let prompt = '';
     let model = 'gpt-4';
 
+    // Add roast intensity instruction
+    let intensityInstruction = '';
+    if (roastIntensity === 'brutal') {
+      intensityInstruction = 'Give feedback that is extremely harsh, brutally honest, and direct. Do not hold back, be as critical and blunt as possible.';
+    } else if (roastIntensity === 'gentle') {
+      intensityInstruction = 'Give feedback that is gentle, supportive, and constructive. Focus on encouragement and actionable advice.';
+    } else {
+      intensityInstruction = 'Give feedback that is honest and direct, but also balanced with encouragement and constructive advice.';
+    }
+
     if (vcPrompt) {
-      prompt = `${vcPrompt.prompt}\n\nPitch deck content:\n${extractedText}`;
+      prompt = `${intensityInstruction}\n\n${vcPrompt.prompt}\n\nPitch deck content:\n${extractedText}`;
       model = vcPrompt.model;
     } else {
-      prompt = `You are a top venture capitalist.\nPitch deck content:\n${extractedText}`;
+      prompt = `${intensityInstruction}\n\nYou are a top venture capitalist.\nPitch deck content:\n${extractedText}`;
     }
 
     // Call OpenAI

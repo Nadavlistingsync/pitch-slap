@@ -28,6 +28,8 @@ export default function UploadPage() {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('vcId', selectedVC);
+      const roastIntensity = localStorage.getItem('roastIntensity') || 'balanced';
+      formData.append('roastIntensity', roastIntensity);
 
       try {
         const response = await fetch('/api/process', {
