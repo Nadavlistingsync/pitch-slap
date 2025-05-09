@@ -2,6 +2,7 @@
 // This can be expanded with more research and quotes for even more accuracy.
 
 export interface VCPrompt {
+  id: string;
   name: string;
   firm: string;
   prompt: string;
@@ -10,6 +11,7 @@ export interface VCPrompt {
 
 export const vcPrompts: VCPrompt[] = [
   {
+    id: 'jean-de-la-rochebrochard',
     name: 'Jean de La Rochebrochard',
     firm: 'Kima Ventures',
     model: 'gpt-4o-mini',
@@ -24,6 +26,7 @@ Write like a human by:
 - Never use hashtags or asterisks for emphasis`
   },
   {
+    id: 'alice-zagury',
     name: 'Alice Zagury',
     firm: 'The Family',
     model: 'gpt-4o-mini',
@@ -38,6 +41,7 @@ Write like a human by:
 - Never use hashtags or asterisks for emphasis`
   },
   {
+    id: 'marie-ekeland',
     name: 'Marie Ekeland',
     firm: '2050',
     model: 'gpt-4o-mini',
@@ -52,6 +56,7 @@ Write like a human by:
 - Never use hashtags or asterisks for emphasis`
   },
   {
+    id: 'nicolas-debock',
     name: 'Nicolas Debock',
     firm: 'Cathay Innovation',
     model: 'gpt-4o-mini',
@@ -66,6 +71,7 @@ Write like a human by:
 - Never use hashtags or asterisks for emphasis`
   },
   {
+    id: 'pauline-roux',
     name: 'Pauline Roux',
     firm: 'Elaia Partners',
     model: 'gpt-4o-mini',
@@ -80,6 +86,7 @@ Write like a human by:
 - Never use hashtags or asterisks for emphasis`
   },
   {
+    id: 'roxanne-varza',
     name: 'Roxanne Varza',
     firm: 'Station F',
     model: 'gpt-4o-mini',
@@ -94,6 +101,7 @@ Write like a human by:
 - Never use hashtags or asterisks for emphasis`
   },
   {
+    id: 'marc-simoncini',
     name: 'Marc Simoncini',
     firm: 'Jaïna Capital',
     model: 'gpt-4o-mini',
@@ -108,6 +116,7 @@ Write like a human by:
 - Never use hashtags or asterisks for emphasis`
   },
   {
+    id: 'oussama-ammar',
     name: 'Oussama Ammar',
     firm: 'The Family',
     model: 'gpt-4o-mini',
@@ -122,6 +131,7 @@ Write like a human by:
 - Never use hashtags or asterisks for emphasis`
   },
   {
+    id: 'celine-lazorthes',
     name: 'Céline Lazorthes',
     firm: 'Leetchi / Mangopay',
     model: 'gpt-4o-mini',
@@ -135,6 +145,7 @@ Write like a human by:
 - Adding your unique insights`
   },
   {
+    id: 'xavier-niel',
     name: 'Xavier Niel',
     firm: 'Iliad / Station F',
     model: 'gpt-4o-mini',
@@ -147,8 +158,8 @@ Write like a human by:
 - Using natural expressions
 - Adding your unique perspective`
   },
-  // New York VCs
   {
+    id: 'fred-wilson',
     name: 'Fred Wilson',
     firm: 'Union Square Ventures',
     model: 'gpt-4o-mini',
@@ -162,6 +173,7 @@ Write like a human by:
 - Adding your unique perspective`
   },
   {
+    id: 'alexis-ohanian',
     name: 'Alexis Ohanian',
     firm: 'Seven Seven Six',
     model: 'gpt-4o-mini',
@@ -176,6 +188,7 @@ Write like a human by:
 - Never use hashtags or asterisks for emphasis`
   },
   {
+    id: 'rebecca-kaden',
     name: 'Rebecca Kaden',
     firm: 'Union Square Ventures',
     model: 'gpt-4o-mini',
@@ -190,6 +203,7 @@ Write like a human by:
 - Never use hashtags or asterisks for emphasis`
   },
   {
+    id: 'ben-sun',
     name: 'Ben Sun',
     firm: 'Primary Venture Partners',
     model: 'gpt-4o-mini',
@@ -204,6 +218,7 @@ Write like a human by:
 - Never use hashtags or asterisks for emphasis`
   },
   {
+    id: 'angela-lee',
     name: 'Angela Lee',
     firm: '37 Angels',
     model: 'gpt-4o-mini',
@@ -218,20 +233,22 @@ Write like a human by:
 - Never use hashtags or asterisks for emphasis`
   },
   {
+    id: 'charlie-odonnell',
     name: "Charlie O'Donnell",
     firm: 'Brooklyn Bridge Ventures',
     model: 'gpt-4o-mini',
-    prompt: `You are Charlie O'Donnell from Brooklyn Bridge Ventures. Write like you're giving NYC street-smart advice. Be direct but helpful. Start with something like "Listen up, here's the deal..." or "Let me tell you how it works..." Use NYC examples. No hashtags or asterisks. End with something like "Stay real. -Charlie" or "Keep it Brooklyn. -C"
+    prompt: `You are Charlie O'Donnell from Brooklyn Bridge Ventures. Write like you're having a local coffee shop chat. Be community-focused and practical. Start with something like "Let's talk about the Brooklyn ecosystem..." or "Here's what I'm seeing in the local scene..." Use local examples. No hashtags or asterisks. End with something like "Keep building locally. -Charlie" or "Stay connected. -C"
 
 Write like a human by:
-- Using NYC street-smart language
-- Including local insights
-- Making feedback relatable
-- Using natural expressions
+- Using community-focused language
+- Including local market insights
+- Making feedback practical
+- Using natural transitions
 - Adding your unique perspective
 - Never use hashtags or asterisks for emphasis`
   },
   {
+    id: 'anu-duggal',
     name: 'Anu Duggal',
     firm: 'Female Founders Fund',
     model: 'gpt-4o-mini',
@@ -246,6 +263,7 @@ Write like a human by:
 - Never use hashtags or asterisks for emphasis`
   },
   {
+    id: 'hunter-walk',
     name: 'Hunter Walk',
     firm: 'Homebrew',
     model: 'gpt-4o-mini',
@@ -260,6 +278,7 @@ Write like a human by:
 - Never use hashtags or asterisks for emphasis`
   },
   {
+    id: 'jenny-fielding',
     name: 'Jenny Fielding',
     firm: 'The Fund',
     model: 'gpt-4o-mini',
@@ -274,6 +293,7 @@ Write like a human by:
 - Never use hashtags or asterisks for emphasis`
   },
   {
+    id: 'david-tisch',
     name: 'David Tisch',
     firm: 'BoxGroup',
     model: 'gpt-4o-mini',
