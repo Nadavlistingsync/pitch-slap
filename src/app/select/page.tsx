@@ -9,8 +9,8 @@ export default function SelectPage() {
   const [selectedVC, setSelectedVC] = useState<string | null>(null);
 
   const handleSelect = (vc: typeof vcPrompts[0]) => {
-    setSelectedVC(vc.name);
-    localStorage.setItem('selectedVC', JSON.stringify(vc));
+    setSelectedVC(vc.id);
+    localStorage.setItem('selectedVC', vc.id);
     router.push('/upload');
   };
 
@@ -49,7 +49,7 @@ export default function SelectPage() {
               key={vc.name}
               onClick={() => handleSelect(vc)}
               className={`card text-left transition-all duration-200 hover:scale-105
-                ${selectedVC === vc.name ? 'ring-2 ring-[#ff4154]' : 'hover:shadow-lg'}`}
+                ${selectedVC === vc.id ? 'ring-2 ring-[#ff4154]' : 'hover:shadow-lg'}`}
             >
               <div className="flex items-start space-x-4">
                 <div className="w-12 h-12 bg-[#ff4154]/10 rounded-full flex items-center justify-center flex-shrink-0">
