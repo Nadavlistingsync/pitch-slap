@@ -36,17 +36,19 @@ export default function UploadPage() {
           method: 'POST',
           body: formData,
         });
-
-        if (response.ok) {
-          window.sessionStorage.setItem('processingResult', await response.text());
+        const data = await response.json();
+        if (response.ok && data.success) {
+          window.sessionStorage.setItem('processingResult', JSON.stringify(data));
           router.push('/processing');
         } else {
-          alert('Failed to process your pitch deck. Please try again.');
+          window.sessionStorage.setItem('processingResult', JSON.stringify({ error: data.error || 'Failed to process your pitch deck.' }));
+          router.push('/processing');
           setIsLoading(false);
         }
       } catch (error) {
         console.error('Error processing file:', error);
-        alert('An error occurred while processing your file. Please try again.');
+        window.sessionStorage.setItem('processingResult', JSON.stringify({ error: 'An error occurred while processing your file. Please try again.' }));
+        router.push('/processing');
         setIsLoading(false);
       }
     }

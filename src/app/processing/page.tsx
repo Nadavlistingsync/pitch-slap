@@ -32,7 +32,13 @@ export default function ProcessingPage() {
     if (result) {
       try {
         const data = JSON.parse(result);
-        setCommentary(data.commentary);
+        if (data.error) {
+          setError(data.error);
+        } else if (data.commentary) {
+          setCommentary(data.commentary);
+        } else {
+          setError('No commentary or error found in processing result.');
+        }
       } catch (e) {
         setError('Failed to parse processing result.');
       }
