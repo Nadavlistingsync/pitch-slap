@@ -2,6 +2,7 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import FeedbackBubble from './components/FeedbackBubble';
+import '@fontsource/inter/variable.css';
 
 const inter = Inter({
   subsets: ['latin'],
