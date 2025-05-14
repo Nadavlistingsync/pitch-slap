@@ -2,20 +2,25 @@
 
 import { useRouter } from 'next/navigation';
 
-export default function Home() {
+export default function HomePage() {
   const router = useRouter();
   return (
-    <main className="min-h-screen flex flex-col justify-center items-center bg-black text-white px-4 py-20">
-      <div className="w-full flex flex-col items-center justify-center text-center max-w-3xl mx-auto">
-        <h1 className="text-6xl md:text-7xl font-extrabold tracking-tight mb-6 leading-tight drop-shadow-xl" style={{fontFamily: 'Inter, sans-serif'}}>PITCH SLAP CLUB</h1>
-        <h2 className="text-4xl md:text-5xl font-extrabold mb-4 text-[#ff4154]">Get Your Pitch Deck Roasted</h2>
-        <p className="text-lg md:text-2xl text-gray-300 mb-10 font-medium">Brutally honest, VC-style feedback. No sugar coating. Upload your deck and get roasted by the best.</p>
-        <button
-          className="bg-[#ff4154] hover:bg-[#ff6b6b] text-white text-xl font-bold py-4 px-12 rounded-full shadow-lg transition-all duration-200 tracking-wide flex items-center gap-2 mx-auto"
-          onClick={() => router.push('/upload')}
-        >
-          Pitch Roast <span className="text-2xl">→</span>
-        </button>
+    <main className="bg-black text-white min-h-screen flex items-center justify-center px-4">
+      <div className="text-center max-w-3xl w-full py-24">
+        <h1 className="text-6xl font-extrabold tracking-tight leading-tight">
+          PITCH<br />SLAP<br />CLUB
+        </h1>
+        <p className="text-xl mt-6 text-gray-300">
+          Bold takes, brutal honesty, and no-nonsense feedback for founders who can handle the truth.
+        </p>
+        <div className="mt-10">
+          <a
+            href="#"
+            className="inline-block bg-white text-black font-bold py-4 px-6 text-xl rounded-lg transition-all hover:bg-gray-200 hover:scale-105"
+          >
+            Pitch Roast →
+          </a>
+        </div>
       </div>
     </main>
   );
