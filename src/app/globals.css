@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Montserrat:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
 
 :root {
   --foreground-rgb: 255, 255, 255;
@@ -16,7 +16,43 @@ body {
   color: rgb(var(--foreground-rgb));
   background: rgb(var(--background-rgb));
   min-height: 100vh;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', Arial, Helvetica, sans-serif;
+}
+
+.hero-heading {
+  font-family: 'Inter', Arial, Helvetica, sans-serif;
+  font-size: 5rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  margin-bottom: 2.5rem;
+}
+
+.hero-subheading {
+  color: #b0b4ba;
+  font-size: 1.25rem;
+  font-weight: 400;
+  margin-bottom: 2.5rem;
+}
+
+.btn-primary {
+  background: #fff;
+  color: #000;
+  font-family: 'Inter', Arial, Helvetica, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  border-radius: 1.25rem;
+  padding: 1.1rem 2.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: background 0.2s, transform 0.2s;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  display: inline-block;
+}
+.btn-primary:hover {
+  background: #f3f3f3;
+  transform: scale(1.04);
 }
 
 @layer base {
@@ -26,14 +62,9 @@ body {
 }
 
 @layer components {
-  .btn-primary {
-    @apply bg-white text-black font-bold py-4 px-6 text-xl rounded-lg transition-all hover:bg-gray-200 hover:scale-105;
-  }
-  
   .card {
     @apply bg-[#1a1a1a] rounded-2xl p-6 border border-gray-800;
   }
-
   .input-field {
     @apply w-full px-4 py-3 rounded-lg bg-[#1a1a1a] border border-gray-800 text-white focus:border-white focus:ring-2 focus:ring-white/20 outline-none transition-all;
   }

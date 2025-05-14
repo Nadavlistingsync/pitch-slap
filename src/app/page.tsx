@@ -8,13 +8,13 @@ export default function HomePage() {
   return (
     <main className="bg-black text-white min-h-screen">
       <div className="text-center max-w-3xl mx-auto px-4 py-24">
-        <h1 className="text-7xl font-black tracking-tight leading-tight">
+        <h1 className="hero-heading">
           PITCH<br />SLAP<br />CLUB
         </h1>
-        <p className="text-xl mt-8 text-gray-400 max-w-xl mx-auto">
+        <p className="hero-subheading max-w-xl mx-auto">
           Bold takes, brutal honesty, and no-nonsense feedback for founders who can handle the truth.
         </p>
-        <div className="mt-12">
+        <div>
           <button
             onClick={() => router.push('/upload')}
             className="btn-primary"
