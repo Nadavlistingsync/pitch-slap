@@ -2,19 +2,19 @@ import { FC } from 'react';
 
 const TrustBar: FC = () => {
   return (
-    <div className="mt-12 opacity-70">
-      <div className="flex flex-wrap justify-center gap-8 md:gap-16">
+    <div className="mt-12 opacity-90">
+      <div className="flex flex-wrap justify-center gap-12 md:gap-24 border-t border-[#23272f] pt-8">
         <div className="text-center">
-          <div className="text-3xl font-bold text-[#ff4154] mb-2">500+</div>
-          <div className="text-sm text-gray-600">Startups Roasted</div>
+          <div className="text-4xl font-extrabold text-white mb-2 tracking-tight">500+</div>
+          <div className="text-base text-gray-400 font-medium">Startups Roasted</div>
         </div>
         <div className="text-center">
-          <div className="text-3xl font-bold text-[#ff4154] mb-2">20+</div>
-          <div className="text-sm text-gray-600">Active VCs</div>
+          <div className="text-4xl font-extrabold text-white mb-2 tracking-tight">20+</div>
+          <div className="text-base text-gray-400 font-medium">Active VCs</div>
         </div>
         <div className="text-center">
-          <div className="text-3xl font-bold text-[#ff4154] mb-2">$50M+</div>
-          <div className="text-sm text-gray-600">Funds Raised</div>
+          <div className="text-4xl font-extrabold text-white mb-2 tracking-tight">$50M+</div>
+          <div className="text-base text-gray-400 font-medium">Funds Raised</div>
         </div>
       </div>
     </div>
