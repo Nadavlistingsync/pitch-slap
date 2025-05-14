@@ -10,6 +10,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://pitch-slap-nadavlistingsync-nadavlistingsyncs-projects.vercel.app'),
   title: 'PitchDeck Roaster - Get Brutally Honest VC Feedback',
   description: 'Upload your pitch deck and get brutally honest feedback from real VCs. No sugar coating, just straight talk to help you raise your next round.',
   keywords: 'pitch deck, VC feedback, startup funding, investor feedback, pitch deck review',
