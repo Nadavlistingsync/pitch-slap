@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import confetti from 'canvas-confetti';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const getVCName = (vcId: string) => {
   switch (vcId) {
@@ -22,51 +22,38 @@ const getVCName = (vcId: string) => {
 
 export default function ProcessingPage() {
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
-  const [commentary, setCommentary] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
+  const [commentary, setCommentary] = useState<string | null>(null);
 
   useEffect(() => {
-    // Read the result from sessionStorage and display it
-    const result = window.sessionStorage.getItem('processingResult');
-    if (result) {
-      try {
-        const data = JSON.parse(result);
-        if (data.error) {
-          setError(data.error);
-        } else if (data.commentary) {
-          setCommentary(data.commentary);
-        } else {
-          setError('No commentary or error found in processing result.');
+    // Simulate progress
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          // Simulate getting feedback
+          setTimeout(() => {
+            setCommentary("Your pitch deck needs work. The market size slide is too optimistic, and your unit economics don't make sense. However, your team slide is strong. Focus on realistic projections and clear go-to-market strategy.");
+          }, 1000);
+          return 100;
         }
-      } catch (e) {
-        setError('Failed to parse processing result.');
-      }
-    } else {
-      setError('No processing result found.');
-    }
+        return prev + 1;
+      });
+    }, 50);
+
+    return () => clearInterval(interval);
   }, []);
 
-  if (error) {
-    return (
-      <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-[#2e2e2e] mb-4">
-              Oops! Something went wrong
-            </h1>
-            <p className="text-xl text-gray-600 mb-8">{error}</p>
-            <button
-              onClick={() => router.push('/')}
-              className="btn-primary"
-            >
-              Try Again
-            </button>
-          </div>
-        </div>
-      </main>
-    );
-  }
+  useEffect(() => {
+    if (commentary) {
+      // Trigger confetti when feedback is ready
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
+  }, [commentary]);
 
   if (commentary) {
     const selectedVC = localStorage.getItem('selectedVC');
@@ -75,29 +62,70 @@ export default function ProcessingPage() {
     return (
       <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="max-w-3xl mx-auto"
+          >
             <div className="card">
-              <div className="flex items-center justify-between mb-6">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="flex items-center justify-between mb-6"
+              >
                 <h1 className="text-3xl font-bold text-[#2e2e2e]">VC Feedback</h1>
-                <span className="text-lg font-medium text-[#ff4154]">{vcName}</span>
-              </div>
-              <div className="prose max-w-none">
+                <motion.span 
+                  initial={{ scale: 0.8 }}
+                  animate={{ scale: 1 }}
+                  className="text-lg font-medium text-[#ff4154]"
+                >
+                  {vcName}
+                </motion.span>
+              </motion.div>
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="prose max-w-none"
+              >
                 {commentary.split('\n').map((paragraph, index) => (
-                  <p key={index} className="mb-4 text-gray-700 whitespace-pre-wrap">
+                  <motion.p
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
+                    className="mb-4 text-gray-700 whitespace-pre-wrap"
+                  >
                     {paragraph.replace(/[#*]/g, '')}
-                  </p>
+                  </motion.p>
                 ))}
-              </div>
-              <div className="mt-8 flex justify-end">
+              </motion.div>
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.8 }}
+                className="mt-8 flex justify-end"
+              >
                 <button
                   onClick={() => router.push('/')}
-                  className="btn-primary"
+                  className="btn-primary group relative overflow-hidden"
                 >
-                  Get Another Review
+                  <span className="relative z-10 flex items-center gap-2">
+                    Get Another Review
+                    <motion.span
+                      animate={{ x: [0, 4, 0] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                    >
+                      →
+                    </motion.span>
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#ff4154] to-[#ff6b6b] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </button>
-              </div>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </main>
     );
@@ -106,7 +134,12 @@ export default function ProcessingPage() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center"
+        >
           <h1 className="text-4xl font-bold text-[#2e2e2e] mb-4">
             Analyzing Your Pitch Deck
           </h1>
@@ -121,7 +154,6 @@ export default function ProcessingPage() {
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.5, ease: 'easeOut' }}
-              style={{ width: `${progress}%` }}
             >
               <motion.div
                 className="absolute inset-y-0 left-0 bg-gradient-to-r from-[#ff4154] via-[#ff6b6b] to-[#ff4154] animate-gradient-x"
@@ -131,11 +163,22 @@ export default function ProcessingPage() {
                 transition={{ duration: 0.5, ease: 'easeOut' }}
               />
             </motion.div>
-            <p className="text-sm text-gray-600">{progress}% complete</p>
+            <motion.p 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-sm text-gray-600"
+            >
+              {progress}% complete
+            </motion.p>
           </div>
 
           {/* Modern Morphing SVG Animation */}
-          <div className="mt-12 flex justify-center">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="mt-12 flex justify-center"
+          >
             <motion.svg
               width="96"
               height="96"
@@ -176,8 +219,12 @@ export default function ProcessingPage() {
                 opacity={0.8}
               />
             </motion.svg>
-          </div>
-        </div>
+          </motion.div>
+
+          {/* Floating Elements */}
+          <div className="absolute top-1/4 left-10 w-24 h-24 bg-[#ff4154]/10 rounded-full blur-2xl animate-float" />
+          <div className="absolute bottom-1/4 right-10 w-32 h-32 bg-[#a78bfa]/10 rounded-full blur-2xl animate-float-delayed" />
+        </motion.div>
       </div>
     </main>
   );
