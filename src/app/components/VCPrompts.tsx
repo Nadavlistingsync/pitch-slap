@@ -163,7 +163,7 @@ const vcs: VC[] = [
 const vcData = [
   {
     name: 'VC Name 1',
-    comment: 'This is a brutally good idea. Nobody else is doing it this raw. I'm in.',
+    comment: "This is a brutally good idea. Nobody else is doing it this raw. I'm in.",
     logo: 'https://via.placeholder.com/80x40?text=Logo+1'
   },
   {
@@ -173,7 +173,7 @@ const vcData = [
   },
   {
     name: 'VC Name 3',
-    comment: 'The feedback is harsh but fair. It's what makes this platform unique.',
+    comment: 'The feedback is harsh but fair. It\'s what makes this platform unique.',
     logo: 'https://via.placeholder.com/80x40?text=Logo+3'
   }
 ];
