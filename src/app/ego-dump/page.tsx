@@ -11,9 +11,6 @@ interface EgoDump {
   author: string;
 }
 
-const gradientText =
-  "bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 bg-clip-text text-transparent";
-
 export default function EgoDumpPage() {
   const [dumps, setDumps] = useState<EgoDump[]>([]);
   const [newDump, setNewDump] = useState('');
@@ -78,20 +75,22 @@ export default function EgoDumpPage() {
   const filteredDumps = dumps; // Add filter logic if needed
 
   return (
-    <main className="min-h-screen w-full bg-black relative overflow-x-hidden">
+    <main className="min-h-screen w-full bg-pitchslap-bg relative overflow-x-hidden font-heading">
       {/* Top Glow Gradient */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120vw] h-64 pointer-events-none z-0">
-        <div className="w-full h-full bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 blur-3xl opacity-40" />
+        <div className="w-full h-full bg-ego-gradient blur-3xl opacity-60" />
       </div>
-      <div className="relative z-10 flex flex-col items-center px-4 pt-16 pb-8">
+      <div className="relative z-10 flex flex-col items-center px-4 pt-20 pb-8">
         {/* ROAST label */}
         <div className="mb-2 w-full max-w-2xl">
-          <span className="uppercase font-bold text-lg tracking-widest text-blue-300 bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
+          <span className="uppercase font-bold text-lg tracking-widest bg-ego-glow bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(255,65,84,0.3)]">
             🔥 ROAST
           </span>
         </div>
         {/* Heading */}
-        <h1 className={`text-5xl md:text-6xl font-extrabold mb-4 text-center ${gradientText}`}>The Ego Dump</h1>
+        <h1 className="text-5xl md:text-6xl font-extrabold mb-4 text-center bg-ego-glow bg-clip-text text-transparent drop-shadow-[0_4px_32px_rgba(167,139,250,0.5)]">
+          The Ego Dump
+        </h1>
         {/* Subheading */}
         <p className="text-lg md:text-xl text-white/90 text-center max-w-2xl mb-2">
           Even the biggest success stories faced countless rejections.
@@ -101,14 +100,14 @@ export default function EgoDumpPage() {
         </p>
         {/* Divider with fire emoji */}
         <div className="flex flex-col items-center w-full mb-2">
-          <div className="w-full max-w-md h-px bg-gradient-to-r from-transparent via-pink-500/60 to-transparent mb-2" />
+          <div className="w-full max-w-md h-px bg-gradient-to-r from-transparent via-pitchslap-accent2 to-transparent mb-2" />
           <span className="text-2xl">🔥</span>
         </div>
         {/* Dropdown */}
         <div className="relative mb-8">
           <button
             onClick={() => setDropdownOpen((v) => !v)}
-            className="flex items-center gap-2 px-6 py-2 rounded-full bg-white/10 border border-white/20 text-white font-medium shadow-lg backdrop-blur-md hover:bg-white/20 transition-all"
+            className="flex items-center gap-2 px-6 py-2 rounded-full bg-pitchslap-glass border border-white/10 text-white font-medium shadow-lg backdrop-blur-md hover:bg-white/20 transition-all"
           >
             Read rejection stories
             <svg
@@ -122,7 +121,7 @@ export default function EgoDumpPage() {
             </svg>
           </button>
           {dropdownOpen && (
-            <div className="absolute left-0 mt-2 w-56 rounded-lg bg-black/90 border border-white/10 shadow-xl z-20">
+            <div className="absolute left-0 mt-2 w-56 rounded-lg bg-pitchslap-bg border border-white/10 shadow-xl z-20">
               <button
                 className="block w-full text-left px-4 py-2 text-white/80 hover:bg-white/10 rounded-t-lg"
                 onClick={() => { setFilter("all"); setDropdownOpen(false); }}
@@ -141,18 +140,18 @@ export default function EgoDumpPage() {
         {/* Post Form */}
         <form
           onSubmit={handleSubmit}
-          className="w-full max-w-2xl mb-12 bg-white/5 rounded-2xl p-6 shadow-xl border border-white/10 backdrop-blur-md"
+          className="w-full max-w-2xl mb-12 bg-pitchslap-glass rounded-2xl p-6 shadow-glass border border-white/10 backdrop-blur-md"
         >
           <textarea
             value={newDump}
             onChange={(e) => setNewDump(e.target.value)}
             placeholder="Share your rejection story..."
-            className="w-full h-24 md:h-28 bg-black/60 text-white rounded-lg p-4 mb-4 resize-none focus:outline-none focus:ring-2 focus:ring-pink-400 border border-white/10 placeholder:text-white/50 font-medium text-lg shadow-inner"
+            className="w-full h-24 md:h-28 bg-black/60 text-white rounded-lg p-4 mb-4 resize-none focus:outline-none focus:ring-2 focus:ring-pitchslap-accent border border-white/10 placeholder:text-white/50 font-medium text-lg shadow-inner"
           />
           <button
             type="submit"
             disabled={isSubmitting || !newDump.trim()}
-            className="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 text-white py-3 rounded-lg font-bold hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-lg shadow-lg"
+            className="w-full bg-ego-glow text-white py-3 rounded-lg font-bold hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-lg shadow-lg"
           >
             {isSubmitting ? "Posting..." : "Post Story"}
           </button>
@@ -167,7 +166,7 @@ export default function EgoDumpPage() {
               key={dump.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white/10 border border-white/10 rounded-2xl p-8 shadow-2xl backdrop-blur-md flex flex-col items-center relative"
+              className="bg-pitchslap-card border border-white/10 rounded-2xl p-8 shadow-glass backdrop-blur-md flex flex-col items-center relative"
             >
               <p className="italic text-lg md:text-xl text-white text-center mb-4 max-w-xl" style={{textShadow: "0 2px 16px rgba(0,0,0,0.3)"}}>
                 {dump.content}
@@ -178,7 +177,7 @@ export default function EgoDumpPage() {
                 <span>{new Date(dump.createdAt).toLocaleDateString()}</span>
                 <button
                   onClick={() => handleLike(dump.id)}
-                  className="flex items-center gap-1 text-pink-300 hover:text-pink-400 transition-colors ml-2"
+                  className="flex items-center gap-1 text-pitchslap-accent hover:text-pitchslap-accent2 transition-colors ml-2"
                   aria-label="Like story"
                 >
                   <svg
