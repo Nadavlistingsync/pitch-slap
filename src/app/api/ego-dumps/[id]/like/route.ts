@@ -1,14 +1,16 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export async function POST(
-  request: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
     const { id } = params;
 
-    const dump = await prisma.egoDump.update({
+    const updatedDump = await prisma.egoDump.update({
       where: { id },
       data: {
         likes: {
@@ -17,12 +19,9 @@ export async function POST(
       },
     });
 
-    return NextResponse.json({ likes: dump.likes });
+    return NextResponse.json(updatedDump);
   } catch (error) {
-    console.error('Failed to like dump:', error);
-    return NextResponse.json(
-      { error: 'Failed to like dump' },
-      { status: 500 }
-    );
+    console.error('Error liking ego dump:', error);
+    return NextResponse.json({ error: 'Failed to like ego dump' }, { status: 500 });
   }
 } 

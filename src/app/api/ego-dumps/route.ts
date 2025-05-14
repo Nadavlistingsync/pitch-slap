@@ -1,5 +1,7 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export async function GET() {
   try {
@@ -7,63 +9,33 @@ export async function GET() {
       orderBy: {
         createdAt: 'desc',
       },
-      include: {
-        _count: {
-          select: {
-            comments: true,
-          },
-        },
-      },
     });
-
-    return NextResponse.json(
-      dumps.map(dump => ({
-        id: dump.id,
-        content: dump.content,
-        timestamp: dump.createdAt,
-        likes: dump.likes,
-        comments: dump._count.comments,
-      }))
-    );
+    return NextResponse.json(dumps);
   } catch (error) {
-    console.error('Failed to fetch dumps:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch dumps' },
-      { status: 500 }
-    );
+    console.error('Error fetching ego dumps:', error);
+    return NextResponse.json({ error: 'Failed to fetch ego dumps' }, { status: 500 });
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const { content } = await request.json();
+    const { content } = await req.json();
 
     if (!content || typeof content !== 'string') {
-      return NextResponse.json(
-        { error: 'Content is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Content is required' }, { status: 400 });
     }
 
     const dump = await prisma.egoDump.create({
       data: {
         content,
+        author: 'Anonymous', // You can modify this to use real user data
         likes: 0,
       },
     });
 
-    return NextResponse.json({
-      id: dump.id,
-      content: dump.content,
-      timestamp: dump.createdAt,
-      likes: dump.likes,
-      comments: 0,
-    });
+    return NextResponse.json(dump);
   } catch (error) {
-    console.error('Failed to create dump:', error);
-    return NextResponse.json(
-      { error: 'Failed to create dump' },
-      { status: 500 }
-    );
+    console.error('Error creating ego dump:', error);
+    return NextResponse.json({ error: 'Failed to create ego dump' }, { status: 500 });
   }
 } 

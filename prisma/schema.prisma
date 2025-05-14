@@ -11,11 +11,12 @@ datasource db {
 }
 
 model EgoDump {
-  id        String    @id @default(cuid())
+  id        String   @id @default(cuid())
   content   String
-  likes     Int       @default(0)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  author    String
+  likes     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   comments  Comment[]
 }
 
