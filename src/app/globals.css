@@ -5,41 +5,37 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Montserrat:wght@400;500;600;700&display=swap');
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 249, 250, 251;
-  --background-end-rgb: 255, 255, 255;
-  --primary: #ff4154;
-  --accent: #2e2e2e;
+  --foreground-rgb: 255, 255, 255;
+  --background-rgb: 0, 0, 0;
+  --primary: #ffffff;
+  --accent: #ff4154;
   --shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-    to bottom,
-    rgb(var(--background-start-rgb)),
-    rgb(var(--background-end-rgb))
-  );
+  background: rgb(var(--background-rgb));
   min-height: 100vh;
+  font-family: 'Inter', sans-serif;
 }
 
 @layer base {
   body {
-    @apply text-[#2e2e2e];
+    @apply text-white;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-[#ff4154] text-white px-6 py-3 rounded-2xl font-semibold hover:bg-[#ff4154]/90 transition-colors shadow-[0_4px_20px_rgba(0,0,0,0.2)];
+    @apply bg-white text-black font-bold py-4 px-6 text-xl rounded-lg transition-all hover:bg-gray-200 hover:scale-105;
   }
   
   .card {
-    @apply bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.2)] p-6;
+    @apply bg-[#1a1a1a] rounded-2xl p-6 border border-gray-800;
   }
 
   .input-field {
-    @apply w-full px-4 py-3 rounded-2xl border border-gray-200 focus:border-[#ff4154] focus:ring-2 focus:ring-[#ff4154]/20 outline-none transition-all;
+    @apply w-full px-4 py-3 rounded-lg bg-[#1a1a1a] border border-gray-800 text-white focus:border-white focus:ring-2 focus:ring-white/20 outline-none transition-all;
   }
 }
 
@@ -50,9 +46,9 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100 rounded-full;
+  @apply bg-[#1a1a1a] rounded-full;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 rounded-full hover:bg-gray-400 transition-colors;
+  @apply bg-gray-700 rounded-full hover:bg-gray-600 transition-colors;
 } 

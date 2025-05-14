@@ -171,12 +171,12 @@ export default function VCPrompts() {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12">
-      <div className="mb-8">
+    <div className="space-y-8">
+      <div className="relative">
         <input
           type="text"
           placeholder="Search VCs..."
-          className="w-full p-4 rounded-lg bg-gray-800 text-white border border-gray-700 focus:border-[#ff4154] focus:outline-none"
+          className="input-field"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
@@ -186,69 +186,60 @@ export default function VCPrompts() {
         {filteredVCs.map((vc) => (
           <div
             key={vc.name}
-            className="bg-gray-800 rounded-xl p-6 cursor-pointer hover:bg-gray-700 transition-colors"
+            className="card cursor-pointer hover:border-gray-700 transition-colors"
             onClick={() => setSelectedVC(vc)}
           >
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h3 className="text-xl font-bold text-white">{vc.name}</h3>
+                <h3 className="text-xl font-bold">{vc.name}</h3>
                 <p className="text-gray-400">{vc.firm}</p>
               </div>
               <span className="text-2xl">{vc.location}</span>
             </div>
-            <div className="space-y-2">
-              <p className="text-gray-300"><span className="font-semibold">Known for:</span> {vc.knownFor}</p>
-              <p className="text-gray-300"><span className="font-semibold">Stage:</span> {vc.stage}</p>
-              <p className="text-gray-300"><span className="font-semibold">Why founders care:</span> {vc.whyFoundersCare}</p>
+            <div className="space-y-3">
+              <p className="text-gray-300"><span className="font-semibold text-white">Known for:</span> {vc.knownFor}</p>
+              <p className="text-gray-300"><span className="font-semibold text-white">Stage:</span> {vc.stage}</p>
+              <p className="text-gray-300"><span className="font-semibold text-white">Why founders care:</span> {vc.whyFoundersCare}</p>
+              <p className="text-gray-300"><span className="font-semibold text-white">Vibe:</span> {vc.vibe}</p>
             </div>
           </div>
         ))}
       </div>
 
       {selectedVC && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
-          <div className="bg-gray-800 rounded-xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="card max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-start mb-6">
               <div>
-                <h2 className="text-3xl font-bold text-white">{selectedVC.name}</h2>
-                <p className="text-xl text-gray-400">{selectedVC.firm}</p>
+                <h2 className="text-2xl font-bold">{selectedVC.name}</h2>
+                <p className="text-gray-400">{selectedVC.firm}</p>
               </div>
               <button
                 onClick={() => setSelectedVC(null)}
-                className="text-gray-400 hover:text-white text-2xl"
+                className="text-gray-400 hover:text-white"
               >
-                ×
+                ✕
               </button>
             </div>
-            
-            <div className="space-y-6">
+            <div className="space-y-4">
               <div>
-                <h3 className="text-xl font-semibold text-white mb-2">Location</h3>
-                <p className="text-gray-300">{selectedVC.location}</p>
-              </div>
-              
-              <div>
-                <h3 className="text-xl font-semibold text-white mb-2">Known For</h3>
+                <h3 className="font-semibold text-white mb-2">Known for</h3>
                 <p className="text-gray-300">{selectedVC.knownFor}</p>
               </div>
-              
               <div>
-                <h3 className="text-xl font-semibold text-white mb-2">Investment Stage</h3>
+                <h3 className="font-semibold text-white mb-2">Stage</h3>
                 <p className="text-gray-300">{selectedVC.stage}</p>
               </div>
-              
               <div>
-                <h3 className="text-xl font-semibold text-white mb-2">Why Founders Care</h3>
+                <h3 className="font-semibold text-white mb-2">Why founders care</h3>
                 <p className="text-gray-300">{selectedVC.whyFoundersCare}</p>
               </div>
-              
               <div>
-                <h3 className="text-xl font-semibold text-white mb-2">Vibe</h3>
+                <h3 className="font-semibold text-white mb-2">Vibe</h3>
                 <p className="text-gray-300">{selectedVC.vibe}</p>
               </div>
-              
               <div>
-                <h3 className="text-xl font-semibold text-white mb-2">Top Podcasts & Interviews</h3>
+                <h3 className="font-semibold text-white mb-2">Podcasts & Content</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-300">
                   {selectedVC.podcasts.map((podcast, index) => (
                     <li key={index}>{podcast}</li>
