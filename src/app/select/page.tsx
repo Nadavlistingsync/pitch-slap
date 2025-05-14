@@ -90,14 +90,10 @@ export default function SelectPage() {
                     </span>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-[#2e2e2e]">{vc.name}</h3>
+                    <h3 className="text-xl font-semibold text-gray-900">{vc.name}</h3>
                     <p className="text-sm text-gray-600">{vc.firm}</p>
-                    <div className="mt-2 flex gap-1">
-                      {vc.tags?.map((tag) => (
-                        <span key={tag} className="text-xs px-2 py-1 bg-gray-100 rounded-full text-gray-600">
-                          {tag}
-                        </span>
-                      ))}
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-500">{vc.prompt.split('\n')[0]}</p>
                     </div>
                   </div>
                 </div>
