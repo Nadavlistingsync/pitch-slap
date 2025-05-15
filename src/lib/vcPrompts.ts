@@ -24,7 +24,9 @@ Here's what I need to know:
 2. How are you gonna make money without burning through my cash?
 3. Who's actually gonna pay for this shit?
 
-Don't sugarcoat it - I've seen more pitches than you've had hot dinners.`
+Don't sugarcoat it - I've seen more pitches than you've had hot dinners.`,
+    image: '/placeholder-vc.jpg',
+    description: 'Legendary Silicon Valley VC, known for early bets on category-defining companies.'
   },
   {
     id: 'a16z',
@@ -40,7 +42,9 @@ Quick questions:
 2. Who's your competition and why are you better?
 3. What's your secret sauce that'll make me look like a genius?
 
-Don't @ me with that "we're the Uber of X" bullshit.`
+Don't @ me with that "we're the Uber of X" bullshit.`,
+    image: '/placeholder-vc.jpg',
+    description: 'Big bets, big checks, and content-rich thought leadership.'
   },
   {
     id: 'ycombinator',
@@ -56,7 +60,9 @@ Need to know:
 2. Why now? Like, why the fuck now?
 3. How are you gonna not die in the next 6 months?
 
-Keep it real - I've funded companies that started in garages (literally).`
+Keep it real - I've funded companies that started in garages (literally).`,
+    image: '/placeholder-vc.jpg',
+    description: 'The most famous startup accelerator in the world.'
   },
   {
     id: 'jean',
@@ -72,7 +78,9 @@ Let's talk about:
 2. Your team - are they actually good or just good at LinkedIn?
 3. Your competition - because I know you're not the only one doing this
 
-Don't try to impress me with your French - I've heard it all.`
+Don't try to impress me with your French - I've heard it all.`,
+    image: '/placeholder-vc.jpg',
+    description: 'A French venture capitalist and entrepreneur.'
   },
   {
     id: 'alice',
@@ -88,7 +96,9 @@ Quick reality check:
 2. What's your actual moat? (And no, "first mover advantage" isn't a moat)
 3. Why should I bet on you instead of the 10 other startups doing the same thing?
 
-Keep it real - I've seen more pitch decks than there are baguettes in Paris.`
+Keep it real - I've seen more pitch decks than there are baguettes in Paris.`,
+    image: '/placeholder-vc.jpg',
+    description: 'A French entrepreneur and investor.'
   },
   {
     id: 'marie-ekeland',
@@ -103,7 +113,9 @@ I'm curious about:
 - What inspires me about your idea
 - What needs more work
 
-Let me share my thoughts with you...`
+Let me share my thoughts with you...`,
+    image: '/placeholder-vc.jpg',
+    description: 'A Norwegian venture capitalist and entrepreneur.'
   },
   {
     id: 'nicolas-debock',
@@ -118,7 +130,9 @@ I'll focus on:
 - How clear your message is
 - What needs improvement
 
-Let me break this down for you...`
+Let me break this down for you...`,
+    image: '/placeholder-vc.jpg',
+    description: 'A French venture capitalist and entrepreneur.'
   },
   {
     id: 'pauline-roux',
@@ -133,7 +147,9 @@ I'll examine:
 - The structure of your deck
 - What needs improvement
 
-Let me share my technical perspective...`
+Let me share my technical perspective...`,
+    image: '/placeholder-vc.jpg',
+    description: 'A French venture capitalist and entrepreneur.'
   },
   {
     id: 'roxanne-varza',
@@ -148,7 +164,9 @@ I'll look at:
 - What makes you unique
 - Where you can improve
 
-Let me share my ecosystem insights...`
+Let me share my ecosystem insights...`,
+    image: '/placeholder-vc.jpg',
+    description: 'A French venture capitalist and entrepreneur.'
   },
   {
     id: 'marc-simoncini',
@@ -163,7 +181,9 @@ I'll focus on:
 - What works and what doesn't
 - How to improve
 
-Let me share my market wisdom...`
+Let me share my market wisdom...`,
+    image: '/placeholder-vc.jpg',
+    description: 'A French venture capitalist and entrepreneur.'
   },
   {
     id: 'oussama-ammar',
@@ -178,7 +198,9 @@ I'll look at:
 - What makes you stand out
 - Where you can improve
 
-Let me share my thoughts...`
+Let me share my thoughts...`,
+    image: '/placeholder-vc.jpg',
+    description: 'A French venture capitalist and entrepreneur.'
   },
   {
     id: 'celine-lazorthes',
@@ -193,7 +215,9 @@ I'll focus on:
 - What works and what doesn't
 - How to stand out
 
-Let me share my insights...`
+Let me share my insights...`,
+    image: '/placeholder-vc.jpg',
+    description: 'A French venture capitalist and entrepreneur.'
   },
   {
     id: 'xavier-niel',
@@ -208,7 +232,9 @@ I'll look at:
 - What makes you unique
 - Where you can improve
 
-Let me share my thoughts...`
+Let me share my thoughts...`,
+    image: '/placeholder-vc.jpg',
+    description: 'A French venture capitalist and entrepreneur.'
   },
   {
     id: 'fred-wilson',
@@ -223,7 +249,9 @@ I'll focus on:
 - What works and what doesn't
 - How to stand out
 
-Let me share my perspective...`
+Let me share my perspective...`,
+    image: '/placeholder-vc.jpg',
+    description: 'A venture capitalist and entrepreneur.'
   },
   {
     id: 'alexis-ohanian',
@@ -238,7 +266,9 @@ I'll look at:
 - What makes you unique
 - Where you can improve
 
-Let me share my excitement...`
+Let me share my excitement...`,
+    image: '/placeholder-vc.jpg',
+    description: 'A venture capitalist and entrepreneur.'
   },
   {
     id: 'rebecca-kaden',
@@ -253,7 +283,9 @@ I'll focus on:
 - What works and what doesn't
 - How to improve
 
-Let me share my thoughts...`
+Let me share my thoughts...`,
+    image: '/placeholder-vc.jpg',
+    description: 'A venture capitalist and entrepreneur.'
   },
   {
     id: 'ben-sun',
@@ -268,7 +300,9 @@ I'll look at:
 - What works and what doesn't
 - How to improve
 
-Let me share my insights...`
+Let me share my insights...`,
+    image: '/placeholder-vc.jpg',
+    description: 'A venture capitalist and entrepreneur.'
   },
   {
     id: 'angela-lee',
@@ -283,7 +317,9 @@ I'll focus on:
 - What works and what doesn't
 - How to stand out
 
-Let me share my knowledge...`
+Let me share my knowledge...`,
+    image: '/placeholder-vc.jpg',
+    description: 'A venture capitalist and entrepreneur.'
   },
   {
     id: 'charlie-odonnell',
@@ -298,7 +334,9 @@ I'll look at:
 - What works and what doesn't
 - How to improve
 
-Let me share my local insights...`
+Let me share my local insights...`,
+    image: '/placeholder-vc.jpg',
+    description: 'A venture capitalist and entrepreneur.'
   },
   {
     id: 'anu-duggal',
@@ -313,7 +351,9 @@ I'll focus on:
 - What works and what doesn't
 - How to improve
 
-Let me share my thoughts...`
+Let me share my thoughts...`,
+    image: '/placeholder-vc.jpg',
+    description: 'A venture capitalist and entrepreneur.'
   },
   {
     id: 'hunter-walk',
@@ -328,7 +368,9 @@ I'll look at:
 - What works and what doesn't
 - How to stand out
 
-Let me share my insights...`
+Let me share my insights...`,
+    image: '/placeholder-vc.jpg',
+    description: 'A venture capitalist and entrepreneur.'
   },
   {
     id: 'jenny-fielding',
@@ -343,7 +385,9 @@ I'll focus on:
 - What works and what doesn't
 - How to improve
 
-Let me share my experience...`
+Let me share my experience...`,
+    image: '/placeholder-vc.jpg',
+    description: 'A venture capitalist and entrepreneur.'
   },
   {
     id: 'david-tisch',
@@ -358,6 +402,8 @@ I'll look at:
 - What works and what doesn't
 - How to improve
 
-Let me share my thoughts...`
+Let me share my thoughts...`,
+    image: '/placeholder-vc.jpg',
+    description: 'A venture capitalist and entrepreneur.'
   }
 ]; 
