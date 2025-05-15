@@ -6,24 +6,95 @@ import { motion } from 'framer-motion';
 
 const vcs = [
   {
-    city: 'Paris',
-    people: [
-      { name: 'Jean de La Rochebrochard', firm: 'Kima Ventures', desc: 'High-velocity investing (600+ startups), founder-first approach' },
-      { name: 'Pauline Roux', firm: 'Elaia Partners', desc: 'B2B SaaS + Deep Tech conviction, surgical due diligence' },
-      { name: 'Roxanne Varza', firm: 'Station F', desc: 'Community queen of French tech, founder enabler' },
-      { name: 'Guillaume Moubeche', firm: 'Lemlist', desc: 'Bootstrapped success, marketing-native founder, now angel/VC hybrid' },
-      { name: 'Partech', firm: 'Partech', desc: 'Global firm with Paris HQ; strong B2B SaaS, fintech, climate' },
-    ],
+    name: 'Jean de La Rochebrochard',
+    firm: 'Kima Ventures',
+    location: 'Paris',
+    knownFor: 'High-velocity investing (600+ startups), founder-first approach',
+    stage: 'Pre-seed to Series A',
+    whyFoundersCare: 'Quick decisions, founder-friendly terms, global network',
+    vibe: 'Humorous, direct, founder-first',
+    podcasts: ['The Twenty Minute VC', 'Sifted']
   },
   {
-    city: 'New York',
-    people: [
-      { name: 'Y Combinator', firm: 'Y Combinator', desc: 'Launchpad of unicorns (Airbnb, Stripe, Reddit)' },
-      { name: 'Andreessen Horowitz', firm: 'a16z', desc: 'Big bets, big checks, and content-rich thought leadership' },
-      { name: 'BoxGroup', firm: 'BoxGroup', desc: 'Quiet power players of NYC pre-seed scene' },
-      { name: 'Lerer Hippeau', firm: 'Lerer Hippeau', desc: 'NYC DTC + SaaS engine; backers of Glossier, Warby Parker, Allbirds' },
-    ],
+    name: 'Pauline Roux',
+    firm: 'Elaia Partners',
+    location: 'Paris',
+    knownFor: 'B2B SaaS + Deep Tech conviction, surgical due diligence',
+    stage: 'Series A to B',
+    whyFoundersCare: 'Deep tech expertise, strong follow-on capabilities',
+    vibe: 'Technical, analytical, clear',
+    podcasts: ['Sifted']
   },
+  {
+    name: 'Roxanne Varza',
+    firm: 'Station F',
+    location: 'Paris',
+    knownFor: 'Community queen of French tech, founder enabler',
+    stage: 'Pre-seed to Series A',
+    whyFoundersCare: 'Access to largest startup campus, strong ecosystem',
+    vibe: 'Community-focused, supportive, ecosystem builder',
+    podcasts: ['Sifted']
+  },
+  {
+    name: 'Guillaume Moubeche',
+    firm: 'Lemlist',
+    location: 'Paris',
+    knownFor: 'Bootstrapped success, marketing-native founder, now angel/VC hybrid',
+    stage: 'Pre-seed to Seed',
+    whyFoundersCare: 'Marketing expertise, founder perspective',
+    vibe: 'Marketing-focused, direct, helpful',
+    podcasts: ['Sifted']
+  },
+  {
+    name: 'Partech',
+    firm: 'Partech',
+    location: 'Paris',
+    knownFor: 'Global firm with Paris HQ; strong B2B SaaS, fintech, climate',
+    stage: 'Series A to Growth',
+    whyFoundersCare: 'Global reach, strong follow-on, sector expertise',
+    vibe: 'Structured, founder-centric, global',
+    podcasts: ['Sifted']
+  },
+  {
+    name: 'Y Combinator',
+    firm: 'Y Combinator',
+    location: 'San Francisco',
+    knownFor: 'Launchpad of unicorns (Airbnb, Stripe, Reddit)',
+    stage: 'Pre-seed to Seed',
+    whyFoundersCare: 'Massive follow-on capital, global network',
+    vibe: 'Blunt, pragmatic, helpful',
+    podcasts: ['The Twenty Minute VC']
+  },
+  {
+    name: 'Andreessen Horowitz',
+    firm: 'a16z',
+    location: 'San Francisco',
+    knownFor: 'Big bets, big checks, and content-rich thought leadership',
+    stage: 'Series A to Growth',
+    whyFoundersCare: 'Massive follow-on capital, strong brand',
+    vibe: 'Intellectual, thesis-first, big picture',
+    podcasts: ['The Twenty Minute VC']
+  },
+  {
+    name: 'BoxGroup',
+    firm: 'BoxGroup',
+    location: 'New York',
+    knownFor: 'Quiet power players of NYC pre-seed scene',
+    stage: 'Pre-seed to Seed',
+    whyFoundersCare: 'Quick decisions, founder-friendly terms',
+    vibe: 'Chill, smart, helpful',
+    podcasts: ['The Twenty Minute VC']
+  },
+  {
+    name: 'Lerer Hippeau',
+    firm: 'Lerer Hippeau',
+    location: 'New York',
+    knownFor: 'NYC DTC + SaaS engine; backers of Glossier, Warby Parker, Allbirds',
+    stage: 'Seed to Series A',
+    whyFoundersCare: 'Strong brand building expertise, NYC network',
+    vibe: 'Brand-focused, savvy, helpful',
+    podcasts: ['The Twenty Minute VC']
+  }
 ];
 
 export default function FeedbackStylePage() {
@@ -33,8 +104,8 @@ export default function FeedbackStylePage() {
   const [search, setSearch] = useState('');
 
   const filteredVCs = vcs
-    .filter(group => filter === 'all' || group.city === filter)
-    .flatMap(group => group.people.map(vc => ({ ...vc, city: group.city })));
+    .filter(group => filter === 'all' || group.location === filter)
+    .flatMap(group => group.map(vc => ({ ...vc, city: group.location })));
 
   const searchedVCs = filteredVCs.filter(vc =>
     vc.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -91,7 +162,7 @@ export default function FeedbackStylePage() {
             <div className="col-span-2 text-center text-gray-500">No VCs found.</div>
           ) : (
             searchedVCs.map(vc => {
-              const value = `${vc.name} | ${vc.firm} | ${vc.desc}`;
+              const value = `${vc.name} | ${vc.firm} | ${vc.knownFor}`;
               return (
                 <div key={vc.name}>
                   <label className={`block p-4 border rounded-lg cursor-pointer transition-colors ${selected === value ? 'border-indigo-600 bg-indigo-50' : 'border-gray-200 hover:border-indigo-300'}`}>
@@ -104,7 +175,7 @@ export default function FeedbackStylePage() {
                       className="mr-3"
                     />
                     <span className="font-bold">{vc.name}</span> <span className="text-gray-500">({vc.firm})</span>
-                    <div className="text-sm text-gray-600 mt-1">{vc.desc}</div>
+                    <div className="text-sm text-gray-600 mt-1">{vc.knownFor}</div>
                   </label>
                 </div>
               );
