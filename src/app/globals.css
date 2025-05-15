@@ -225,9 +225,9 @@ body {
 }
 
 /* Transitions */
-.transition-all {
-  @apply transition-all duration-200 ease-out;
-}
+// .transition-all {
+//   @apply transition-all duration-200 ease-out;
+// }
 
 .transition-transform {
   @apply transition-transform duration-200 ease-out;
