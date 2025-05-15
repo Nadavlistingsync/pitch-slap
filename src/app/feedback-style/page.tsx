@@ -103,13 +103,12 @@ export default function FeedbackStylePage() {
   const [filter, setFilter] = useState<'all' | 'Paris' | 'New York'>('all');
   const [search, setSearch] = useState('');
 
-  const filteredVCs = vcs
-    .filter(group => filter === 'all' || group.location === filter)
-    .flatMap(group => group.map(vc => ({ ...vc, city: group.location })));
+  const filteredVCs = vcs.filter(vc => filter === 'all' || vc.location === filter);
 
   const searchedVCs = filteredVCs.filter(vc =>
     vc.name.toLowerCase().includes(search.toLowerCase()) ||
-    vc.firm.toLowerCase().includes(search.toLowerCase())
+    vc.firm.toLowerCase().includes(search.toLowerCase()) ||
+    vc.knownFor.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleContinue = () => {
