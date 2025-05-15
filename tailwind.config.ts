@@ -28,6 +28,7 @@ const config: Config = {
         'custom': '0 4px 20px rgba(0,0,0,0.2)',
         'glow-pink': '0 0 40px 0 #ff4154, 0 0 80px 0 #a78bfa',
         'glass': '0 4px 32px 0 rgba(0,0,0,0.25)',
+        'glow': '0 0 15px rgba(99,102,241,0.3)',
       },
       backgroundImage: {
         'ego-gradient': 'radial-gradient(ellipse at top, #ff4154 0%, #a78bfa 50%, #0a0a0a 100%)',
