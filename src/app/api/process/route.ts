@@ -15,37 +15,62 @@ const idMap: Record<string, string> = {
   // Add more mappings as needed
 };
 
-export async function POST(req: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const { deckContent, vcStyle, roastIntensity } = await req.json();
+    const formData = await request.formData();
+    const file = formData.get('file') as File;
+    const vcId = formData.get('vcId') as string;
+    const roastIntensity = formData.get('roastIntensity') as 'gentle' | 'balanced' | 'brutal';
 
-    const prompt = `As a ${vcStyle} VC, analyze this pitch deck with ${roastIntensity} intensity. Focus on:
-    1. Market opportunity and size
-    2. Business model and revenue potential
-    3. Team and execution capability
-    4. Competition and differentiation
-    5. Financial projections and funding ask
-    Provide brutally honest feedback that will help the founders improve their pitch.`;
+    if (!file || !vcId) {
+      return NextResponse.json(
+        { error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
 
-    const completion = await openai.chat.completions.create({
-      messages: [
-        { role: "system", content: "You are a seasoned VC with a reputation for brutal honesty and valuable feedback." },
-        { role: "user", content: prompt + "\n\nPitch Deck Content:\n" + deckContent }
-      ],
-      model: "gpt-4-turbo-preview",
-      temperature: 0.7,
-      max_tokens: 2000,
-    });
+    // Find the selected VC
+    const selectedVC = vcPrompts.find(vc => vc.id === vcId);
+    if (!selectedVC) {
+      return NextResponse.json(
+        { error: 'Invalid VC selected' },
+        { status: 400 }
+      );
+    }
 
-    return NextResponse.json({ 
-      feedback: completion.choices[0].message.content,
-      timestamp: new Date().toISOString()
+    // Process the file and generate feedback based on roast intensity
+    // This is where you would integrate with your AI service
+    const feedback = await generateFeedback(file, selectedVC, roastIntensity);
+
+    return NextResponse.json({
+      success: true,
+      feedback,
+      vc: selectedVC,
+      roastIntensity
     });
   } catch (error) {
-    console.error('Error processing pitch deck:', error);
+    console.error('Error processing file:', error);
     return NextResponse.json(
-      { error: 'Failed to process pitch deck' },
+      { error: 'Failed to process file' },
       { status: 500 }
     );
   }
+}
+
+async function generateFeedback(
+  file: File,
+  vc: typeof vcPrompts[0],
+  intensity: 'gentle' | 'balanced' | 'brutal'
+) {
+  // This is a placeholder for the actual AI integration
+  // You would implement the actual file processing and feedback generation here
+  return {
+    summary: `Feedback from ${vc.name} (${intensity} intensity)`,
+    points: [
+      'Market size needs to be more realistic',
+      'Team slide is strong',
+      'Unit economics need improvement',
+      'Go-to-market strategy needs more detail'
+    ]
+  };
 } 

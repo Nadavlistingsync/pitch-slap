@@ -25,7 +25,7 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
             <button
-              onClick={() => router.push('/upload')}
+              onClick={() => router.push('/select')}
               className="btn-primary group"
             >
               Get Roasted
