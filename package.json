@@ -12,7 +12,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "db:stats": "ts-node scripts/db-stats.ts",
+    "db:analyze": "ts-node scripts/analyze-query.ts",
+    "db:monitor": "ts-node scripts/monitor-db.ts"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.3",
@@ -23,9 +26,11 @@
     "@tailwindcss/typography": "^0.5.16",
     "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^20.11.16",
+    "@types/pg": "^8.11.0",
     "@types/react": "^18.2.52",
     "@types/react-dom": "^18.2.18",
     "@types/uuid": "^10.0.0",
+    "@upstash/redis": "^1.28.4",
     "autoprefixer": "^10.4.17",
     "canvas-confetti": "^1.9.3",
     "eslint": "^8.56.0",
@@ -34,6 +39,7 @@
     "lucide-react": "^0.510.0",
     "next": "14.1.0",
     "openai": "^4.97.0",
+    "pg": "^8.11.3",
     "pdf-parse": "^1.1.1",
     "postcss": "^8.4.35",
     "react": "^18.2.0",
@@ -46,6 +52,7 @@
   },
   "devDependencies": {
     "@types/pdf-parse": "^1.1.5",
-    "prisma": "^5.22.0"
+    "prisma": "^5.22.0",
+    "ts-node": "^10.9.2"
   }
 }

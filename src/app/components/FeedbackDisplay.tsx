@@ -1,41 +1,76 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, memo } from 'react';
 import { vcPrompts } from '@/lib/vcPrompts';
 import Image from 'next/image';
+import { logger } from '@/lib/logger';
 
 interface FeedbackDisplayProps {
   feedback: string;
   vcId: string;
 }
 
-export default function FeedbackDisplay({ feedback, vcId }: FeedbackDisplayProps) {
+const FeedbackDisplay = memo(({ feedback, vcId }: FeedbackDisplayProps) => {
   const [displayedFeedback, setDisplayedFeedback] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const vcPrompt = vcPrompts.find(vc => vc.id === vcId);
 
   useEffect(() => {
-    if (!feedback) return;
+    logger.info('FeedbackDisplay mounted', {
+      vcId,
+      hasFeedback: !!feedback,
+      vcName: vcPrompt?.name
+    });
+  }, [vcId, feedback, vcPrompt]);
+
+  const typeFeedback = useCallback((text: string) => {
+    if (!text) {
+      logger.debug('No feedback text to display');
+      return;
+    }
+
+    logger.debug('Starting feedback typing animation', {
+      textLength: text.length
+    });
 
     setIsTyping(true);
     let currentText = '';
-    const words = feedback.split(' ');
+    const words = text.split(' ');
     let currentIndex = 0;
 
     const typingInterval = setInterval(() => {
       if (currentIndex >= words.length) {
         clearInterval(typingInterval);
         setIsTyping(false);
+        logger.debug('Feedback typing animation completed');
         return;
       }
 
       currentText += (currentIndex === 0 ? '' : ' ') + words[currentIndex];
       setDisplayedFeedback(currentText);
       currentIndex++;
-    }, 100); // Adjust speed as needed
 
-    return () => clearInterval(typingInterval);
-  }, [feedback]);
+      if (currentIndex % 10 === 0) {
+        logger.debug('Feedback typing progress', {
+          progress: Math.round((currentIndex / words.length) * 100),
+          wordsTyped: currentIndex,
+          totalWords: words.length
+        });
+      }
+    }, 100);
+
+    return () => {
+      clearInterval(typingInterval);
+      logger.debug('Feedback typing animation cleanup');
+    };
+  }, []);
+
+  useEffect(() => {
+    const cleanup = typeFeedback(feedback);
+    return () => {
+      if (cleanup) cleanup();
+    };
+  }, [feedback, typeFeedback]);
 
   return (
     <div className="max-w-2xl mx-auto bg-gray-100 rounded-lg p-4">
@@ -63,4 +98,8 @@ export default function FeedbackDisplay({ feedback, vcId }: FeedbackDisplayProps
       </div>
     </div>
   );
-} 
+});
+
+FeedbackDisplay.displayName = 'FeedbackDisplay';
+
+export default FeedbackDisplay; 

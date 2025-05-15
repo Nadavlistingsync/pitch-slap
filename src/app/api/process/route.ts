@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { vcPrompts } from '@/lib/vcPrompts';
+import { Redis } from '@upstash/redis';
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL || '',
+  token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
+});
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -14,6 +20,9 @@ const idMap: Record<string, string> = {
   yc: 'nicolas-debock',
   // Add more mappings as needed
 };
+
+// Cache TTL in seconds
+const CACHE_TTL = 3600; // 1 hour
 
 export async function POST(request: Request) {
   try {
@@ -29,6 +38,15 @@ export async function POST(request: Request) {
       );
     }
 
+    // Generate cache key
+    const cacheKey = `feedback:${vcId}:${roastIntensity}:${file.name}`;
+
+    // Check cache first
+    const cachedResult = await redis.get(cacheKey);
+    if (cachedResult) {
+      return NextResponse.json(JSON.parse(cachedResult as string));
+    }
+
     // Find the selected VC
     const selectedVC = vcPrompts.find(vc => vc.id === vcId);
     if (!selectedVC) {
@@ -38,16 +56,20 @@ export async function POST(request: Request) {
       );
     }
 
-    // Process the file and generate feedback based on roast intensity
-    // This is where you would integrate with your AI service
+    // Process the file and generate feedback
     const feedback = await generateFeedback(file, selectedVC, roastIntensity);
 
-    return NextResponse.json({
+    const result = {
       success: true,
       feedback,
       vc: selectedVC,
       roastIntensity
-    });
+    };
+
+    // Cache the result
+    await redis.set(cacheKey, JSON.stringify(result), { ex: CACHE_TTL });
+
+    return NextResponse.json(result);
   } catch (error) {
     console.error('Error processing file:', error);
     return NextResponse.json(
@@ -62,15 +84,20 @@ async function generateFeedback(
   vc: typeof vcPrompts[0],
   intensity: 'gentle' | 'balanced' | 'brutal'
 ) {
-  // This is a placeholder for the actual AI integration
-  // You would implement the actual file processing and feedback generation here
-  return {
-    summary: `Feedback from ${vc.name} (${intensity} intensity)`,
-    points: [
-      'Market size needs to be more realistic',
-      'Team slide is strong',
-      'Unit economics need improvement',
-      'Go-to-market strategy needs more detail'
-    ]
-  };
+  try {
+    // Implement actual file processing and feedback generation here
+    // This is a placeholder for the actual implementation
+    return {
+      summary: `Feedback from ${vc.name} (${intensity} intensity)`,
+      points: [
+        'Market size needs to be more realistic',
+        'Team slide is strong',
+        'Unit economics need improvement',
+        'Go-to-market strategy needs more detail'
+      ]
+    };
+  } catch (error) {
+    console.error('Error generating feedback:', error);
+    throw error;
+  }
 } 

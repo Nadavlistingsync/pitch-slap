@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { logger } from '@/lib/logger';
 
 interface SlideFeedbackProps {
   slideNumber: number;
@@ -29,24 +30,44 @@ export default function SlideFeedback({ slideNumber, onSubmit }: SlideFeedbackPr
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({
+    
+    logger.info('Submitting slide feedback', {
       slideNumber,
-      content,
       rating,
-      comments: comments || undefined,
       brutalityLevel,
+      hasContent: !!content,
+      hasComments: !!comments
     });
-    // Reset form
-    setRating(0);
-    setContent('');
-    setComments('');
-    setBrutalityLevel('moderate');
+
+    try {
+      onSubmit({
+        slideNumber,
+        content,
+        rating,
+        comments,
+        brutalityLevel,
+      });
+
+      logger.debug('Feedback submitted successfully');
+      
+      // Reset form
+      setRating(0);
+      setContent('');
+      setComments('');
+      setBrutalityLevel('moderate');
+    } catch (error) {
+      logger.error('Error submitting feedback', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined
+      });
+    }
   };
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
       className="bg-white/10 backdrop-blur-lg rounded-lg p-6 shadow-lg"
     >
       <h3 className="text-xl font-bold mb-4">Slide {slideNumber} Feedback</h3>
@@ -79,7 +100,10 @@ export default function SlideFeedback({ slideNumber, onSubmit }: SlideFeedbackPr
               <button
                 key={star}
                 type="button"
-                onClick={() => setRating(star)}
+                onClick={() => {
+                  setRating(star);
+                  logger.debug('Rating updated', { rating: star });
+                }}
                 className={`text-2xl ${
                   rating >= star ? 'text-yellow-400' : 'text-gray-400'
                 } hover:text-yellow-400 transition-colors`}
@@ -94,7 +118,12 @@ export default function SlideFeedback({ slideNumber, onSubmit }: SlideFeedbackPr
           <label className="block text-sm font-medium mb-2">Feedback</label>
           <textarea
             value={content}
-            onChange={(e) => setContent(e.target.value)}
+            onChange={(e) => {
+              setContent(e.target.value);
+              logger.debug('Feedback content updated', { 
+                contentLength: e.target.value.length 
+              });
+            }}
             className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             rows={3}
             required
@@ -106,7 +135,12 @@ export default function SlideFeedback({ slideNumber, onSubmit }: SlideFeedbackPr
           <label className="block text-sm font-medium mb-2">Additional Comments (Optional)</label>
           <textarea
             value={comments}
-            onChange={(e) => setComments(e.target.value)}
+            onChange={(e) => {
+              setComments(e.target.value);
+              logger.debug('Additional comments updated', { 
+                commentsLength: e.target.value.length 
+              });
+            }}
             className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             rows={2}
             placeholder="Any additional comments or suggestions?"
