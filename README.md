@@ -1,24 +1,24 @@
-# Pitch Slap
+# PitchSlap - Brutally Honest VC Feedback
 
-A modern web application that helps users transform their pitch decks with AI-powered design suggestions. Built with Next.js 15 and Tailwind CSS.
+Get brutally honest feedback on your pitch deck from AI-powered VCs. No sugar coating, just straight talk to help you raise your next round.
 
 ## Features
 
-- PDF upload and processing
-- AI-powered layout suggestions
-- Custom branding options
-- Multiple design templates
-- Interactive preview and customization
-- Export to PPTX format
+- Upload and analyze pitch decks
+- Get feedback from different VC personalities
+- Choose your preferred feedback intensity
+- Share your VC rejection stories in the Ego Dump
+- Modern, responsive UI with smooth animations
 
 ## Tech Stack
 
-- Next.js 15
+- Next.js 14
 - TypeScript
 - Tailwind CSS
+- Prisma
+- PostgreSQL
+- OpenAI GPT-4
 - Framer Motion
-- React Dropzone
-- React Colorful
 
 ## Getting Started
 
@@ -33,12 +33,30 @@ cd pitch-slap
 npm install
 ```
 
-3. Run the development server:
+3. Set up environment variables:
+Create a `.env` file in the root directory with the following variables:
+```
+DATABASE_URL="your-postgresql-url"
+OPENAI_API_KEY="your-openai-api-key"
+NEXT_PUBLIC_APP_URL="your-app-url"
+```
+
+4. Set up the database:
+```bash
+npx prisma generate
+npx prisma db push
+```
+
+5. Run the development server:
 ```bash
 npm run dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+6. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Deployment
+
+The project is configured for deployment on Vercel. Simply connect your GitHub repository to Vercel and set up the environment variables.
 
 ## Project Structure
 

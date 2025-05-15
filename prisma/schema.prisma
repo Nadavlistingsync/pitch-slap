@@ -17,14 +17,13 @@ model EgoDump {
   likes     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  comments  Comment[]
 }
 
-model Comment {
+model Feedback {
   id        String   @id @default(cuid())
   content   String
+  vcStyle   String
+  intensity String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  dump      EgoDump  @relation(fields: [dumpId], references: [id])
-  dumpId    String
 } 

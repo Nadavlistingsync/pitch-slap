@@ -17,88 +17,34 @@ const idMap: Record<string, string> = {
 
 export async function POST(req: NextRequest) {
   try {
-    const formData = await req.formData();
-    const file = formData.get('file') as File | null;
-    const vcId = formData.get('vcId') as string | null;
-    const roastIntensity = formData.get('roastIntensity') as string | null;
+    const { deckContent, vcStyle, roastIntensity } = await req.json();
 
-    console.log('[API/process] Incoming request:', { vcId, fileType: file?.type, fileName: file?.name });
+    const prompt = `As a ${vcStyle} VC, analyze this pitch deck with ${roastIntensity} intensity. Focus on:
+    1. Market opportunity and size
+    2. Business model and revenue potential
+    3. Team and execution capability
+    4. Competition and differentiation
+    5. Financial projections and funding ask
+    Provide brutally honest feedback that will help the founders improve their pitch.`;
 
-    if (!file) {
-      console.log('[API/process] No file uploaded.');
-      return NextResponse.json({ error: 'No file uploaded.' }, { status: 400 });
-    }
-
-    // Read the file buffer directly
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    let extractedText = '';
-    if (file.type === 'application/pdf') {
-      try {
-        const pdfParse = (await import('pdf-parse')).default;
-        const pdfData = await pdfParse(buffer);
-        extractedText = pdfData.text;
-        console.log('[API/process] PDF parsed successfully.');
-      } catch (err) {
-        console.error('[API/process] Failed to parse PDF:', err);
-        return NextResponse.json({ error: 'Failed to parse PDF.' }, { status: 400 });
-      }
-    } else if (file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') {
-      // Optionally: handle PPTX parsing here if needed
-      extractedText = `PPTX file uploaded: ${file.name}`;
-      console.log('[API/process] PPTX file received.');
-    } else {
-      console.log('[API/process] Unsupported file type:', file.type);
-      return NextResponse.json({ error: 'Unsupported file type.' }, { status: 400 });
-    }
-
-    // Map old VC IDs to new ones if needed
-    const realVcId = idMap[vcId ?? ''] || vcId;
-    const vcPrompt = vcPrompts.find(vc => vc.id === realVcId);
-    console.log('[API/process] VC prompt lookup:', { vcId, realVcId, found: !!vcPrompt });
-
-    let prompt = '';
-    let model = 'gpt-4';
-
-    // Add roast intensity instruction
-    let intensityInstruction = '';
-    if (roastIntensity === 'brutal') {
-      intensityInstruction = 'Give feedback that is extremely harsh, brutally honest, and direct. Do not hold back, be as critical and blunt as possible.';
-    } else if (roastIntensity === 'gentle') {
-      intensityInstruction = 'Give feedback that is gentle, supportive, and constructive. Focus on encouragement and actionable advice.';
-    } else {
-      intensityInstruction = 'Give feedback that is honest and direct, but also balanced with encouragement and constructive advice.';
-    }
-
-    if (vcPrompt) {
-      prompt = `${intensityInstruction}\n\n${vcPrompt.prompt}\n\nPitch deck content:\n${extractedText}`;
-      model = vcPrompt.model;
-    } else {
-      prompt = `${intensityInstruction}\n\nYou are a top venture capitalist.\nPitch deck content:\n${extractedText}`;
-    }
-
-    // Call OpenAI
     const completion = await openai.chat.completions.create({
-      messages: [{ role: 'user', content: prompt }],
-      model: model,
+      messages: [
+        { role: "system", content: "You are a seasoned VC with a reputation for brutal honesty and valuable feedback." },
+        { role: "user", content: prompt + "\n\nPitch Deck Content:\n" + deckContent }
+      ],
+      model: "gpt-4-turbo-preview",
       temperature: 0.7,
-      max_tokens: 1000,
+      max_tokens: 2000,
     });
 
-    const commentary = completion.choices[0]?.message?.content;
-    console.log('[API/process] OpenAI response received.');
-
-    return NextResponse.json({
-      success: true,
-      commentary,
-      vcId,
-      model,
+    return NextResponse.json({ 
+      feedback: completion.choices[0].message.content,
+      timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error('[API/process] Error processing file:', error);
+    console.error('Error processing pitch deck:', error);
     return NextResponse.json(
-      { error: 'Failed to process file.' },
+      { error: 'Failed to process pitch deck' },
       { status: 500 }
     );
   }
