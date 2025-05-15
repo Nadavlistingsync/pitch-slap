@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Search, MapPin, Building2, Award, Users, MessageSquare } from 'lucide-react';
 
 interface VC {
   name: string;
@@ -189,25 +190,135 @@ export default function VCPrompts() {
   );
 
   return (
-    <div className="flex flex-wrap justify-center gap-6 max-w-5xl mx-auto">
-      {vcData.map((vc, i) => (
-        <div
-          key={i}
-          className="bg-[#111] p-6 rounded-2xl w-full sm:w-[300px] text-left border border-gray-800"
-        >
-          <div className="text-lg font-semibold mb-2">{vc.name}</div>
-          <p className="text-gray-400 text-sm">
-            "{vc.comment}"
-          </p>
-          <div className="mt-4">
-            <img
-              src={vc.logo}
-              alt={`${vc.name} logo`}
-              className="h-6"
-            />
+    <div className="w-full">
+      {/* Search bar */}
+      <div className="max-w-xl mx-auto mb-12">
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <input
+            type="text"
+            placeholder="Search VCs by name, firm, or location..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="input-field pl-12"
+          />
+        </div>
+      </div>
+
+      {/* VC Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredVCs.map((vc, index) => (
+          <div
+            key={index}
+            className="card hover-lift cursor-pointer transition-all duration-300"
+            onClick={() => setSelectedVC(vc)}
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h3 className="text-xl font-semibold mb-1">{vc.name}</h3>
+                <div className="flex items-center text-gray-400 text-sm gap-2">
+                  <Building2 className="w-4 h-4" />
+                  <span>{vc.firm}</span>
+                </div>
+              </div>
+              <div className="text-sm font-medium px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400">
+                {vc.stage}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-start gap-2">
+                <MapPin className="w-4 h-4 text-gray-400 mt-1" />
+                <span className="text-sm text-gray-300">{vc.location}</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Award className="w-4 h-4 text-gray-400 mt-1" />
+                <span className="text-sm text-gray-300">{vc.knownFor}</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Users className="w-4 h-4 text-gray-400 mt-1" />
+                <span className="text-sm text-gray-300">{vc.whyFoundersCare}</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <MessageSquare className="w-4 h-4 text-gray-400 mt-1" />
+                <span className="text-sm text-gray-300">{vc.vibe}</span>
+              </div>
+            </div>
+
+            {/* Podcasts */}
+            <div className="mt-4 pt-4 border-t border-gray-800/50">
+              <h4 className="text-sm font-medium text-gray-400 mb-2">Featured Podcasts</h4>
+              <div className="space-y-2">
+                {vc.podcasts.slice(0, 2).map((podcast, i) => (
+                  <div key={i} className="text-sm text-gray-500 line-clamp-1">
+                    {podcast}
+                  </div>
+                ))}
+                {vc.podcasts.length > 2 && (
+                  <div className="text-sm text-indigo-400">
+                    +{vc.podcasts.length - 2} more
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* VC Detail Modal */}
+      {selectedVC && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="card max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-start mb-6">
+              <div>
+                <h2 className="text-2xl font-bold mb-2">{selectedVC.name}</h2>
+                <div className="flex items-center gap-2 text-gray-400">
+                  <Building2 className="w-4 h-4" />
+                  <span>{selectedVC.firm}</span>
+                  <span className="mx-2">•</span>
+                  <MapPin className="w-4 h-4" />
+                  <span>{selectedVC.location}</span>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedVC(null)}
+                className="text-gray-400 hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-sm font-medium text-gray-400 mb-2">Known For</h3>
+                <p className="text-gray-300">{selectedVC.knownFor}</p>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-gray-400 mb-2">Investment Stage</h3>
+                <p className="text-gray-300">{selectedVC.stage}</p>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-gray-400 mb-2">Why Founders Care</h3>
+                <p className="text-gray-300">{selectedVC.whyFoundersCare}</p>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-gray-400 mb-2">Vibe</h3>
+                <p className="text-gray-300">{selectedVC.vibe}</p>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-gray-400 mb-2">Featured Podcasts</h3>
+                <ul className="space-y-2">
+                  {selectedVC.podcasts.map((podcast, i) => (
+                    <li key={i} className="text-gray-300 text-sm">
+                      {podcast}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
-      ))}
+      )}
     </div>
   );
 } 
