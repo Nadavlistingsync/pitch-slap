@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import PitchDeckFeedback from '@/components/PitchDeckFeedback';
 
 const slides = [
   { id: 1, title: 'Introduction' },
@@ -108,6 +109,12 @@ export default function PreviewPage() {
           </div>
         </div>
       </div>
+
+      {/* Slide Feedback Component */}
+      <PitchDeckFeedback
+        currentSlide={selectedSlide}
+        totalSlides={slides.length}
+      />
     </main>
   );
 } 
