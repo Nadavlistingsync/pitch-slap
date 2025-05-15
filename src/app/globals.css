@@ -205,15 +205,6 @@ body {
   @apply transition-transform duration-200 hover:-translate-y-1;
 }
 
-/* Modern shadows */
-.shadow-soft {
-  @apply shadow-[0_8px_30px_rgb(0,0,0,0.12)];
-}
-
-.shadow-glow {
-  @apply shadow-[0_0_15px_rgba(99,102,241,0.3)];
-}
-
 /* Loading states */
 .loading {
   @apply relative overflow-hidden;
@@ -222,19 +213,6 @@ body {
 .loading::after {
   content: '';
   @apply absolute inset-0 animate-shimmer;
-}
-
-/* Transitions */
-// .transition-all {
-//   @apply transition-all duration-200 ease-out;
-// }
-
-.transition-transform {
-  @apply transition-transform duration-200 ease-out;
-}
-
-.transition-colors {
-  @apply transition-colors duration-200 ease-out;
 }
 
 /* Focus states */
