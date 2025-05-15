@@ -93,6 +93,10 @@ body {
   .gradient-border > div {
     @apply bg-gray-900 rounded-2xl h-full w-full;
   }
+
+  .hover-glow {
+    @apply transition-all duration-200 hover:shadow-[0_0_15px_rgba(99,102,241,0.3)];
+  }
 }
 
 /* Custom scrollbar */
@@ -199,10 +203,6 @@ body {
 /* Hover effects */
 .hover-lift {
   @apply transition-transform duration-200 hover:-translate-y-1;
-}
-
-.hover-glow {
-  @apply transition-all duration-200 hover:shadow-glow;
 }
 
 /* Modern shadows */
