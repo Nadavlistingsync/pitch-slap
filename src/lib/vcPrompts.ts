@@ -7,6 +7,8 @@ export interface VCPrompt {
   firm: string;
   prompt: string;
   model: string;
+  image?: string;
+  description?: string;
 }
 
 export const vcPrompts: VCPrompt[] = [
