@@ -5,41 +5,69 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { vcPrompts } from '@/lib/vcPrompts';
 
+// Performance monitoring
+const logProcessingPerformance = (startTime: number, operation: string) => {
+  const duration = Date.now() - startTime;
+  console.log(`Processing ${operation} took ${duration}ms`);
+};
+
 export default function ProcessingPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     const processDeck = async () => {
+      const startTime = Date.now();
       const vcId = localStorage.getItem('selectedVC');
       const roastIntensity = localStorage.getItem('roastIntensity') as 'gentle' | 'balanced' | 'brutal';
       const fileName = localStorage.getItem('uploadedFileName');
       const fileData = localStorage.getItem('uploadedFileData');
+
       if (!vcId || !fileName || !fileData) {
+        logProcessingPerformance(startTime, 'validation_failed');
         router.push('/select');
         return;
       }
+
       try {
+        setProgress(10);
         const file = new File([Uint8Array.from(atob(fileData), c => c.charCodeAt(0))], fileName);
         const formData = new FormData();
         formData.append('file', file);
         formData.append('vcId', vcId);
         formData.append('roastIntensity', roastIntensity || 'balanced');
-        const res = await fetch('/api/process', { method: 'POST', body: formData });
+
+        setProgress(30);
+        const res = await fetch('/api/process', { 
+          method: 'POST', 
+          body: formData,
+          headers: {
+            'Accept': 'application/json',
+          }
+        });
+
+        setProgress(60);
         const result = await res.json();
+
         if (result.error) {
+          logProcessingPerformance(startTime, 'error');
           setError(result.error);
           setLoading(false);
         } else {
+          logProcessingPerformance(startTime, 'success');
           window.sessionStorage.setItem('processingResult', JSON.stringify(result));
-          router.push('/feedback');
+          setProgress(100);
+          setTimeout(() => router.push('/feedback'), 500); // Small delay for smooth transition
         }
       } catch (err) {
+        logProcessingPerformance(startTime, 'error');
         setError('Failed to process your pitch deck.');
         setLoading(false);
       }
     };
+
     processDeck();
   }, [router]);
 
@@ -67,11 +95,19 @@ export default function ProcessingPage() {
           <p className="text-gray-400 mb-8">
             {error ? error : 'Our AI is carefully reviewing your pitch deck and preparing personalized feedback.'}
           </p>
+          
           {!error && loading && (
-            <div className="flex justify-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#ff4154]" />
+            <div className="space-y-4">
+              <div className="w-full bg-gray-700 rounded-full h-2.5">
+                <div 
+                  className="bg-[#ff4154] h-2.5 rounded-full transition-all duration-300"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+              <p className="text-sm text-gray-400">Progress: {progress}%</p>
             </div>
           )}
+
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
