@@ -51,66 +51,75 @@ interface PerformanceMetrics {
 }
 
 async function collectMetrics(): Promise<PerformanceMetrics> {
-  // Get slow queries
-  const slowQueries = await prisma.$queryRaw<SlowQuery[]>`
-    SELECT 
-      query,
-      calls,
-      total_time,
-      mean_time,
-      rows
-    FROM pg_stat_statements
-    WHERE mean_time > 1000
-    ORDER BY mean_time DESC
-    LIMIT 10;
-  `;
+  if (!prisma) {
+    throw new Error('Database connection not initialized');
+  }
 
-  // Get cache hit ratio
-  const cacheStats = await prisma.$queryRaw<CacheStats[]>`
-    SELECT 
-      sum(heap_blks_hit) / (sum(heap_blks_hit) + sum(heap_blks_read)) as hit_ratio
-    FROM pg_statio_user_tables;
-  `;
+  try {
+    // Get slow queries
+    const slowQueries = await prisma.$queryRaw<SlowQuery[]>`
+      SELECT 
+        query,
+        calls,
+        total_time,
+        mean_time,
+        rows
+      FROM pg_stat_statements
+      WHERE mean_time > 1000
+      ORDER BY mean_time DESC
+      LIMIT 10;
+    `;
 
-  // Get active connections
-  const connections = await prisma.$queryRaw<ConnectionStats[]>`
-    SELECT count(*) as active_connections
-    FROM pg_stat_activity
-    WHERE state = 'active';
-  `;
+    // Get cache hit ratio
+    const cacheStats = await prisma.$queryRaw<CacheStats[]>`
+      SELECT 
+        sum(heap_blks_hit) / (sum(heap_blks_hit) + sum(heap_blks_read)) as hit_ratio
+      FROM pg_statio_user_tables;
+    `;
 
-  // Get table sizes
-  const tableSizes = await prisma.$queryRaw<TableSize[]>`
-    SELECT 
-      relname as table_name,
-      pg_size_pretty(pg_total_relation_size(relid)) as total_size,
-      pg_size_pretty(pg_relation_size(relid)) as table_size,
-      pg_size_pretty(pg_total_relation_size(relid) - pg_relation_size(relid)) as index_size
-    FROM pg_stat_user_tables
-    ORDER BY pg_total_relation_size(relid) DESC;
-  `;
+    // Get active connections
+    const connections = await prisma.$queryRaw<ConnectionStats[]>`
+      SELECT count(*) as active_connections
+      FROM pg_stat_activity
+      WHERE state = 'active';
+    `;
 
-  // Get index usage
-  const indexUsage = await prisma.$queryRaw<IndexUsage[]>`
-    SELECT 
-      schemaname,
-      tablename,
-      indexname,
-      idx_scan as number_of_scans,
-      idx_tup_read as tuples_read,
-      idx_tup_fetch as tuples_fetched
-    FROM pg_stat_user_indexes
-    ORDER BY idx_scan DESC;
-  `;
+    // Get table sizes
+    const tableSizes = await prisma.$queryRaw<TableSize[]>`
+      SELECT 
+        relname as table_name,
+        pg_size_pretty(pg_total_relation_size(relid)) as total_size,
+        pg_size_pretty(pg_relation_size(relid)) as table_size,
+        pg_size_pretty(pg_total_relation_size(relid) - pg_relation_size(relid)) as index_size
+      FROM pg_stat_user_tables
+      ORDER BY pg_total_relation_size(relid) DESC;
+    `;
 
-  return {
-    timestamp: Date.now(),
-    slowQueries,
-    cacheHitRatio: cacheStats[0].hit_ratio,
-    activeConnections: connections[0].active_connections,
-    tableSizes,
-    indexUsage,
-  };
+    // Get index usage
+    const indexUsage = await prisma.$queryRaw<IndexUsage[]>`
+      SELECT 
+        schemaname,
+        tablename,
+        indexname,
+        idx_scan as number_of_scans,
+        idx_tup_read as tuples_read,
+        idx_tup_fetch as tuples_fetched
+      FROM pg_stat_user_indexes
+      ORDER BY idx_scan DESC;
+    `;
+
+    return {
+      timestamp: Date.now(),
+      slowQueries,
+      cacheHitRatio: cacheStats[0].hit_ratio,
+      activeConnections: connections[0].active_connections,
+      tableSizes,
+      indexUsage,
+    };
+  } catch (error) {
+    console.error('Error collecting metrics:', error);
+    throw error;
+  }
 }
 
 async function optimizeDatabase(metrics: PerformanceMetrics) {
@@ -183,10 +192,16 @@ async function monitorDatabase() {
 
   } catch (error) {
     console.error('Error monitoring database:', error);
+    process.exit(1);
   } finally {
-    await prisma.$disconnect();
+    if (prisma) {
+      await prisma.$disconnect();
+    }
   }
 }
 
 // Run monitoring
-monitorDatabase(); 
+monitorDatabase().catch((error) => {
+  console.error('Fatal error:', error);
+  process.exit(1);
+}); 
