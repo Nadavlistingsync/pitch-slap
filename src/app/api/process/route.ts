@@ -3,6 +3,7 @@ import OpenAI from 'openai';
 import { vcPrompts } from '@/lib/vcPrompts';
 import { Redis } from '@upstash/redis';
 import { logger } from '@/lib/logger';
+import pdfParse from 'pdf-parse';
 
 // Initialize Redis with error handling
 let redis: Redis | null = null;
@@ -147,19 +148,44 @@ async function generateFeedback(
 ) {
   const startTime = Date.now();
   try {
-    // Implement actual file processing and feedback generation here
-    const feedback = {
-      summary: `Feedback from ${vc.name} (${intensity} intensity)`,
-      points: [
-        'Market size needs to be more realistic',
-        'Team slide is strong',
-        'Unit economics need improvement',
-        'Go-to-market strategy needs more detail'
-      ]
-    };
-    
+    // Only support PDF for now
+    if (file.type !== 'application/pdf') {
+      throw new Error('Only PDF files are supported at this time.');
+    }
+
+    if (!openai) {
+      throw new Error('OpenAI service is not configured');
+    }
+
+    // Read file as ArrayBuffer
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    // Extract text from PDF
+    const pdfData = await pdfParse(buffer);
+    const extractedText = pdfData.text;
+
+    // Compose the prompt for GPT
+    const prompt = `${vc.prompt}\n\nHere is the pitch deck content (as extracted text):\n\n${extractedText}\n\nPlease provide your brutally honest feedback as a VC, in a structured and actionable way. Roast intensity: ${intensity}.`;
+
+    // Call OpenAI GPT-4
+    const completion = await openai.chat.completions.create({
+      model: vc.model || 'gpt-4',
+      messages: [
+        { role: 'system', content: 'You are a brutally honest venture capitalist giving feedback on startup pitch decks.' },
+        { role: 'user', content: prompt }
+      ],
+      max_tokens: 800,
+      temperature: 0.7
+    });
+
+    const feedbackText = completion.choices[0]?.message?.content || 'No feedback generated.';
+
     logApiPerformance(startTime, 'feedback_generation');
-    return feedback;
+    return {
+      summary: `Feedback from ${vc.name} (${intensity} intensity)`,
+      points: [feedbackText]
+    };
   } catch (error) {
     logApiPerformance(startTime, 'feedback_error');
     logger.error('Error generating feedback:', error);
