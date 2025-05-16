@@ -5,7 +5,6 @@ import { Pool } from 'pg';
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   max: 10, // Reduced from 20 to prevent connection exhaustion
-  min: 2, // Maintain minimum connections
   idleTimeoutMillis: 60000, // Increased idle timeout
   connectionTimeoutMillis: 5000, // Increased connection timeout
   application_name: 'pitch-slap', // Add application name for monitoring
