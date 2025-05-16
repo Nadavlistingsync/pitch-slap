@@ -6,9 +6,12 @@ import { logger } from '@/lib/logger';
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL || '',
   token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
+  automaticDeserialization: false,
+  maxRetriesPerRequest: 3,
 });
 
-const CACHE_TTL = 300; // 5 minutes
+const CACHE_TTL = 1800; // 30 minutes
+const BATCH_SIZE = 50;
 
 export async function POST(request: Request) {
   try {
@@ -83,19 +86,23 @@ export async function GET(request: Request) {
       skip
     });
 
-    // Generate cache key
-    const cacheKey = `feedback:deck:${deckId}:page:${page}:limit:${limit}`;
+    // Generate cache key with version
+    const cacheKey = `feedback:deck:${deckId}:page:${page}:limit:${limit}:v1`;
 
-    // Check cache first
-    const cachedResult = await redis.get(cacheKey);
+    // Check cache first using pipeline
+    const pipeline = redis.pipeline();
+    pipeline.get(cacheKey);
+    pipeline.ttl(cacheKey);
+    const [cachedResult, ttl] = await pipeline.exec();
+
     if (cachedResult) {
-      logger.debug('Cache hit for feedback query', { cacheKey });
+      logger.debug('Cache hit for feedback query', { cacheKey, ttl });
       return NextResponse.json(JSON.parse(cachedResult as string));
     }
 
     logger.debug('Cache miss, querying database');
 
-    // Use a more efficient query with Neon's connection pooling
+    // Use a more efficient query with batch processing
     const [total, feedback] = await Promise.all([
       prisma.slideFeedback.count({
         where: deckId ? { deckId } : undefined,
@@ -134,13 +141,17 @@ export async function GET(request: Request) {
       },
     };
 
-    // Cache the result
-    await redis.set(cacheKey, JSON.stringify(result), { ex: CACHE_TTL });
+    // Cache the result with pipeline
+    const cachePipeline = redis.pipeline();
+    cachePipeline.set(cacheKey, JSON.stringify(result), { ex: CACHE_TTL });
+    cachePipeline.set(`feedback:deck:${deckId}:last-updated`, Date.now(), { ex: CACHE_TTL });
+    await cachePipeline.exec();
+
     logger.debug('Results cached', { cacheKey, ttl: CACHE_TTL });
 
     return NextResponse.json(result);
   } catch (error) {
-    logger.error('Error fetching slide feedback', {
+    logger.error('Error fetching feedback', {
       error: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined
     });
