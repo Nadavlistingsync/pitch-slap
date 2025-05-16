@@ -9,6 +9,7 @@ const nextConfig = {
   experimental: {
     optimizeCss: false,
     optimizePackageImports: ['framer-motion'],
+    serverActions: true,
   },
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
@@ -33,6 +34,15 @@ const nextConfig = {
       ],
     },
   ],
+  webpack: (config, { isServer }) => {
+    // Exclude tools directory from build
+    config.module.rules.push({
+      test: /\.ts$/,
+      include: /tools/,
+      use: 'ignore-loader',
+    });
+    return config;
+  },
 }
 
 module.exports = nextConfig 

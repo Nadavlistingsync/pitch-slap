@@ -1,6 +1,10 @@
 import { prisma } from '../src/lib/db';
 
 async function analyzeQuery(query: string) {
+  if (!prisma) {
+    throw new Error('Database connection not initialized');
+  }
+
   try {
     // Enable query analysis
     await prisma.$executeRaw`SET track_io_timing = ON`;
@@ -44,7 +48,9 @@ async function analyzeQuery(query: string) {
   } catch (error) {
     console.error('Error analyzing query:', error);
   } finally {
-    await prisma.$disconnect();
+    if (prisma) {
+      await prisma.$disconnect();
+    }
   }
 }
 
