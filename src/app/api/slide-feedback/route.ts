@@ -36,6 +36,13 @@ export async function POST(request: Request) {
     });
 
     // Use a transaction for better performance
+    if (!prisma) {
+      logger.error('Prisma client is not initialized');
+      return NextResponse.json(
+        { error: 'Database connection not available' },
+        { status: 500 }
+      );
+    }
     const feedback = await prisma.$transaction(async (tx) => {
       logger.debug('Starting database transaction for feedback submission');
       
