@@ -3,11 +3,21 @@ import { prisma, executeQuery } from '@/lib/db';
 import { Redis } from '@upstash/redis';
 import { logger } from '@/lib/logger';
 
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL || '',
-  token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
-  automaticDeserialization: false,
-});
+// Initialize Redis with error handling
+let redis: Redis | null = null;
+try {
+  if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
+    logger.warn('Redis credentials not found, caching will be disabled');
+  } else {
+    redis = new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN,
+      automaticDeserialization: false,
+    });
+  }
+} catch (error) {
+  logger.error('Failed to initialize Redis', { error });
+}
 
 const CACHE_TTL = 1800; // 30 minutes
 const BATCH_SIZE = 50;
@@ -52,14 +62,16 @@ export async function POST(request: Request) {
       return result;
     });
 
-    // Invalidate cache for this deck
-    await redis.del(`feedback:deck:${deckId}`);
-    logger.debug('Cache invalidated', { deckId });
+    // Invalidate cache for this deck if Redis is available
+    if (redis) {
+      await redis.del(`feedback:deck:${deckId}`);
+      logger.debug('Cache invalidated', { deckId });
+    }
 
     logger.info('Feedback submission completed successfully', { feedbackId: feedback.id });
     return NextResponse.json(feedback, { status: 201 });
   } catch (error) {
-    logger.error('Error submitting slide feedback', {
+    logger.error('Error submitting feedback', {
       error: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined
     });
@@ -88,15 +100,17 @@ export async function GET(request: Request) {
     // Generate cache key with version
     const cacheKey = `feedback:deck:${deckId}:page:${page}:limit:${limit}:v1`;
 
-    // Check cache first using pipeline
-    const pipeline = redis.pipeline();
-    pipeline.get(cacheKey);
-    pipeline.ttl(cacheKey);
-    const [cachedResult, ttl] = await pipeline.exec();
+    // Check cache first if Redis is available
+    if (redis) {
+      const pipeline = redis.pipeline();
+      pipeline.get(cacheKey);
+      pipeline.ttl(cacheKey);
+      const [cachedResult, ttl] = await pipeline.exec();
 
-    if (cachedResult) {
-      logger.debug('Cache hit for feedback query', { cacheKey, ttl });
-      return NextResponse.json(JSON.parse(cachedResult as string));
+      if (cachedResult) {
+        logger.debug('Cache hit for feedback query', { cacheKey, ttl });
+        return NextResponse.json(JSON.parse(cachedResult as string));
+      }
     }
 
     logger.debug('Cache miss, querying database');
@@ -140,13 +154,14 @@ export async function GET(request: Request) {
       },
     };
 
-    // Cache the result with pipeline
-    const cachePipeline = redis.pipeline();
-    cachePipeline.set(cacheKey, JSON.stringify(result), { ex: CACHE_TTL });
-    cachePipeline.set(`feedback:deck:${deckId}:last-updated`, Date.now(), { ex: CACHE_TTL });
-    await cachePipeline.exec();
-
-    logger.debug('Results cached', { cacheKey, ttl: CACHE_TTL });
+    // Cache the result if Redis is available
+    if (redis) {
+      const cachePipeline = redis.pipeline();
+      cachePipeline.set(cacheKey, JSON.stringify(result), { ex: CACHE_TTL });
+      cachePipeline.set(`feedback:deck:${deckId}:last-updated`, Date.now(), { ex: CACHE_TTL });
+      await cachePipeline.exec();
+      logger.debug('Results cached', { cacheKey, ttl: CACHE_TTL });
+    }
 
     return NextResponse.json(result);
   } catch (error) {

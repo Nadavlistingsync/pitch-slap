@@ -1,40 +1,50 @@
 import { PrismaClient } from '@prisma/client';
 import { Pool } from 'pg';
+import { logger } from './logger';
 
-// Create a connection pool for Neon with optimized settings
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  max: 10, // Reduced from 20 to prevent connection exhaustion
-  idleTimeoutMillis: 60000, // Increased idle timeout
-  connectionTimeoutMillis: 5000, // Increased connection timeout
-  application_name: 'pitch-slap', // Add application name for monitoring
-  statement_timeout: 30000, // Add statement timeout
-});
+// Initialize database connection with error handling
+let prisma: PrismaClient | null = null;
+let pool: Pool | null = null;
 
-// Add pool error handling
-pool.on('error', (err) => {
-  console.error('Unexpected error on idle client', err);
-  process.exit(-1);
-});
+try {
+  if (!process.env.DATABASE_URL) {
+    logger.error('Database URL not found');
+  } else {
+    prisma = new PrismaClient({
+      datasources: {
+        db: {
+          url: process.env.DATABASE_URL,
+        },
+      },
+      log: ['error', 'warn'],
+    });
 
-// Create a singleton instance of PrismaClient with optimized settings
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
-};
+    pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      max: 20,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 2000,
+    });
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient({
-  datasources: {
-    db: {
-      url: process.env.DATABASE_URL,
-    },
-  },
-  log: ['error', 'warn'],
-});
+    // Test the connection
+    pool.on('connect', () => {
+      logger.info('Connected to database');
+    });
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+    pool.on('error', (err) => {
+      logger.error('Unexpected error on idle client', { error: err });
+    });
+  }
+} catch (error) {
+  logger.error('Failed to initialize database connection', { error });
+}
 
 // Helper function to execute raw queries with the pool and retry logic
 export async function executeQuery<T>(query: string, params?: any[], retries = 3): Promise<T> {
+  if (!pool) {
+    throw new Error('Database connection not initialized');
+  }
+
   const client = await pool.connect();
   try {
     const result = await client.query(query, params);
@@ -82,4 +92,7 @@ export async function analyzeQuery(query: string, params?: any[]) {
   } finally {
     client.release();
   }
-} 
+}
+
+// Export prisma instance with type safety
+export { prisma }; 

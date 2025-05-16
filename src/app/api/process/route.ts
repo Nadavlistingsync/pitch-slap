@@ -2,15 +2,36 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { vcPrompts } from '@/lib/vcPrompts';
 import { Redis } from '@upstash/redis';
+import { logger } from '@/lib/logger';
 
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL || '',
-  token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
-});
+// Initialize Redis with error handling
+let redis: Redis | null = null;
+try {
+  if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
+    logger.warn('Redis credentials not found, caching will be disabled');
+  } else {
+    redis = new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN,
+    });
+  }
+} catch (error) {
+  logger.error('Failed to initialize Redis', { error });
+}
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Initialize OpenAI with error handling
+let openai: OpenAI | null = null;
+try {
+  if (!process.env.OPENAI_API_KEY) {
+    logger.error('OpenAI API key not found');
+  } else {
+    openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+  }
+} catch (error) {
+  logger.error('Failed to initialize OpenAI', { error });
+}
 
 // Map old VC IDs to new IDs in vcPrompts
 const idMap: Record<string, string> = {
@@ -27,13 +48,20 @@ const CACHE_TTL = 3600; // 1 hour
 // Performance logging
 const logApiPerformance = (startTime: number, operation: string) => {
   const duration = Date.now() - startTime;
-  console.log(`API ${operation} took ${duration}ms`);
+  logger.info(`API ${operation} took ${duration}ms`);
 };
 
 export async function POST(request: Request) {
   const startTime = Date.now();
   
   try {
+    if (!openai) {
+      return NextResponse.json(
+        { error: 'OpenAI service is not configured' },
+        { status: 503 }
+      );
+    }
+
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const vcId = formData.get('vcId') as string;
@@ -50,16 +78,21 @@ export async function POST(request: Request) {
     // Generate cache key
     const cacheKey = `feedback:${vcId}:${roastIntensity}:${file.name}`;
 
-    // Check cache first
-    const cachedResult = await redis.get(cacheKey);
-    if (cachedResult) {
-      logApiPerformance(startTime, 'cache_hit');
-      return NextResponse.json(JSON.parse(cachedResult as string), {
-        headers: {
-          'Cache-Control': 'public, max-age=3600',
-          'X-Cache': 'HIT'
-        }
-      });
+    // Check cache first if Redis is available
+    if (redis) {
+      const cachedResult = await redis.get(cacheKey);
+      if (cachedResult) {
+        logApiPerformance(startTime, 'cache_hit');
+        return NextResponse.json({
+          status: 'complete',
+          result: JSON.parse(cachedResult as string)
+        }, {
+          headers: {
+            'Cache-Control': 'public, max-age=3600',
+            'X-Cache': 'HIT'
+          }
+        });
+      }
     }
 
     // Find the selected VC
@@ -82,11 +115,16 @@ export async function POST(request: Request) {
       roastIntensity
     };
 
-    // Cache the result
-    await redis.set(cacheKey, JSON.stringify(result), { ex: CACHE_TTL });
+    // Cache the result if Redis is available
+    if (redis) {
+      await redis.set(cacheKey, JSON.stringify(result), { ex: CACHE_TTL });
+    }
 
     logApiPerformance(startTime, 'success');
-    return NextResponse.json(result, {
+    return NextResponse.json({
+      status: 'complete',
+      result
+    }, {
       headers: {
         'Cache-Control': 'public, max-age=3600',
         'X-Cache': 'MISS'
@@ -94,7 +132,7 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     logApiPerformance(startTime, 'error');
-    console.error('Error processing file:', error);
+    logger.error('Error processing file:', error);
     return NextResponse.json(
       { error: 'Failed to process file' },
       { status: 500 }
@@ -110,7 +148,6 @@ async function generateFeedback(
   const startTime = Date.now();
   try {
     // Implement actual file processing and feedback generation here
-    // This is a placeholder for the actual implementation
     const feedback = {
       summary: `Feedback from ${vc.name} (${intensity} intensity)`,
       points: [
@@ -125,7 +162,7 @@ async function generateFeedback(
     return feedback;
   } catch (error) {
     logApiPerformance(startTime, 'feedback_error');
-    console.error('Error generating feedback:', error);
+    logger.error('Error generating feedback:', error);
     throw error;
   }
 } 

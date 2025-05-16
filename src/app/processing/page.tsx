@@ -3,12 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { vcPrompts } from '@/lib/vcPrompts';
+import { logger } from '@/lib/logger';
 
 // Performance monitoring
 const logProcessingPerformance = (startTime: number, operation: string) => {
   const duration = Date.now() - startTime;
-  console.log(`Processing ${operation} took ${duration}ms`);
+  logger.info(`Processing ${operation} took ${duration}ms`);
 };
 
 export default function ProcessingPage() {
@@ -16,6 +16,7 @@ export default function ProcessingPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
+  const [status, setStatus] = useState('Initializing...');
 
   useEffect(() => {
     const processDeck = async () => {
@@ -26,12 +27,14 @@ export default function ProcessingPage() {
       const fileData = localStorage.getItem('uploadedFileData');
 
       if (!vcId || !fileName || !fileData) {
-        logProcessingPerformance(startTime, 'validation_failed');
-        router.push('/select');
+        logger.error('Missing required data for processing', { vcId, fileName, hasFileData: !!fileData });
+        setError('Missing required data. Please try uploading your pitch deck again.');
+        setLoading(false);
         return;
       }
 
       try {
+        setStatus('Preparing your file...');
         setProgress(10);
         const file = new File([Uint8Array.from(atob(fileData), c => c.charCodeAt(0))], fileName);
         const formData = new FormData();
@@ -39,6 +42,7 @@ export default function ProcessingPage() {
         formData.append('vcId', vcId);
         formData.append('roastIntensity', roastIntensity || 'balanced');
 
+        setStatus('Analyzing your pitch deck...');
         setProgress(30);
         const res = await fetch('/api/process', { 
           method: 'POST', 
@@ -48,22 +52,28 @@ export default function ProcessingPage() {
           }
         });
 
+        setStatus('Generating feedback...');
         setProgress(60);
         const result = await res.json();
 
         if (result.error) {
-          logProcessingPerformance(startTime, 'error');
+          logger.error('Error processing pitch deck', { error: result.error });
           setError(result.error);
           setLoading(false);
-        } else {
-          logProcessingPerformance(startTime, 'success');
-          window.sessionStorage.setItem('processingResult', JSON.stringify(result));
+        } else if (result.status === 'complete') {
+          logger.info('Successfully processed pitch deck', { vcId, roastIntensity });
+          window.sessionStorage.setItem('processingResult', JSON.stringify(result.result));
+          setStatus('Finalizing...');
           setProgress(100);
-          setTimeout(() => router.push('/feedback'), 500); // Small delay for smooth transition
+          setTimeout(() => router.push('/feedback'), 500);
+        } else {
+          logger.error('Unexpected response format', { result });
+          setError('Unexpected response from server. Please try again.');
+          setLoading(false);
         }
       } catch (err) {
-        logProcessingPerformance(startTime, 'error');
-        setError('Failed to process your pitch deck.');
+        logger.error('Failed to process pitch deck', { error: err });
+        setError('Failed to process your pitch deck. Please try again.');
         setLoading(false);
       }
     };
@@ -90,7 +100,7 @@ export default function ProcessingPage() {
         >
           <div className="text-6xl mb-6">🤖</div>
           <h2 className="text-2xl font-semibold text-white mb-4">
-            {error ? 'Oops! Something went wrong' : 'Analyzing your pitch deck...'}
+            {error ? 'Oops! Something went wrong' : status}
           </h2>
           <p className="text-gray-400 mb-8">
             {error ? error : 'Our AI is carefully reviewing your pitch deck and preparing personalized feedback.'}
@@ -99,37 +109,25 @@ export default function ProcessingPage() {
           {!error && loading && (
             <div className="space-y-4">
               <div className="w-full bg-gray-700 rounded-full h-2.5">
-                <div 
-                  className="bg-[#ff4154] h-2.5 rounded-full transition-all duration-300"
-                  style={{ width: `${progress}%` }}
+                <motion.div 
+                  className="bg-[#ff4154] h-2.5 rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progress}%` }}
+                  transition={{ duration: 0.3 }}
                 />
               </div>
               <p className="text-sm text-gray-400">Progress: {progress}%</p>
             </div>
           )}
 
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.8 }}
-            className="mt-8 flex justify-center"
-          >
+          {error && (
             <button
-              onClick={() => router.push('/select')}
-              className="btn-primary group relative overflow-hidden"
+              onClick={() => router.push('/upload')}
+              className="mt-4 px-6 py-2 bg-[#ff4154] text-white rounded-lg hover:bg-[#ff4154]/90 transition-colors"
             >
-              <span className="relative z-10 flex items-center gap-2">
-                {error ? 'Try Again' : 'Cancel'}
-                <motion.span
-                  animate={{ x: [0, 4, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                >
-                  →
-                </motion.span>
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-[#ff4154] to-[#ff6b6b] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              Try Again
             </button>
-          </motion.div>
+          )}
         </motion.div>
       </div>
     </main>
