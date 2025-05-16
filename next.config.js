@@ -2,9 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  output: 'export',
   images: {
-    unoptimized: true,
     domains: ['pitch-slap-nadavlistingsync-nadavlistingsyncs-projects.vercel.app'],
     formats: ['image/avif', 'image/webp'],
   },
