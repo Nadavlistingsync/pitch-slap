@@ -43,7 +43,13 @@ async function collectMetrics(): Promise<PerformanceMetrics> {
 
   try {
     const [slowQueries, cacheStats, connections, tableSizes, indexUsage] = await Promise.all([
-      prisma.$queryRaw`
+      prisma.$queryRaw<Array<{
+        query: string;
+        calls: number;
+        total_time: number;
+        mean_time: number;
+        rows: number;
+      }>>`
         SELECT 
           query,
           calls,
@@ -55,17 +61,22 @@ async function collectMetrics(): Promise<PerformanceMetrics> {
         ORDER BY mean_time DESC
         LIMIT 10;
       `,
-      prisma.$queryRaw`
+      prisma.$queryRaw<Array<{ hit_ratio: number }>>`
         SELECT 
           sum(heap_blks_hit) / (sum(heap_blks_hit) + sum(heap_blks_read)) as hit_ratio
         FROM pg_statio_user_tables;
       `,
-      prisma.$queryRaw`
+      prisma.$queryRaw<Array<{ active_connections: number }>>`
         SELECT count(*) as active_connections
         FROM pg_stat_activity
         WHERE state = 'active';
       `,
-      prisma.$queryRaw`
+      prisma.$queryRaw<Array<{
+        table_name: string;
+        total_size: string;
+        table_size: string;
+        index_size: string;
+      }>>`
         SELECT 
           relname as table_name,
           pg_size_pretty(pg_total_relation_size(relid)) as total_size,
@@ -74,7 +85,14 @@ async function collectMetrics(): Promise<PerformanceMetrics> {
         FROM pg_stat_user_tables
         ORDER BY pg_total_relation_size(relid) DESC;
       `,
-      prisma.$queryRaw`
+      prisma.$queryRaw<Array<{
+        schemaname: string;
+        tablename: string;
+        indexname: string;
+        number_of_scans: number;
+        tuples_read: number;
+        tuples_fetched: number;
+      }>>`
         SELECT 
           schemaname,
           tablename,
