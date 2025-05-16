@@ -9,7 +9,6 @@ const nextConfig = {
   experimental: {
     optimizeCss: false,
     optimizePackageImports: ['framer-motion'],
-    serverActions: true,
   },
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',

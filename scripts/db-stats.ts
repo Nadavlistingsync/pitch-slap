@@ -1,6 +1,10 @@
 import { prisma } from '../src/lib/db';
 
 async function getDatabaseStats() {
+  if (!prisma) {
+    throw new Error('Database connection not initialized');
+  }
+
   try {
     // Get table statistics
     const stats = await prisma.$queryRaw`
@@ -54,9 +58,15 @@ async function getDatabaseStats() {
 
   } catch (error) {
     console.error('Error getting database stats:', error);
+    process.exit(1);
   } finally {
-    await prisma.$disconnect();
+    if (prisma) {
+      await prisma.$disconnect();
+    }
   }
 }
 
-getDatabaseStats(); 
+getDatabaseStats().catch((error) => {
+  console.error('Fatal error:', error);
+  process.exit(1);
+}); 
