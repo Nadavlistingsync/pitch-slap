@@ -36,25 +36,8 @@ class Logger {
   private log(level: LogLevel, message: string, data?: any) {
     const logEntry = this.formatLog(level, message, data);
     
-    // Always log errors
-    if (level === 'error') {
-      console.error(JSON.stringify(logEntry));
-      return;
-    }
-
-    // In development, log everything
-    if (this.isDevelopment) {
-      switch (level) {
-        case 'debug':
-          console.debug(JSON.stringify(logEntry));
-          break;
-        case 'info':
-          console.info(JSON.stringify(logEntry));
-          break;
-        case 'warn':
-          console.warn(JSON.stringify(logEntry));
-          break;
-      }
+    if (level === 'error' || this.isDevelopment) {
+      console[level](JSON.stringify(logEntry));
     }
   }
 

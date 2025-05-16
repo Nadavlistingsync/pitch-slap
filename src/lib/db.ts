@@ -2,42 +2,33 @@ import { PrismaClient } from '@prisma/client';
 import { Pool } from 'pg';
 import { logger } from './logger';
 
-// Initialize database connection with error handling
+if (!process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL environment variable is not set');
+}
+
+// Initialize Prisma client
 let prisma: PrismaClient | null = null;
-let pool: Pool | null = null;
 
 try {
-  if (!process.env.DATABASE_URL) {
-    logger.error('Database URL not found');
-  } else {
-    prisma = new PrismaClient({
-      datasources: {
-        db: {
-          url: process.env.DATABASE_URL,
-        },
-      },
-      log: ['error', 'warn'],
-    });
-
-    pool = new Pool({
-      connectionString: process.env.DATABASE_URL,
-      max: 20,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 2000,
-    });
-
-    // Test the connection
-    pool.on('connect', () => {
-      logger.info('Connected to database');
-    });
-
-    pool.on('error', (err) => {
-      logger.error('Unexpected error on idle client', { error: err });
-    });
-  }
+  prisma = new PrismaClient();
+  logger.info('Prisma client initialized successfully');
 } catch (error) {
-  logger.error('Failed to initialize database connection', { error });
+  logger.error('Failed to initialize Prisma client:', error);
+  throw error;
 }
+
+// Initialize PostgreSQL connection pool
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
+});
+
+pool.on('error', (err) => {
+  logger.error('Unexpected error on idle client', err);
+  process.exit(-1);
+});
 
 // Helper function to execute raw queries with the pool and retry logic
 export async function executeQuery<T>(query: string, params?: any[], retries = 3): Promise<T> {

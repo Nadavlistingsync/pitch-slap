@@ -9,45 +9,31 @@ const redis = new Redis({
 const CACHE_KEY = 'db:performance:metrics';
 const CACHE_TTL = 300; // 5 minutes
 
-interface SlowQuery {
-  query: string;
-  calls: number;
-  total_time: number;
-  mean_time: number;
-  rows: number;
-}
-
-interface CacheStats {
-  hit_ratio: number;
-}
-
-interface ConnectionStats {
-  active_connections: number;
-}
-
-interface TableSize {
-  table_name: string;
-  total_size: string;
-  table_size: string;
-  index_size: string;
-}
-
-interface IndexUsage {
-  schemaname: string;
-  tablename: string;
-  indexname: string;
-  number_of_scans: number;
-  tuples_read: number;
-  tuples_fetched: number;
-}
-
 interface PerformanceMetrics {
   timestamp: number;
-  slowQueries: SlowQuery[];
+  slowQueries: Array<{
+    query: string;
+    calls: number;
+    total_time: number;
+    mean_time: number;
+    rows: number;
+  }>;
   cacheHitRatio: number;
   activeConnections: number;
-  tableSizes: TableSize[];
-  indexUsage: IndexUsage[];
+  tableSizes: Array<{
+    table_name: string;
+    total_size: string;
+    table_size: string;
+    index_size: string;
+  }>;
+  indexUsage: Array<{
+    schemaname: string;
+    tablename: string;
+    indexname: string;
+    number_of_scans: number;
+    tuples_read: number;
+    tuples_fetched: number;
+  }>;
 }
 
 async function collectMetrics(): Promise<PerformanceMetrics> {
@@ -56,57 +42,50 @@ async function collectMetrics(): Promise<PerformanceMetrics> {
   }
 
   try {
-    // Get slow queries
-    const slowQueries = await prisma.$queryRaw<SlowQuery[]>`
-      SELECT 
-        query,
-        calls,
-        total_time,
-        mean_time,
-        rows
-      FROM pg_stat_statements
-      WHERE mean_time > 1000
-      ORDER BY mean_time DESC
-      LIMIT 10;
-    `;
-
-    // Get cache hit ratio
-    const cacheStats = await prisma.$queryRaw<CacheStats[]>`
-      SELECT 
-        sum(heap_blks_hit) / (sum(heap_blks_hit) + sum(heap_blks_read)) as hit_ratio
-      FROM pg_statio_user_tables;
-    `;
-
-    // Get active connections
-    const connections = await prisma.$queryRaw<ConnectionStats[]>`
-      SELECT count(*) as active_connections
-      FROM pg_stat_activity
-      WHERE state = 'active';
-    `;
-
-    // Get table sizes
-    const tableSizes = await prisma.$queryRaw<TableSize[]>`
-      SELECT 
-        relname as table_name,
-        pg_size_pretty(pg_total_relation_size(relid)) as total_size,
-        pg_size_pretty(pg_relation_size(relid)) as table_size,
-        pg_size_pretty(pg_total_relation_size(relid) - pg_relation_size(relid)) as index_size
-      FROM pg_stat_user_tables
-      ORDER BY pg_total_relation_size(relid) DESC;
-    `;
-
-    // Get index usage
-    const indexUsage = await prisma.$queryRaw<IndexUsage[]>`
-      SELECT 
-        schemaname,
-        tablename,
-        indexname,
-        idx_scan as number_of_scans,
-        idx_tup_read as tuples_read,
-        idx_tup_fetch as tuples_fetched
-      FROM pg_stat_user_indexes
-      ORDER BY idx_scan DESC;
-    `;
+    const [slowQueries, cacheStats, connections, tableSizes, indexUsage] = await Promise.all([
+      prisma.$queryRaw`
+        SELECT 
+          query,
+          calls,
+          total_time,
+          mean_time,
+          rows
+        FROM pg_stat_statements
+        WHERE mean_time > 1000
+        ORDER BY mean_time DESC
+        LIMIT 10;
+      `,
+      prisma.$queryRaw`
+        SELECT 
+          sum(heap_blks_hit) / (sum(heap_blks_hit) + sum(heap_blks_read)) as hit_ratio
+        FROM pg_statio_user_tables;
+      `,
+      prisma.$queryRaw`
+        SELECT count(*) as active_connections
+        FROM pg_stat_activity
+        WHERE state = 'active';
+      `,
+      prisma.$queryRaw`
+        SELECT 
+          relname as table_name,
+          pg_size_pretty(pg_total_relation_size(relid)) as total_size,
+          pg_size_pretty(pg_relation_size(relid)) as table_size,
+          pg_size_pretty(pg_total_relation_size(relid) - pg_relation_size(relid)) as index_size
+        FROM pg_stat_user_tables
+        ORDER BY pg_total_relation_size(relid) DESC;
+      `,
+      prisma.$queryRaw`
+        SELECT 
+          schemaname,
+          tablename,
+          indexname,
+          idx_scan as number_of_scans,
+          idx_tup_read as tuples_read,
+          idx_tup_fetch as tuples_fetched
+        FROM pg_stat_user_indexes
+        ORDER BY idx_scan DESC;
+      `
+    ]);
 
     return {
       timestamp: Date.now(),
@@ -123,64 +102,60 @@ async function collectMetrics(): Promise<PerformanceMetrics> {
 }
 
 async function optimizeDatabase(metrics: PerformanceMetrics) {
-  // Check for slow queries and suggest optimizations
+  const issues = [];
+
   if (metrics.slowQueries.length > 0) {
-    console.log('\nSlow Queries Detected:');
+    issues.push('\nSlow Queries Detected:');
     metrics.slowQueries.forEach(query => {
-      console.log(`\nQuery: ${query.query}`);
-      console.log(`Average Time: ${query.mean_time}ms`);
-      console.log(`Total Calls: ${query.calls}`);
-      console.log(`Rows Affected: ${query.rows}`);
+      issues.push(`\nQuery: ${query.query}`);
+      issues.push(`Average Time: ${query.mean_time}ms`);
+      issues.push(`Total Calls: ${query.calls}`);
+      issues.push(`Rows Affected: ${query.rows}`);
     });
   }
 
-  // Check cache hit ratio
   if (metrics.cacheHitRatio < 0.8) {
-    console.log('\nLow Cache Hit Ratio Detected:');
-    console.log(`Current Ratio: ${metrics.cacheHitRatio}`);
-    console.log('Consider increasing shared_buffers or work_mem');
+    issues.push('\nLow Cache Hit Ratio Detected:');
+    issues.push(`Current Ratio: ${metrics.cacheHitRatio}`);
+    issues.push('Consider increasing shared_buffers or work_mem');
   }
 
-  // Check for large tables
   const largeTables = metrics.tableSizes.filter(table => {
     const size = parseInt(table.total_size);
     return size > 1000000; // 1GB
   });
 
   if (largeTables.length > 0) {
-    console.log('\nLarge Tables Detected:');
+    issues.push('\nLarge Tables Detected:');
     largeTables.forEach(table => {
-      console.log(`\nTable: ${table.table_name}`);
-      console.log(`Total Size: ${table.total_size}`);
-      console.log(`Table Size: ${table.table_size}`);
-      console.log(`Index Size: ${table.index_size}`);
+      issues.push(`\nTable: ${table.table_name}`);
+      issues.push(`Total Size: ${table.total_size}`);
+      issues.push(`Table Size: ${table.table_size}`);
+      issues.push(`Index Size: ${table.index_size}`);
     });
   }
 
-  // Check for unused indexes
   const unusedIndexes = metrics.indexUsage.filter(index => index.number_of_scans === 0);
   if (unusedIndexes.length > 0) {
-    console.log('\nUnused Indexes Detected:');
+    issues.push('\nUnused Indexes Detected:');
     unusedIndexes.forEach(index => {
-      console.log(`\nIndex: ${index.indexname}`);
-      console.log(`Table: ${index.tablename}`);
-      console.log(`Schema: ${index.schemaname}`);
+      issues.push(`\nIndex: ${index.indexname}`);
+      issues.push(`Table: ${index.tablename}`);
+      issues.push(`Schema: ${index.schemaname}`);
     });
+  }
+
+  if (issues.length > 0) {
+    console.log(issues.join('\n'));
   }
 }
 
 async function monitorDatabase() {
   try {
-    // Collect metrics
     const metrics = await collectMetrics();
-
-    // Cache metrics
     await redis.set(CACHE_KEY, JSON.stringify(metrics), { ex: CACHE_TTL });
-
-    // Analyze and optimize
     await optimizeDatabase(metrics);
 
-    // Log summary
     console.log('\nDatabase Performance Summary:');
     console.log('===========================');
     console.log(`Timestamp: ${new Date(metrics.timestamp).toISOString()}`);
@@ -200,7 +175,6 @@ async function monitorDatabase() {
   }
 }
 
-// Run monitoring
 monitorDatabase().catch((error) => {
   console.error('Fatal error:', error);
   process.exit(1);
