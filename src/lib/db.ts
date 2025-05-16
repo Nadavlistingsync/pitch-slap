@@ -22,12 +22,6 @@ export const prisma = globalForPrisma.prisma ?? new PrismaClient({
   },
   // Add Neon-specific optimizations
   log: ['error', 'warn'],
-  // Enable query caching
-  __internal: {
-    engine: {
-      queryCache: true,
-    },
-  },
 });
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;

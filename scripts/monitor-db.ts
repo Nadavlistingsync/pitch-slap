@@ -9,18 +9,50 @@ const redis = new Redis({
 const CACHE_KEY = 'db:performance:metrics';
 const CACHE_TTL = 300; // 5 minutes
 
+interface SlowQuery {
+  query: string;
+  calls: number;
+  total_time: number;
+  mean_time: number;
+  rows: number;
+}
+
+interface CacheStats {
+  hit_ratio: number;
+}
+
+interface ConnectionStats {
+  active_connections: number;
+}
+
+interface TableSize {
+  table_name: string;
+  total_size: string;
+  table_size: string;
+  index_size: string;
+}
+
+interface IndexUsage {
+  schemaname: string;
+  tablename: string;
+  indexname: string;
+  number_of_scans: number;
+  tuples_read: number;
+  tuples_fetched: number;
+}
+
 interface PerformanceMetrics {
   timestamp: number;
-  slowQueries: any[];
+  slowQueries: SlowQuery[];
   cacheHitRatio: number;
   activeConnections: number;
-  tableSizes: any[];
-  indexUsage: any[];
+  tableSizes: TableSize[];
+  indexUsage: IndexUsage[];
 }
 
 async function collectMetrics(): Promise<PerformanceMetrics> {
   // Get slow queries
-  const slowQueries = await prisma.$queryRaw`
+  const slowQueries = await prisma.$queryRaw<SlowQuery[]>`
     SELECT 
       query,
       calls,
@@ -34,21 +66,21 @@ async function collectMetrics(): Promise<PerformanceMetrics> {
   `;
 
   // Get cache hit ratio
-  const cacheStats = await prisma.$queryRaw`
+  const cacheStats = await prisma.$queryRaw<CacheStats[]>`
     SELECT 
       sum(heap_blks_hit) / (sum(heap_blks_hit) + sum(heap_blks_read)) as hit_ratio
     FROM pg_statio_user_tables;
   `;
 
   // Get active connections
-  const connections = await prisma.$queryRaw`
+  const connections = await prisma.$queryRaw<ConnectionStats[]>`
     SELECT count(*) as active_connections
     FROM pg_stat_activity
     WHERE state = 'active';
   `;
 
   // Get table sizes
-  const tableSizes = await prisma.$queryRaw`
+  const tableSizes = await prisma.$queryRaw<TableSize[]>`
     SELECT 
       relname as table_name,
       pg_size_pretty(pg_total_relation_size(relid)) as total_size,
@@ -59,7 +91,7 @@ async function collectMetrics(): Promise<PerformanceMetrics> {
   `;
 
   // Get index usage
-  const indexUsage = await prisma.$queryRaw`
+  const indexUsage = await prisma.$queryRaw<IndexUsage[]>`
     SELECT 
       schemaname,
       tablename,
