@@ -29,12 +29,6 @@ export const prisma = globalForPrisma.prisma ?? new PrismaClient({
     },
   },
   log: ['error', 'warn'],
-  // Add connection pool settings
-  connectionLimit: 10,
-  pool: {
-    min: 2,
-    max: 10,
-  },
 });
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
