@@ -123,6 +123,13 @@ export async function GET(request: Request) {
     logger.debug('Cache miss, querying database');
 
     // Use a more efficient query with batch processing
+    if (!prisma) {
+      logger.error('Prisma client is not initialized');
+      return NextResponse.json(
+        { error: 'Database connection not available' },
+        { status: 500 }
+      );
+    }
     const [total, feedback] = await Promise.all([
       prisma.slideFeedback.count({
         where: deckId ? { deckId } : undefined,
