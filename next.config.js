@@ -12,6 +12,7 @@ const nextConfig = {
   experimental: {
     optimizeCss: false,
     optimizePackageImports: ['framer-motion'],
+    outputFileTracingIgnores: ['**/test/**'],
   },
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
@@ -64,8 +65,28 @@ const nextConfig = {
       )
     );
 
+    // Add a rule to handle PDF files
+    config.module.rules.push({
+      test: /\.pdf$/,
+      use: [
+        {
+          loader: 'ignore-loader',
+        },
+      ],
+    });
+
+    // Add a rule to handle test files
+    config.module.rules.push({
+      test: /test\/.*$/,
+      use: [
+        {
+          loader: 'ignore-loader',
+        },
+      ],
+    });
+
     return config;
   },
-}
+};
 
-module.exports = nextConfig 
+module.exports = nextConfig; 
