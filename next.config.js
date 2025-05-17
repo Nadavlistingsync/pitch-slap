@@ -33,13 +33,26 @@ const nextConfig = {
       ],
     },
   ],
-  webpack: (config, { isServer }) => {
-    // Exclude tools directory from build
+  webpack: (config, { isServer, dev }) => {
+    // Exclude test files and tools directory from build
     config.module.rules.push({
-      test: /\.ts$/,
-      include: /tools/,
+      test: /\.(ts|tsx|js|jsx)$/,
+      include: [
+        /test/,
+        /tools/,
+        /scripts/,
+      ],
       use: 'ignore-loader',
     });
+
+    // Add environment variable to indicate build environment
+    config.plugins.push(
+      new config.webpack.DefinePlugin({
+        'process.env.NEXT_PHASE': JSON.stringify(process.env.NEXT_PHASE),
+        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+      })
+    );
+
     return config;
   },
 }
