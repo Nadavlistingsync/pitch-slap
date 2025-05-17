@@ -12,7 +12,22 @@ const nextConfig = {
   },
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
-  }
+  },
+  webpack: (config, { isServer }) => {
+    // Handle PDF files
+    config.module.rules.push({
+      test: /\.pdf$/,
+      type: 'asset/resource',
+    });
+
+    // Exclude test files
+    config.module.rules.push({
+      test: /\.(test|spec)\.(js|jsx|ts|tsx)$/,
+      loader: 'ignore-loader',
+    });
+
+    return config;
+  },
 };
 
 module.exports = nextConfig; 
