@@ -17,7 +17,16 @@ const nextConfig = {
     // Handle PDF files
     config.module.rules.push({
       test: /\.pdf$/,
-      type: 'asset/resource',
+      use: [
+        {
+          loader: 'file-loader',
+          options: {
+            name: '[name].[ext]',
+            outputPath: 'static/pdfs/',
+            publicPath: '/_next/static/pdfs/',
+          },
+        },
+      ],
     });
 
     // Exclude test files and test data
@@ -30,6 +39,12 @@ const nextConfig = {
     config.module.rules.push({
       test: /test\/data\/.*\.pdf$/,
       loader: 'ignore-loader',
+    });
+
+    // Ignore test files during build
+    config.module.rules.push({
+      test: /\.(test|spec)\.(js|jsx|ts|tsx)$/,
+      use: 'ignore-loader',
     });
 
     return config;

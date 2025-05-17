@@ -40,6 +40,7 @@
   },
   "devDependencies": {
     "@types/pdf-parse": "^1.1.5",
+    "file-loader": "^6.2.0",
     "ignore-loader": "^0.1.2"
   }
 }
