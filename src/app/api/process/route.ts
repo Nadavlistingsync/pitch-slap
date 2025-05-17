@@ -1,64 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import { vcPrompts } from '@/lib/vcPrompts';
-import { Redis } from '@upstash/redis';
-import { logger } from '@/lib/logger';
 import pdfParse from 'pdf-parse';
 
-// Initialize Redis with error handling
-let redis: Redis | null = null;
-try {
-  if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
-    logger.warn('Redis credentials not found, caching will be disabled');
-  } else {
-    redis = new Redis({
-      url: process.env.UPSTASH_REDIS_REST_URL,
-      token: process.env.UPSTASH_REDIS_REST_TOKEN,
-    });
-  }
-} catch (error) {
-  logger.error('Failed to initialize Redis', { error });
-}
-
-// Initialize OpenAI with error handling
-let openai: OpenAI | null = null;
-try {
-  if (!process.env.OPENAI_API_KEY) {
-    logger.error('OpenAI API key not found');
-  } else {
-    openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
-  }
-} catch (error) {
-  logger.error('Failed to initialize OpenAI', { error });
-}
-
-// Map old VC IDs to new IDs in vcPrompts
-const idMap: Record<string, string> = {
-  sequoia: 'jean-de-la-rochebrochard',
-  andreessen: 'alice-zagury',
-  accel: 'marie-ekeland',
-  yc: 'nicolas-debock',
-  // Add more mappings as needed
-};
-
-// Cache TTL in seconds
-const CACHE_TTL = 3600; // 1 hour
-
-// Performance logging
-const logApiPerformance = (startTime: number, operation: string) => {
-  const duration = Date.now() - startTime;
-  logger.info(`API ${operation} took ${duration}ms`);
-};
+// Initialize OpenAI
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 export async function POST(request: Request) {
-  const startTime = Date.now();
-  
   try {
-    if (!openai) {
+    if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json(
-        { error: 'OpenAI service is not configured' },
+        { error: 'OpenAI API key not configured' },
         { status: 503 }
       );
     }
@@ -68,7 +21,6 @@ export async function POST(request: Request) {
     const roastIntensity = formData.get('roastIntensity') as 'gentle' | 'balanced' | 'brutal';
 
     if (!file) {
-      logApiPerformance(startTime, 'validation');
       return NextResponse.json(
         { error: 'No file provided' },
         { status: 400 }
@@ -77,7 +29,6 @@ export async function POST(request: Request) {
 
     // Only support PDF
     if (file.type !== 'application/pdf') {
-      logApiPerformance(startTime, 'validation');
       return NextResponse.json(
         { error: 'Only PDF files are supported' },
         { status: 400 }
@@ -109,25 +60,14 @@ export async function POST(request: Request) {
 
     const feedback = completion.choices[0]?.message?.content || 'No feedback generated.';
 
-    const result = {
+    return NextResponse.json({
       success: true,
       feedback,
       roastIntensity
-    };
-
-    logApiPerformance(startTime, 'success');
-    return NextResponse.json({
-      status: 'complete',
-      result
-    }, {
-      headers: {
-        'Cache-Control': 'public, max-age=3600',
-        'X-Cache': 'MISS'
-      }
     });
+
   } catch (error) {
-    logApiPerformance(startTime, 'error');
-    logger.error('Error processing file:', error);
+    console.error('Error processing file:', error);
     return NextResponse.json(
       { error: 'Failed to process file' },
       { status: 500 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { vcPrompts } from '@/lib/vcPrompts';
+import { vcPrompts, VCPrompt } from '../lib/vcPrompts';
 
 interface VCSelectorProps {
   onSelect: (vcId: string) => void;
@@ -14,19 +14,18 @@ export default function VCSelector({ onSelect }: VCSelectorProps) {
 
   // Group VCs by city
   const vcsByCity = vcPrompts.reduce((acc, vc) => {
-    const city = vc.firm.includes('Paris') || vc.firm.includes('Station F') || vc.firm.includes('Kima') ? 'Paris' : 'New York';
+    const city = vc.name.includes('Paris') || vc.name.includes('Station F') || vc.name.includes('Kima') ? 'Paris' : 'New York';
     if (!acc[city]) acc[city] = [];
     acc[city].push(vc);
     return acc;
-  }, {} as Record<string, typeof vcPrompts>);
+  }, {} as Record<string, VCPrompt[]>);
 
   // Filter VCs based on search term and selected city
   const filteredVCs = Object.entries(vcsByCity)
     .filter(([city]) => selectedCity === 'all' || city === selectedCity)
     .flatMap(([_, vcs]) => vcs)
     .filter(vc => 
-      vc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      vc.firm.toLowerCase().includes(searchTerm.toLowerCase())
+      vc.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
   const handleSelect = (vc: typeof vcPrompts[0]) => {
@@ -104,7 +103,7 @@ export default function VCSelector({ onSelect }: VCSelectorProps) {
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold text-gray-900">{vc.name}</h3>
-                  <p className="text-gray-600 mb-2">{vc.firm}</p>
+                  <p className="text-gray-600 mb-2">{vc.name}</p>
                   <p className="text-sm text-gray-500">{vc.prompt.split('\n')[0]}</p>
                 </div>
               </div>
