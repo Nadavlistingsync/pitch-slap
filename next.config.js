@@ -17,16 +17,10 @@ const nextConfig = {
     // Handle PDF files
     config.module.rules.push({
       test: /\.pdf$/,
-      use: [
-        {
-          loader: 'file-loader',
-          options: {
-            name: '[name].[ext]',
-            outputPath: 'static/pdfs/',
-            publicPath: '/_next/static/pdfs/',
-          },
-        },
-      ],
+      type: 'asset/resource',
+      generator: {
+        filename: 'static/pdfs/[name][ext]'
+      }
     });
 
     // Exclude test files and test data
@@ -46,6 +40,13 @@ const nextConfig = {
       test: /\.(test|spec)\.(js|jsx|ts|tsx)$/,
       use: 'ignore-loader',
     });
+
+    // Add fallback for missing files
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+      path: false,
+    };
 
     return config;
   },
