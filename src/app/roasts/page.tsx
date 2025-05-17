@@ -1,6 +1,14 @@
 import React from 'react';
 import { RoastLevel } from '@/components/RoastLevelSelector';
-import { VC } from '@/components/VCSelector';
+
+interface VC {
+  id: string;
+  name: string;
+  firm: string;
+  image: string;
+  specialties: string[];
+  description: string;
+}
 
 interface Roast {
   id: string;
