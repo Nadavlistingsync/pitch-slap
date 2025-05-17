@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const webpack = require('webpack');
+const path = require('path');
 
 const nextConfig = {
   reactStrictMode: true,
@@ -53,6 +54,14 @@ const nextConfig = {
         'process.env.NEXT_PHASE': JSON.stringify(process.env.NEXT_PHASE),
         'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
       })
+    );
+
+    // Add a plugin to handle missing files
+    config.plugins.push(
+      new webpack.NormalModuleReplacementPlugin(
+        /\.\/test\/data\/.*\.pdf$/,
+        path.resolve(__dirname, 'src/lib/mock-pdf.js')
+      )
     );
 
     return config;
