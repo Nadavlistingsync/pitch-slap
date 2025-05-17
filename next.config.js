@@ -12,7 +12,11 @@ const nextConfig = {
   experimental: {
     optimizeCss: false,
     optimizePackageImports: ['framer-motion'],
-    outputFileTracingIgnores: ['**/test/**'],
+    outputFileTracingExcludes: {
+      '**/test/**': true,
+      '**/tools/**': true,
+      '**/scripts/**': true,
+    },
   },
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
