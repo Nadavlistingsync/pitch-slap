@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+const webpack = require('webpack');
+
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
@@ -47,7 +49,7 @@ const nextConfig = {
 
     // Add environment variable to indicate build environment
     config.plugins.push(
-      new config.webpack.DefinePlugin({
+      new webpack.DefinePlugin({
         'process.env.NEXT_PHASE': JSON.stringify(process.env.NEXT_PHASE),
         'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
       })
