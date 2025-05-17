@@ -48,6 +48,12 @@ const nextConfig = {
       path: false,
     };
 
+    // Ignore test files during build
+    config.module.rules.push({
+      test: /test\/data\/.*$/,
+      loader: 'ignore-loader',
+    });
+
     return config;
   },
 };
