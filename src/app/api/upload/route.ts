@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
 import { ensureUploadDirectory, validateFileType, generateUniqueFileName, cleanupFile } from '@/lib/fileUtils';
-import { v4 as uuidv4 } from 'uuid';
 
 export async function POST(req: Request) {
   try {
@@ -16,13 +15,21 @@ export async function POST(req: Request) {
       );
     }
 
+    if (!validateFileType(file.type)) {
+      return NextResponse.json(
+        { error: 'Invalid file type' },
+        { status: 400 }
+      );
+    }
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
+    // Ensure upload directory exists
+    await ensureUploadDirectory();
+
     // Create unique filename
-    const uniqueId = uuidv4();
-    const fileExtension = file.name.split('.').pop();
-    const fileName = `${uniqueId}.${fileExtension}`;
+    const fileName = generateUniqueFileName(file.name);
     
     // Save file
     const uploadDir = join(process.cwd(), 'uploads');
