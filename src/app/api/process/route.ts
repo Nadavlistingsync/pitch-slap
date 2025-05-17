@@ -65,61 +65,55 @@ export async function POST(request: Request) {
 
     const formData = await request.formData();
     const file = formData.get('file') as File;
-    const vcId = formData.get('vcId') as string;
     const roastIntensity = formData.get('roastIntensity') as 'gentle' | 'balanced' | 'brutal';
 
-    if (!file || !vcId) {
+    if (!file) {
       logApiPerformance(startTime, 'validation');
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'No file provided' },
         { status: 400 }
       );
     }
 
-    // Generate cache key
-    const cacheKey = `feedback:${vcId}:${roastIntensity}:${file.name}`;
-
-    // Check cache first if Redis is available
-    if (redis) {
-      const cachedResult = await redis.get(cacheKey);
-      if (cachedResult) {
-        logApiPerformance(startTime, 'cache_hit');
-        return NextResponse.json({
-          status: 'complete',
-          result: JSON.parse(cachedResult as string)
-        }, {
-          headers: {
-            'Cache-Control': 'public, max-age=3600',
-            'X-Cache': 'HIT'
-          }
-        });
-      }
-    }
-
-    // Find the selected VC
-    const selectedVC = vcPrompts.find(vc => vc.id === vcId);
-    if (!selectedVC) {
-      logApiPerformance(startTime, 'vc_not_found');
+    // Only support PDF
+    if (file.type !== 'application/pdf') {
+      logApiPerformance(startTime, 'validation');
       return NextResponse.json(
-        { error: 'Invalid VC selected' },
+        { error: 'Only PDF files are supported' },
         { status: 400 }
       );
     }
 
-    // Process the file and generate feedback
-    const feedback = await generateFeedback(file, selectedVC, roastIntensity);
+    // Read and parse PDF
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const pdfData = await pdfParse(buffer);
+    const extractedText = pdfData.text;
+
+    // Generate roast using GPT
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4',
+      messages: [
+        { 
+          role: 'system', 
+          content: 'You are a brutally honest venture capitalist giving feedback on startup pitch decks. Be direct, critical, and provide actionable feedback.' 
+        },
+        { 
+          role: 'user', 
+          content: `Here is the pitch deck content:\n\n${extractedText}\n\nPlease provide your brutally honest feedback as a VC. Roast intensity: ${roastIntensity}.` 
+        }
+      ],
+      max_tokens: 800,
+      temperature: 0.7
+    });
+
+    const feedback = completion.choices[0]?.message?.content || 'No feedback generated.';
 
     const result = {
       success: true,
       feedback,
-      vc: selectedVC,
       roastIntensity
     };
-
-    // Cache the result if Redis is available
-    if (redis) {
-      await redis.set(cacheKey, JSON.stringify(result), { ex: CACHE_TTL });
-    }
 
     logApiPerformance(startTime, 'success');
     return NextResponse.json({
@@ -138,57 +132,5 @@ export async function POST(request: Request) {
       { error: 'Failed to process file' },
       { status: 500 }
     );
-  }
-}
-
-async function generateFeedback(
-  file: File,
-  vc: typeof vcPrompts[0],
-  intensity: 'gentle' | 'balanced' | 'brutal'
-) {
-  const startTime = Date.now();
-  try {
-    // Only support PDF for now
-    if (file.type !== 'application/pdf') {
-      throw new Error('Only PDF files are supported at this time.');
-    }
-
-    if (!openai) {
-      throw new Error('OpenAI service is not configured');
-    }
-
-    // Read file as ArrayBuffer
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    // Extract text from PDF
-    const pdfData = await pdfParse(buffer);
-    const extractedText = pdfData.text;
-
-    // Compose the prompt for GPT
-    const prompt = `${vc.prompt}\n\nHere is the pitch deck content (as extracted text):\n\n${extractedText}\n\nPlease provide your brutally honest feedback as a VC, in a structured and actionable way. Roast intensity: ${intensity}.`;
-
-    // Call OpenAI GPT-4
-    const completion = await openai.chat.completions.create({
-      model: vc.model || 'gpt-4',
-      messages: [
-        { role: 'system', content: 'You are a brutally honest venture capitalist giving feedback on startup pitch decks.' },
-        { role: 'user', content: prompt }
-      ],
-      max_tokens: 800,
-      temperature: 0.7
-    });
-
-    const feedbackText = completion.choices[0]?.message?.content || 'No feedback generated.';
-
-    logApiPerformance(startTime, 'feedback_generation');
-    return {
-      summary: `Feedback from ${vc.name} (${intensity} intensity)`,
-      points: [feedbackText]
-    };
-  } catch (error) {
-    logApiPerformance(startTime, 'feedback_error');
-    logger.error('Error generating feedback:', error);
-    throw error;
   }
 } 
