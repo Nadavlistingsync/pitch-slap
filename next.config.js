@@ -20,9 +20,15 @@ const nextConfig = {
       type: 'asset/resource',
     });
 
-    // Exclude test files
+    // Exclude test files and test data
     config.module.rules.push({
       test: /\.(test|spec)\.(js|jsx|ts|tsx)$/,
+      loader: 'ignore-loader',
+    });
+
+    // Exclude test data directory
+    config.module.rules.push({
+      test: /test\/data\/.*\.pdf$/,
       loader: 'ignore-loader',
     });
 
