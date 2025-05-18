@@ -22,7 +22,7 @@ export const vcPersonalities: VCPersonality[] = [
     ],
     typicalQuestions: [
       'How will this change the world in 10 years?',
-      'What's your vision for the future of this industry?',
+      'What\'s your vision for the future of this industry?',
       'How will you maintain your first-mover advantage?'
     ],
     investmentStyle: 'Long-term, high-conviction bets on transformative technologies',
@@ -42,7 +42,7 @@ export const vcPersonalities: VCPersonality[] = [
     typicalQuestions: [
       'What are your unit economics?',
       'How will you scale operations?',
-      'What's your customer acquisition cost?',
+      'What\'s your customer acquisition cost?',
       'How will you maintain margins at scale?'
     ],
     investmentStyle: 'Growth-stage investments with proven business models',
@@ -81,9 +81,9 @@ export const vcPersonalities: VCPersonality[] = [
     ],
     typicalQuestions: [
       'When will you be profitable?',
-      'What's your burn rate?',
+      'What\'s your burn rate?',
       'How will you manage cash flow?',
-      'What's your path to break-even?'
+      'What\'s your path to break-even?'
     ],
     investmentStyle: 'Later-stage investments with proven business models',
     riskTolerance: 'Low',
