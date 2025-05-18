@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { FaLinkedin, FaTwitter } from 'react-icons/fa';
 
 const buckets = [
   { key: 'hook', label: 'Hook / Traction' },
@@ -69,6 +70,18 @@ export default function SharedFeedbackPage({ params }: { params: { id: string } 
   // Determine the email body (feedback)
   const emailBody = feedback?.email || feedback;
 
+  const handleShareLinkedIn = () => {
+    const text = `Check out this pitch deck feedback from ${feedback.personality} using PitchDeck Roaster!`;
+    const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}&summary=${encodeURIComponent(text)}`;
+    window.open(linkedInUrl, '_blank');
+  };
+
+  const handleShareTwitter = () => {
+    const text = `Check out this pitch deck feedback from ${feedback.personality} using @PitchDeckRoaster!`;
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.href)}`;
+    window.open(twitterUrl, '_blank');
+  };
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-purple-900 to-indigo-950 py-12 flex flex-col items-center">
       <div className="max-w-3xl w-full mx-auto bg-white/10 rounded-2xl p-8 shadow-xl">
@@ -86,7 +99,21 @@ export default function SharedFeedbackPage({ params }: { params: { id: string } 
           <div className="text-gray-700 whitespace-pre-line">{emailBody}</div>
         </div>
 
-        <div className="mt-8 flex justify-center">
+        <div className="mt-8 flex gap-4 justify-center">
+          <button
+            className="px-6 py-3 rounded-full font-bold text-lg bg-[#0077B5] text-white hover:bg-[#006399] shadow-lg transition-all flex items-center gap-2"
+            onClick={handleShareLinkedIn}
+          >
+            <FaLinkedin className="w-5 h-5" />
+            Share on LinkedIn
+          </button>
+          <button
+            className="px-6 py-3 rounded-full font-bold text-lg bg-[#1DA1F2] text-white hover:bg-[#1a8cd8] shadow-lg transition-all flex items-center gap-2"
+            onClick={handleShareTwitter}
+          >
+            <FaTwitter className="w-5 h-5" />
+            Share on X
+          </button>
           <button
             className="px-6 py-3 rounded-full font-bold text-lg bg-purple-500 text-white hover:bg-purple-600 shadow-lg transition-all"
             onClick={() => router.push('/')}
