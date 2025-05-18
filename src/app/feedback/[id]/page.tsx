@@ -91,16 +91,9 @@ export default function SharedFeedbackPage({ params }: { params: { id: string } 
                 className="border-b border-gray-100 pb-6 last:border-0"
               >
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">{b.label}</h3>
-                {feedback.feedback[b.key]?.roast && (
-                  <div className="mb-3">
-                    <p className="text-red-600 font-medium mb-1">Roast:</p>
-                    <p className="text-gray-700">{feedback.feedback[b.key].roast}</p>
-                  </div>
-                )}
-                {feedback.feedback[b.key]?.constructive && (
+                {feedback.feedback[b.key]?.feedback && (
                   <div>
-                    <p className="text-green-600 font-medium mb-1">Constructive Feedback:</p>
-                    <p className="text-gray-700">{feedback.feedback[b.key].constructive}</p>
+                    <p className="text-gray-700">{feedback.feedback[b.key].feedback}</p>
                   </div>
                 )}
               </motion.div>

@@ -112,20 +112,22 @@ IMPORTANT: You must respond with valid JSON only. Do not include any other text 
 The response must be a single JSON object with the following structure:
 
 {
-  "hook": { "roast": "string", "constructive": "string" },
-  "pain": { "roast": "string", "constructive": "string" },
-  "numbers": { "roast": "string", "constructive": "string" },
-  "solution": { "roast": "string", "constructive": "string" },
-  "visual": { "roast": "string", "constructive": "string" },
-  "ease": { "roast": "string", "constructive": "string" },
-  "demo": { "roast": "string", "constructive": "string" },
-  "team": { "roast": "string", "constructive": "string" },
-  "story": { "roast": "string", "constructive": "string" },
-  "icp": { "roast": "string", "constructive": "string" },
-  "whynow": { "roast": "string", "constructive": "string" },
-  "competition": { "roast": "string", "constructive": "string" },
-  "bizmodel": { "roast": "string", "constructive": "string" }
+  "hook": { "feedback": "string" },
+  "pain": { "feedback": "string" },
+  "numbers": { "feedback": "string" },
+  "solution": { "feedback": "string" },
+  "visual": { "feedback": "string" },
+  "ease": { "feedback": "string" },
+  "demo": { "feedback": "string" },
+  "team": { "feedback": "string" },
+  "story": { "feedback": "string" },
+  "icp": { "feedback": "string" },
+  "whynow": { "feedback": "string" },
+  "competition": { "feedback": "string" },
+  "bizmodel": { "feedback": "string" }
 }
+
+For each section, provide feedback in a natural, email-like tone that combines both critical feedback and constructive suggestions. The feedback should read like a direct email from the VC, without explicit labels for "Roast" or "Constructive Feedback". Use the VC's unique personality and style to deliver the feedback.
 
 Ensure all values are strings and properly escaped. Do not include any markdown formatting or special characters.`
           },
@@ -156,7 +158,7 @@ Ensure all values are strings and properly escaped. Do not include any markdown 
           
           // Validate the feedback structure
           const requiredSections = ['hook', 'pain', 'numbers', 'solution', 'visual', 'ease', 'demo', 'team', 'story', 'icp', 'whynow', 'competition', 'bizmodel'];
-          const requiredFields = ['roast', 'constructive'];
+          const requiredFields = ['feedback'];
           
           for (const section of requiredSections) {
             if (!feedback[section] || typeof feedback[section] !== 'object') {
