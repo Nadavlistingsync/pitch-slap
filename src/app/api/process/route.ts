@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import pdfParse from 'pdf-parse';
 import { realVCPersonalities } from '../../../types/realVCPersonalities';
-import { storeFeedback } from '../feedback/[id]/route';
+import { storeFeedback } from '@/lib/feedback';
 
 // Initialize OpenAI
 const openai = new OpenAI({
