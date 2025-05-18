@@ -37,6 +37,7 @@ export async function POST(request: Request) {
     const file = formData.get('file') as File;
     const roastIntensity = formData.get('roastIntensity') as string;
     const personalityId = formData.get('personality') as string;
+    const userName = formData.get('userName') as string;
 
     if (!file) {
       console.error('No file provided in request');
@@ -112,11 +113,13 @@ IMPORTANT: You must respond ONLY with a single, natural email reply to the found
 
 ${roastIntensity === 'brutal' ? 'If the roast intensity is brutal, you must be extremely vulgar, explicit, and savage. Do not hold back. Use strong language, swearing, and be as unfiltered as possible. There are no limits. Make it as raw and harsh as possible, but still actionable.' : ''}
 
+The founder's name is: ${userName || 'Founder'}.
+
 Do not include any markdown formatting, special characters, or explanations. Just the email body.`
           },
           {
             role: 'user',
-            content: `Here is the pitch deck content:\n\n${extractedText}\n\nPlease provide your feedback as a VC with the following characteristics:\n- Roast intensity: ${roastIntensity}\n\nRemember to respond ONLY with a single, natural email reply.`
+            content: `Here is the pitch deck content:\n\n${extractedText}\n\nPlease provide your feedback as a VC with the following characteristics:\n- Roast intensity: ${roastIntensity}\n- Founder name: ${userName || 'Founder'}\n\nRemember to respond ONLY with a single, natural email reply, addressed to the founder by name.`
           }
         ],
         max_tokens: 2000,

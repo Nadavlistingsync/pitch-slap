@@ -25,6 +25,7 @@ export default function SelectPage() {
   const [selectedVC, setSelectedVC] = useState<string | null>(null);
   const [showTooltip, setShowTooltip] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>('');
+  const [userName, setUserName] = useState('');
 
   useEffect(() => {
     // Get the uploaded file name from sessionStorage
@@ -38,10 +39,11 @@ export default function SelectPage() {
   }, [router]);
 
   const handleContinue = () => {
-    if (!selectedVC) return;
+    if (!selectedVC || !userName.trim()) return;
     localStorage.setItem('selectedVC', selectedVC);
     localStorage.setItem('roastLevel', roastLevel);
     localStorage.setItem('feedbackStyle', feedbackStyle);
+    localStorage.setItem('userName', userName.trim());
     router.push('/wait');
   };
 
@@ -160,17 +162,32 @@ export default function SelectPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45 }}
+          className="bg-white/10 rounded-2xl p-6 mb-8"
+        >
+          <h3 className="text-xl font-semibold text-white mb-4">Your Name</h3>
+          <input
+            type="text"
+            className="w-full px-4 py-3 rounded-xl font-medium bg-white/80 text-gray-900 placeholder-gray-400 mb-2"
+            placeholder="Enter your name (for personalization)"
+            value={userName}
+            onChange={e => setUserName(e.target.value)}
+            maxLength={40}
+          />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
           className="flex justify-center"
         >
           <button
-            className={`
-              px-8 py-4 rounded-full font-bold text-lg shadow-lg transition-all
-              flex items-center gap-2
-              ${selectedVC ? 'bg-pink-500 text-white hover:bg-pink-600' : 'bg-white/20 text-white/50 cursor-not-allowed'}
-            `}
+            className={
+              `px-8 py-4 rounded-full font-bold text-lg shadow-lg transition-all flex items-center gap-2 ${selectedVC && userName.trim() ? 'bg-pink-500 text-white hover:bg-pink-600' : 'bg-white/20 text-white/50 cursor-not-allowed'}`
+            }
             onClick={handleContinue}
-            disabled={!selectedVC}
+            disabled={!selectedVC || !userName.trim()}
           >
             Continue
             <FiArrowRight className="w-5 h-5" />

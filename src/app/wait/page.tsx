@@ -43,6 +43,7 @@ export default function WaitPage() {
       const fileName = sessionStorage.getItem('uploadedFileName') || 'deck.pdf';
       const roastLevel = localStorage.getItem('roastLevel') || 'balanced';
       const personality = localStorage.getItem('selectedVC') || 'sequoia';
+      const userName = localStorage.getItem('userName') || '';
       if (!fileDataUrl) {
         setError('No uploaded file found. Please start over.');
         setShowRetry(true);
@@ -53,6 +54,7 @@ export default function WaitPage() {
       formData.append('file', file, fileName);
       formData.append('roastIntensity', roastLevel);
       formData.append('personality', personality);
+      formData.append('userName', userName);
       try {
         const res = await fetch('/api/process', {
           method: 'POST',
