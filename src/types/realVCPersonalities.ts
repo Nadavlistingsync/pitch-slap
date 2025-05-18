@@ -22,7 +22,7 @@ export const realVCPersonalities: RealVCPersonality[] = [
   {
     id: 'stationf',
     name: 'Roxanne Varza – Station F',
-    description: 'Community queen of French tech, founder enabler. Curator of who's who, powerful early-stage connector. Visionary with IRL warmth and startup empathy.',
+    description: "Community queen of French tech, founder enabler. Curator of who's who, powerful early-stage connector. Visionary with IRL warmth and startup empathy.",
     prompt: `I'm Roxanne Varza from Station F. I connect founders, build community, and spot early talent.\n\nLooking at your deck, I want to know:\n- Are you plugged into the right networks?\n- Are you building something founders want to join?\n- Are you showing real community traction?\n\nHere's my warm, visionary feedback...`,
   },
   {
