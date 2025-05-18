@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getFeedback } from '@/lib/feedback';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -13,7 +14,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const feedback = feedbackStore.get(params.id);
+    const feedback = getFeedback(params.id);
     
     if (!feedback) {
       return NextResponse.json(
@@ -30,9 +31,4 @@ export async function GET(
       { status: 500 }
     );
   }
-}
-
-// Helper function to store feedback (called from the process endpoint)
-export function storeFeedback(id: string, feedback: any) {
-  feedbackStore.set(id, feedback);
 } 
