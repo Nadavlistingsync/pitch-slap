@@ -3,119 +3,41 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { realVCPersonalities } from '../types/realVCPersonalities';
 
-const vcs = [
-  {
-    name: 'Jean de La Rochebrochard',
-    firm: 'Kima Ventures',
-    location: 'Paris',
-    knownFor: 'High-velocity investing (600+ startups), founder-first approach',
-    stage: 'Pre-seed to Series A',
-    whyFoundersCare: 'Quick decisions, founder-friendly terms, global network',
-    vibe: 'Humorous, direct, founder-first',
-    podcasts: ['The Twenty Minute VC', 'Sifted']
-  },
-  {
-    name: 'Pauline Roux',
-    firm: 'Elaia Partners',
-    location: 'Paris',
-    knownFor: 'B2B SaaS + Deep Tech conviction, surgical due diligence',
-    stage: 'Series A to B',
-    whyFoundersCare: 'Deep tech expertise, strong follow-on capabilities',
-    vibe: 'Technical, analytical, clear',
-    podcasts: ['Sifted']
-  },
-  {
-    name: 'Roxanne Varza',
-    firm: 'Station F',
-    location: 'Paris',
-    knownFor: 'Community queen of French tech, founder enabler',
-    stage: 'Pre-seed to Series A',
-    whyFoundersCare: 'Access to largest startup campus, strong ecosystem',
-    vibe: 'Community-focused, supportive, ecosystem builder',
-    podcasts: ['Sifted']
-  },
-  {
-    name: 'Guillaume Moubeche',
-    firm: 'Lemlist',
-    location: 'Paris',
-    knownFor: 'Bootstrapped success, marketing-native founder, now angel/VC hybrid',
-    stage: 'Pre-seed to Seed',
-    whyFoundersCare: 'Marketing expertise, founder perspective',
-    vibe: 'Marketing-focused, direct, helpful',
-    podcasts: ['Sifted']
-  },
-  {
-    name: 'Partech',
-    firm: 'Partech',
-    location: 'Paris',
-    knownFor: 'Global firm with Paris HQ; strong B2B SaaS, fintech, climate',
-    stage: 'Series A to Growth',
-    whyFoundersCare: 'Global reach, strong follow-on, sector expertise',
-    vibe: 'Structured, founder-centric, global',
-    podcasts: ['Sifted']
-  },
-  {
-    name: 'Y Combinator',
-    firm: 'Y Combinator',
-    location: 'San Francisco',
-    knownFor: 'Launchpad of unicorns (Airbnb, Stripe, Reddit)',
-    stage: 'Pre-seed to Seed',
-    whyFoundersCare: 'Massive follow-on capital, global network',
-    vibe: 'Blunt, pragmatic, helpful',
-    podcasts: ['The Twenty Minute VC']
-  },
-  {
-    name: 'Andreessen Horowitz',
-    firm: 'a16z',
-    location: 'San Francisco',
-    knownFor: 'Big bets, big checks, and content-rich thought leadership',
-    stage: 'Series A to Growth',
-    whyFoundersCare: 'Massive follow-on capital, strong brand',
-    vibe: 'Intellectual, thesis-first, big picture',
-    podcasts: ['The Twenty Minute VC']
-  },
-  {
-    name: 'BoxGroup',
-    firm: 'BoxGroup',
-    location: 'New York',
-    knownFor: 'Quiet power players of NYC pre-seed scene',
-    stage: 'Pre-seed to Seed',
-    whyFoundersCare: 'Quick decisions, founder-friendly terms',
-    vibe: 'Chill, smart, helpful',
-    podcasts: ['The Twenty Minute VC']
-  },
-  {
-    name: 'Lerer Hippeau',
-    firm: 'Lerer Hippeau',
-    location: 'New York',
-    knownFor: 'NYC DTC + SaaS engine; backers of Glossier, Warby Parker, Allbirds',
-    stage: 'Seed to Series A',
-    whyFoundersCare: 'Strong brand building expertise, NYC network',
-    vibe: 'Brand-focused, savvy, helpful',
-    podcasts: ['The Twenty Minute VC']
-  }
+const roastLevels = [
+  { value: 'gentle', label: 'Gentle', description: 'Constructive feedback with a soft touch' },
+  { value: 'balanced', label: 'Balanced', description: 'Mix of tough love and helpful advice' },
+  { value: 'brutal', label: 'Brutal', description: 'No holds barred, prepare for impact' },
+];
+
+const feedbackStyles = [
+  { value: 'helpful', label: 'Helpful VC', description: 'Focus on actionable improvements' },
+  { value: 'brutal', label: 'Brutal Honesty', description: 'Direct and unfiltered feedback' },
+  { value: 'roast', label: 'Roast Mode', description: 'Maximum entertainment value' },
+  { value: 'wildcard', label: 'Wildcard', description: 'Surprise me with any style' },
 ];
 
 export default function FeedbackStylePage() {
   const router = useRouter();
   const [selected, setSelected] = useState('');
-  const [filter, setFilter] = useState<'all' | 'Paris' | 'New York'>('all');
   const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState('all');
 
-  const filteredVCs = vcs.filter(vc => filter === 'all' || vc.location === filter);
-
-  const searchedVCs = filteredVCs.filter(vc =>
-    vc.name.toLowerCase().includes(search.toLowerCase()) ||
-    vc.firm.toLowerCase().includes(search.toLowerCase()) ||
-    vc.knownFor.toLowerCase().includes(search.toLowerCase())
-  );
+  const searchedVCs = realVCPersonalities.filter(vc => {
+    const matchesSearch = vc.name.toLowerCase().includes(search.toLowerCase()) ||
+                         vc.description.toLowerCase().includes(search.toLowerCase());
+    const matchesFilter = filter === 'all' ||
+                         (filter === 'Paris' && vc.description.includes('Paris')) ||
+                         (filter === 'New York' && vc.description.includes('NYC'));
+    return matchesSearch && matchesFilter;
+  });
 
   const handleContinue = () => {
-    if (!selected) return;
-    const [name, firm] = selected.split(' | ');
-    localStorage.setItem('selectedVC', JSON.stringify({ name, firm }));
-    router.push('/upload');
+    if (selected) {
+      const [name, firm] = selected.split(' | ');
+      router.push(`/upload?vc=${encodeURIComponent(name)}&firm=${encodeURIComponent(firm)}`);
+    }
   };
 
   return (
@@ -161,9 +83,9 @@ export default function FeedbackStylePage() {
             <div className="col-span-2 text-center text-gray-500">No VCs found.</div>
           ) : (
             searchedVCs.map(vc => {
-              const value = `${vc.name} | ${vc.firm} | ${vc.knownFor}`;
+              const value = `${vc.name} | ${vc.description}`;
               return (
-                <div key={vc.name}>
+                <div key={vc.id}>
                   <label className={`block p-4 border rounded-lg cursor-pointer transition-colors ${selected === value ? 'border-indigo-600 bg-indigo-50' : 'border-gray-200 hover:border-indigo-300'}`}>
                     <input
                       type="radio"
@@ -173,8 +95,8 @@ export default function FeedbackStylePage() {
                       onChange={() => setSelected(value)}
                       className="mr-3"
                     />
-                    <span className="font-bold">{vc.name}</span> <span className="text-gray-500">({vc.firm})</span>
-                    <div className="text-sm text-gray-600 mt-1">{vc.knownFor}</div>
+                    <span className="font-bold">{vc.name}</span>
+                    <div className="text-sm text-gray-600 mt-1">{vc.description}</div>
                   </label>
                 </div>
               );

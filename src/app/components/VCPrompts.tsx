@@ -128,8 +128,8 @@ const vcs: VC[] = [
     ]
   },
   {
-    name: "BoxGroup",
-    firm: "BoxGroup",
+    name: "NYC Operator VC",
+    firm: "NYC Operator VC",
     location: "🇺🇸 NYC",
     knownFor: "Quiet power players of NYC pre-seed scene",
     stage: "Pre-seed, Seed",

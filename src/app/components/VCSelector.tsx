@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { vcPrompts, VCPrompt } from '../lib/vcPrompts';
+import { FC, useState } from 'react';
+import { realVCPersonalities } from '../types/realVCPersonalities';
 
 interface VCSelectorProps {
   onSelect: (vcId: string) => void;
@@ -12,25 +12,17 @@ export default function VCSelector({ onSelect }: VCSelectorProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCity, setSelectedCity] = useState<'all' | 'Paris' | 'New York'>('all');
 
-  // Group VCs by city
-  const vcsByCity = vcPrompts.reduce((acc, vc) => {
-    const city = vc.name.includes('Paris') || vc.name.includes('Station F') || vc.name.includes('Kima') ? 'Paris' : 'New York';
-    if (!acc[city]) acc[city] = [];
-    acc[city].push(vc);
-    return acc;
-  }, {} as Record<string, VCPrompt[]>);
+  const filteredVCs = realVCPersonalities.filter(vc => {
+    const matchesSearch = vc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         vc.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCity = selectedCity === 'all' || 
+                       (selectedCity === 'Paris' && vc.description.includes('Paris')) ||
+                       (selectedCity === 'New York' && vc.description.includes('NYC'));
+    return matchesSearch && matchesCity;
+  });
 
-  // Filter VCs based on search term and selected city
-  const filteredVCs = Object.entries(vcsByCity)
-    .filter(([city]) => selectedCity === 'all' || city === selectedCity)
-    .flatMap(([_, vcs]) => vcs)
-    .filter(vc => 
-      vc.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-  const handleSelect = (vc: typeof vcPrompts[0]) => {
+  const handleSelect = (vc: typeof realVCPersonalities[0]) => {
     setSelectedVC(vc.id);
-    localStorage.setItem('selectedVC', vc.id);
     onSelect(vc.id);
   };
 
@@ -103,7 +95,7 @@ export default function VCSelector({ onSelect }: VCSelectorProps) {
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold text-gray-900">{vc.name}</h3>
-                  <p className="text-gray-600 mb-2">{vc.name}</p>
+                  <p className="text-gray-600 mb-2">{vc.description}</p>
                   <p className="text-sm text-gray-500">{vc.prompt.split('\n')[0]}</p>
                 </div>
               </div>
