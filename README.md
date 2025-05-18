@@ -7,7 +7,6 @@ Get brutally honest feedback on your pitch deck from AI-powered VCs. No sugar co
 - Upload and analyze pitch decks
 - Get feedback from different VC personalities
 - Choose your preferred feedback intensity
-- Share your VC rejection stories in the Ego Dump
 - Modern, responsive UI with smooth animations
 
 ## Tech Stack

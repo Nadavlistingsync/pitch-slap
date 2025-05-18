@@ -58,9 +58,6 @@ function Navbar() {
               <Link href="/roast" className="nav-link">
                 Get Roasted
               </Link>
-              <Link href="/ego-dump" className="nav-link">
-                Ego Dump
-              </Link>
               <Link href="/feedback" className="nav-link">
                 Feedback
               </Link>
