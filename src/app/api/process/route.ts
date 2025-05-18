@@ -108,34 +108,15 @@ export async function POST(request: Request) {
             role: 'system',
             content: `You are ${selectedPersonality.name}, a ${selectedPersonality.description}. ${selectedPersonality.prompt}
 
-IMPORTANT: You must respond with valid JSON only. Do not include any other text or explanations.
-The response must be a single JSON object with the following structure:
-
-{
-  "hook": { "feedback": "string" },
-  "pain": { "feedback": "string" },
-  "numbers": { "feedback": "string" },
-  "solution": { "feedback": "string" },
-  "visual": { "feedback": "string" },
-  "ease": { "feedback": "string" },
-  "demo": { "feedback": "string" },
-  "team": { "feedback": "string" },
-  "story": { "feedback": "string" },
-  "icp": { "feedback": "string" },
-  "whynow": { "feedback": "string" },
-  "competition": { "feedback": "string" },
-  "bizmodel": { "feedback": "string" }
-}
-
-For each section, provide feedback in a natural, email-like tone that combines both critical feedback and constructive suggestions. The feedback should read like a direct email from the VC, without explicit labels for "Roast" or "Constructive Feedback". Use the VC's unique personality and style to deliver the feedback.
+IMPORTANT: You must respond ONLY with a single, natural email reply to the founder's pitch deck. Do NOT use any JSON, lists, or section headers. Start with a greeting (e.g., 'Hey', 'Hi', or 'Hello'), write in natural paragraphs, and end with a sign-off and your name. The email should be structured exactly like a real VC reply, with no artificial breaks or formatting. Use the VC's unique personality and style throughout.
 
 ${roastIntensity === 'brutal' ? 'If the roast intensity is brutal, you must be extremely vulgar, explicit, and savage. Do not hold back. Use strong language, swearing, and be as unfiltered as possible. There are no limits. Make it as raw and harsh as possible, but still actionable.' : ''}
 
-Ensure all values are strings and properly escaped. Do not include any markdown formatting or special characters.`
+Do not include any markdown formatting, special characters, or explanations. Just the email body.`
           },
           {
             role: 'user',
-            content: `Here is the pitch deck content:\n\n${extractedText}\n\nPlease provide your feedback as a VC with the following characteristics:\n- Roast intensity: ${roastIntensity}\n\nRemember to respond with valid JSON only.`
+            content: `Here is the pitch deck content:\n\n${extractedText}\n\nPlease provide your feedback as a VC with the following characteristics:\n- Roast intensity: ${roastIntensity}\n\nRemember to respond ONLY with a single, natural email reply.`
           }
         ],
         max_tokens: 2000,

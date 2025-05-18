@@ -89,6 +89,9 @@ export default function ResultsPage() {
     );
   }
 
+  // Determine the email body (feedback)
+  const emailBody = rawFeedback || feedback?.email || feedback;
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-purple-900 to-indigo-950 py-12 flex flex-col items-center">
       <div className="max-w-3xl w-full mx-auto bg-white/10 rounded-2xl p-8 shadow-xl">
@@ -103,14 +106,7 @@ export default function ResultsPage() {
               <p>To: You</p>
             </div>
           </div>
-          
-          {rawFeedback ? (
-            <div className="text-gray-700 whitespace-pre-line">{rawFeedback}</div>
-          ) : (
-            <div className="text-gray-700 whitespace-pre-line">
-              {buckets.map((b) => feedback[b.key]?.feedback).filter(Boolean).join('\n\n')}
-            </div>
-          )}
+          <div className="text-gray-700 whitespace-pre-line">{emailBody}</div>
         </div>
 
         <div className="mt-8 flex gap-4 justify-center">
