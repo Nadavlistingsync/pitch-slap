@@ -1,6 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FiLoader } from 'react-icons/fi';
 
 const messages = [
   "VCs reviewing your brilliance...",
@@ -8,7 +10,11 @@ const messages = [
   "Checking for real traction...",
   "Roast mode engaged...",
   "Looking for LinkedIn links...",
-  "Summoning brutal honesty..."
+  "Summoning brutal honesty...",
+  "Analyzing market size claims...",
+  "Verifying founder credentials...",
+  "Calculating burn rate...",
+  "Evaluating product-market fit..."
 ];
 
 export default function WaitPage() {
@@ -16,6 +22,7 @@ export default function WaitPage() {
   const [progress, setProgress] = useState(0);
   const [messageIdx, setMessageIdx] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [showRetry, setShowRetry] = useState(false);
 
   useEffect(() => {
     // Helper to convert base64 to Blob
@@ -38,6 +45,7 @@ export default function WaitPage() {
       const personality = localStorage.getItem('selectedVC') || 'sequoia';
       if (!fileDataUrl) {
         setError('No uploaded file found. Please start over.');
+        setShowRetry(true);
         return;
       }
       const file = dataURLtoBlob(fileDataUrl);
@@ -57,6 +65,7 @@ export default function WaitPage() {
         setTimeout(() => router.push('/results'), 800);
       } catch (e: any) {
         setError(e.message || 'Failed to process feedback.');
+        setShowRetry(true);
       }
     }
 
@@ -75,21 +84,81 @@ export default function WaitPage() {
     return () => clearInterval(interval);
   }, [router]);
 
+  const handleRetry = () => {
+    setError(null);
+    setShowRetry(false);
+    setProgress(0);
+    router.push('/');
+  };
+
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-purple-900 to-indigo-950">
       <div className="max-w-lg w-full bg-white/10 rounded-2xl p-8 shadow-xl text-center">
-        <h2 className="text-2xl font-bold text-white mb-6">Generating Your Feedback</h2>
-        <div className="w-full bg-white/20 rounded-full h-6 mb-4 overflow-hidden">
-          <div
-            className="bg-pink-500 h-6 rounded-full transition-all"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-        {error ? (
-          <p className="text-lg text-red-400 animate-pulse">{error}</p>
-        ) : (
-          <p className="text-lg text-white/80 animate-pulse">{messages[messageIdx]}</p>
-        )}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
+          <h2 className="text-2xl font-bold text-white mb-6">Generating Your Feedback</h2>
+          <div className="w-full bg-white/20 rounded-full h-6 mb-4 overflow-hidden">
+            <motion.div
+              className="bg-pink-500 h-6 rounded-full"
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.3 }}
+            />
+          </div>
+          <AnimatePresence mode="wait">
+            {error ? (
+              <motion.div
+                key="error"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="text-lg text-red-400"
+              >
+                {error}
+              </motion.div>
+            ) : (
+              <motion.div
+                key="message"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="text-lg text-white/80"
+              >
+                {messages[messageIdx]}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="flex justify-center"
+        >
+          <FiLoader className="w-8 h-8 text-white/60 animate-spin" />
+        </motion.div>
+
+        <AnimatePresence>
+          {showRetry && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="mt-8"
+            >
+              <button
+                onClick={handleRetry}
+                className="px-6 py-3 rounded-full font-bold text-lg bg-pink-500 text-white hover:bg-pink-600 shadow-lg transition-all"
+              >
+                Try Again
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </main>
   );
