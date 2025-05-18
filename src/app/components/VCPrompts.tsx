@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Search, MapPin, Building2, Award, Users, MessageSquare } from 'lucide-react';
+import { realVCPersonalities } from '../../types/realVCPersonalities';
 
 interface VC {
   name: string;

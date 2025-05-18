@@ -1,4 +1,4 @@
-import { realVCPersonalities } from '../types/realVCPersonalities';
+import { realVCPersonalities } from '../../types/realVCPersonalities';
 
 export interface VCPrompt {
   id: string;

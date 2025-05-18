@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { realVCPersonalities } from '../types/realVCPersonalities';
+import { realVCPersonalities } from '../../types/realVCPersonalities';
 
 const roastLevels = [
   { value: 'gentle', label: 'Gentle', description: 'Constructive feedback with a soft touch' },
