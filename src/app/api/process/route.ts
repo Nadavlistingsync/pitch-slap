@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import pdfParse from 'pdf-parse';
+import { vcPersonalities } from '../../../types/vcPersonalities';
 
 // Initialize OpenAI
 const openai = new OpenAI({
@@ -16,6 +17,11 @@ const isValidRoastIntensity = (intensity: string): intensity is 'gentle' | 'bala
   return ['gentle', 'balanced', 'brutal'].includes(intensity);
 };
 
+// Validate VC personality
+const isValidVCPersonality = (personalityId: string): boolean => {
+  return vcPersonalities.some(p => p.id === personalityId);
+};
+
 export async function POST(request: Request) {
   try {
     if (!process.env.OPENAI_API_KEY) {
@@ -29,6 +35,7 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const roastIntensity = formData.get('roastIntensity') as string;
+    const personalityId = formData.get('personality') as string;
 
     if (!file) {
       console.error('No file provided in request');
@@ -46,6 +53,14 @@ export async function POST(request: Request) {
       );
     }
 
+    if (!isValidVCPersonality(personalityId)) {
+      console.error('Invalid VC personality:', personalityId);
+      return NextResponse.json(
+        { error: 'Invalid VC personality selected' },
+        { status: 400 }
+      );
+    }
+
     // Only support PDF
     if (file.type !== 'application/pdf') {
       console.error('Invalid file type:', file.type);
@@ -53,6 +68,12 @@ export async function POST(request: Request) {
         { error: 'Only PDF files are supported' },
         { status: 400 }
       );
+    }
+
+    // Get selected personality
+    const selectedPersonality = vcPersonalities.find(p => p.id === personalityId);
+    if (!selectedPersonality) {
+      throw new Error('Selected personality not found');
     }
 
     // Read and parse PDF
@@ -78,20 +99,30 @@ export async function POST(request: Request) {
       
       const extractedText = pdfData.text;
 
-      // Generate roast using GPT
+      // Generate roast using GPT with personality context
       const completion = await openai.chat.completions.create({
         model: 'gpt-4',
         messages: [
           { 
             role: 'system', 
-            content: 'You are a brutally honest venture capitalist giving feedback on startup pitch decks. Be direct, critical, and provide actionable feedback.' 
+            content: `You are a venture capitalist with the following personality:
+            Name: ${selectedPersonality.name}
+            Description: ${selectedPersonality.description}
+            Investment Style: ${selectedPersonality.investmentStyle}
+            Risk Tolerance: ${selectedPersonality.riskTolerance}
+            Focus Areas: ${selectedPersonality.focusAreas.join(', ')}
+            
+            Give feedback on startup pitch decks from this perspective. Be direct, critical, and provide actionable feedback that aligns with your investment style and focus areas.` 
           },
           { 
             role: 'user', 
-            content: `Here is the pitch deck content:\n\n${extractedText}\n\nPlease provide your brutally honest feedback as a VC. Roast intensity: ${roastIntensity}.` 
+            content: `Here is the pitch deck content:\n\n${extractedText}\n\nPlease provide your feedback as a VC with the following characteristics:
+            - Roast intensity: ${roastIntensity}
+            - Typical questions you would ask: ${selectedPersonality.typicalQuestions.join(', ')}
+            - Your key characteristics: ${selectedPersonality.characteristics.join(', ')}` 
           }
         ],
-        max_tokens: 800,
+        max_tokens: 1000,
         temperature: 0.7
       });
 
@@ -104,7 +135,8 @@ export async function POST(request: Request) {
       return NextResponse.json({
         success: true,
         feedback,
-        roastIntensity
+        roastIntensity,
+        personality: selectedPersonality.name
       });
 
     } catch (pdfError) {

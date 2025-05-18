@@ -5,11 +5,13 @@ import { useDropzone } from 'react-dropzone';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Star, Zap, Upload } from 'lucide-react';
+import VCPersonalitySelector from '../components/VCPersonalitySelector';
 
 export default function Home() {
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [roastIntensity, setRoastIntensity] = useState<'gentle' | 'balanced' | 'brutal'>('balanced');
+  const [selectedPersonality, setSelectedPersonality] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string>('');
   const [loading, setLoading] = useState(false);
 
@@ -24,12 +26,13 @@ export default function Home() {
   });
 
   const handleSubmit = async () => {
-    if (!file) return;
+    if (!file || !selectedPersonality) return;
 
     setLoading(true);
     const formData = new FormData();
     formData.append('file', file);
     formData.append('roastIntensity', roastIntensity);
+    formData.append('personality', selectedPersonality);
 
     try {
       const response = await fetch('/api/process', {
@@ -58,7 +61,7 @@ export default function Home() {
         <div className="absolute bottom-0 right-0 w-[80vw] h-[80vh] bg-gradient-to-tl from-purple-500/20 to-transparent blur-3xl opacity-40" />
       </div>
 
-      <div className="max-w-2xl mx-auto relative z-10">
+      <div className="max-w-4xl mx-auto relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -128,11 +131,18 @@ export default function Home() {
             </div>
           </div>
 
+          <div className="mt-8">
+            <VCPersonalitySelector
+              selectedPersonality={selectedPersonality}
+              onPersonalitySelect={setSelectedPersonality}
+            />
+          </div>
+
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={handleSubmit}
-            disabled={!file || loading}
+            disabled={!file || !selectedPersonality || loading}
             className="mt-8 w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-4 rounded-xl font-medium text-lg shadow-lg hover:shadow-purple-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
           >
             {loading ? (
