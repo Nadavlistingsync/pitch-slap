@@ -256,4 +256,59 @@ body {
   .container-text {
     @apply text-xl;
   }
+}
+
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.confetti-burst {
+  pointer-events: none;
+  z-index: 9999;
+  animation: confetti-burst 1s cubic-bezier(0.23, 1, 0.32, 1);
+  background: none;
+}
+@keyframes confetti-burst {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.border-gradient-to-r {
+  border-image: linear-gradient(to right, #a78bfa, #ff4154) 1;
+}
+
+.shadow-glow {
+  box-shadow: 0 0 40px 0 #ff4154, 0 0 80px 0 #a78bfa;
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+.tracking-wide {
+  letter-spacing: 0.05em;
+}
+
+.mt-\[-80px\] {
+  margin-top: -80px;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.fixed.bottom-0.left-0.w-full.z-30 {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 30;
 } 
