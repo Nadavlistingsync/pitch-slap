@@ -69,29 +69,45 @@ export default function SharedFeedbackPage({ params }: { params: { id: string } 
   return (
     <main className="min-h-screen bg-gradient-to-b from-purple-900 to-indigo-950 py-12 flex flex-col items-center">
       <div className="max-w-3xl w-full mx-auto bg-white/10 rounded-2xl p-8 shadow-xl">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-bold text-white">Shared Feedback</h2>
-          <div className="text-white/80">
-            By {feedback.personality} • {new Date(feedback.timestamp).toLocaleDateString()}
+        <div className="bg-white rounded-xl p-8 shadow-lg">
+          <div className="border-b border-gray-200 pb-4 mb-6">
+            <div className="flex justify-between items-center mb-2">
+              <h2 className="text-2xl font-bold text-gray-800">Re: Your Pitch Deck</h2>
+              <span className="text-gray-500 text-sm">{new Date(feedback.timestamp).toLocaleString()}</span>
+            </div>
+            <div className="text-gray-600">
+              <p>From: {feedback.personality}</p>
+              <p>To: You</p>
+            </div>
+          </div>
+          
+          <div className="space-y-6">
+            {buckets.map((b, index) => (
+              <motion.div
+                key={b.key}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="border-b border-gray-100 pb-6 last:border-0"
+              >
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">{b.label}</h3>
+                {feedback.feedback[b.key]?.roast && (
+                  <div className="mb-3">
+                    <p className="text-red-600 font-medium mb-1">Roast:</p>
+                    <p className="text-gray-700">{feedback.feedback[b.key].roast}</p>
+                  </div>
+                )}
+                {feedback.feedback[b.key]?.constructive && (
+                  <div>
+                    <p className="text-green-600 font-medium mb-1">Constructive Feedback:</p>
+                    <p className="text-gray-700">{feedback.feedback[b.key].constructive}</p>
+                  </div>
+                )}
+              </motion.div>
+            ))}
           </div>
         </div>
-        <div className="grid grid-cols-1 gap-6">
-          {buckets.map((b, index) => (
-            <motion.div
-              key={b.key}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-white/20 rounded-xl p-6"
-            >
-              <h3 className="text-xl font-bold text-pink-300 mb-2">{b.label}</h3>
-              <p className="text-pink-200 mb-1 font-semibold">Roast:</p>
-              <p className="text-white mb-2">{feedback.feedback[b.key]?.roast || <span className="text-gray-400">No roast for this section.</span>}</p>
-              <p className="text-indigo-200 mb-1 font-semibold">Constructive:</p>
-              <p className="text-white">{feedback.feedback[b.key]?.constructive || <span className="text-gray-400">No constructive feedback for this section.</span>}</p>
-            </motion.div>
-          ))}
-        </div>
+
         <div className="mt-8 flex justify-center">
           <button
             className="px-6 py-3 rounded-full font-bold text-lg bg-purple-500 text-white hover:bg-purple-600 shadow-lg transition-all"
