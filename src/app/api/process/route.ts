@@ -11,6 +11,13 @@ const openai = new OpenAI({
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
+// Configure PDF.js log level to suppress warnings
+if (typeof window === 'undefined') {
+  const pdfjs = require('pdfjs-dist');
+  pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+  pdfjs.verbosity = 0; // Suppress warnings
+}
+
 // Validate roast intensity
 const isValidRoastIntensity = (intensity: string): intensity is 'gentle' | 'balanced' | 'brutal' => {
   return ['gentle', 'balanced', 'brutal'].includes(intensity);
