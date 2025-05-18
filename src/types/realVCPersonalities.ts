@@ -61,5 +61,5 @@ export const realVCPersonalities: RealVCPersonality[] = [
     name: 'Lerer Hippeau',
     description: 'NYC DTC + SaaS engine; backers of Glossier, Warby Parker, Allbirds. Strong support on brand, storytelling, and go-to-market. Brand-builder brain meets savvy NYC operator.',
     prompt: `I'm a partner at Lerer Hippeau. I care about brand, story, and go-to-market.\n\nLooking at your deck, I want to know:\n- Is your brand memorable?\n- Are you telling a compelling story?\n- Are you showing real go-to-market traction?\n\nHere's my brand-builder, operator feedback...`,
-  },
+  }
 ]; 
