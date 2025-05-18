@@ -33,23 +33,28 @@ export default function ResultsPage() {
     // Read feedback from sessionStorage
     const stored = sessionStorage.getItem('feedbackResult');
     if (stored) {
-      const result = JSON.parse(stored);
-      if (typeof result.feedback === 'object') {
-        setFeedback(result.feedback);
-      } else if (typeof result.feedback === 'string') {
-        setRawFeedback(result.feedback);
-      }
-      if (result.feedbackId) {
-        setFeedbackId(result.feedbackId);
-        // Generate share URL
-        const url = `${window.location.origin}/feedback/${result.feedbackId}`;
-        setShareUrl(url);
-      }
-      if (result.personality) {
-        setVcName(result.personality);
-      }
-      if (result.timestamp) {
-        setTimestamp(new Date(result.timestamp).toLocaleString());
+      try {
+        const result = JSON.parse(stored);
+        if (typeof result.feedback === 'object') {
+          setFeedback(result.feedback);
+        } else if (typeof result.feedback === 'string') {
+          setRawFeedback(result.feedback);
+        }
+        if (result.feedbackId) {
+          setFeedbackId(result.feedbackId);
+          // Generate share URL
+          const url = `${window.location.origin}/feedback/${result.feedbackId}`;
+          setShareUrl(url);
+        }
+        if (result.personality) {
+          setVcName(result.personality);
+        }
+        if (result.timestamp) {
+          setTimestamp(new Date(result.timestamp).toLocaleString());
+        }
+      } catch (error) {
+        console.error('Error parsing feedback:', error);
+        router.push('/');
       }
     } else {
       // No feedback found, redirect to home
@@ -90,7 +95,13 @@ export default function ResultsPage() {
   }
 
   // Determine the email body (feedback)
-  const emailBody = rawFeedback || feedback?.email || feedback;
+  const emailBody = typeof rawFeedback === 'string' 
+    ? rawFeedback 
+    : typeof feedback?.email === 'string'
+      ? feedback.email
+      : typeof feedback === 'string'
+        ? feedback
+        : JSON.stringify(feedback, null, 2);
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-purple-900 to-indigo-950 py-12 flex flex-col items-center">
