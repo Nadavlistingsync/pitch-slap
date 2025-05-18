@@ -81,20 +81,8 @@ export default function SharedFeedbackPage({ params }: { params: { id: string } 
             </div>
           </div>
           
-          <div className="space-y-6">
-            {buckets.map((b, index) => (
-              feedback.feedback[b.key]?.feedback && (
-                <motion.div
-                  key={b.key}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="border-b border-gray-100 pb-6 last:border-0"
-                >
-                  <p className="text-gray-700">{feedback.feedback[b.key].feedback}</p>
-                </motion.div>
-              )
-            ))}
+          <div className="text-gray-700 whitespace-pre-line">
+            {buckets.map((b) => feedback.feedback[b.key]?.feedback).filter(Boolean).join('\n\n')}
           </div>
         </div>
 

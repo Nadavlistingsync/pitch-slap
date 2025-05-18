@@ -129,6 +129,8 @@ The response must be a single JSON object with the following structure:
 
 For each section, provide feedback in a natural, email-like tone that combines both critical feedback and constructive suggestions. The feedback should read like a direct email from the VC, without explicit labels for "Roast" or "Constructive Feedback". Use the VC's unique personality and style to deliver the feedback.
 
+${roastIntensity === 'brutal' ? 'If the roast intensity is brutal, you must be extremely vulgar, explicit, and savage. Do not hold back. Use strong language, swearing, and be as unfiltered as possible. There are no limits. Make it as raw and harsh as possible, but still actionable.' : ''}
+
 Ensure all values are strings and properly escaped. Do not include any markdown formatting or special characters.`
           },
           {
