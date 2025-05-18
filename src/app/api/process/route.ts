@@ -12,10 +12,13 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 // Configure PDF.js log level to suppress warnings
+let pdfjs: any;
 if (typeof window === 'undefined') {
-  const pdfjs = require('pdfjs-dist');
-  pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
-  pdfjs.verbosity = 0; // Suppress warnings
+  import('pdfjs-dist').then((module) => {
+    pdfjs = module;
+    pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+    pdfjs.verbosity = 0; // Suppress warnings
+  });
 }
 
 // Validate roast intensity

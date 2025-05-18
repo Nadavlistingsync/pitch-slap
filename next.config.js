@@ -30,11 +30,17 @@ const nextConfig = {
       path: false,
     };
 
+    // Handle ESM modules
+    config.resolve.extensionAlias = {
+      '.js': ['.js', '.ts', '.tsx'],
+      '.mjs': ['.mjs', '.mts', '.mtsx'],
+    };
+
     return config;
   },
   // Disable static optimization for API routes
   experimental: {
-    serverComponentsExternalPackages: ['pdf-parse'],
+    serverComponentsExternalPackages: ['pdf-parse', 'pdfjs-dist'],
   },
 };
 
