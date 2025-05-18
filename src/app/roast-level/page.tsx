@@ -34,7 +34,7 @@ export default function RoastLevelPage() {
         return;
       }
       // Convert base64 to Blob
-      function dataURLtoBlob(dataurl: string) {
+      const dataURLtoBlob = (dataurl: string) => {
         const arr = dataurl.split(',');
         const match = arr[0].match(/:(.*?);/);
         if (!match) throw new Error('Invalid data URL');
@@ -44,7 +44,7 @@ export default function RoastLevelPage() {
         const u8arr = new Uint8Array(n);
         while(n--) u8arr[n] = bstr.charCodeAt(n);
         return new Blob([u8arr], { type: mime });
-      }
+      };
       const file = dataURLtoBlob(fileDataUrl);
       const formData = new FormData();
       formData.append("file", file, fileName);
