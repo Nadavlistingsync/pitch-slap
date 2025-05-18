@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Star, Zap, Upload } from 'lucide-react';
+import { ArrowRight, Star, Zap, Upload, ClipboardCopy } from 'lucide-react';
 import VCPersonalitySelector from '../components/VCPersonalitySelector';
 
 export default function Home() {
@@ -14,6 +14,7 @@ export default function Home() {
   const [selectedPersonality, setSelectedPersonality] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string>('');
   const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
@@ -53,6 +54,14 @@ export default function Home() {
     }
   };
 
+  const handleCopy = () => {
+    if (feedback) {
+      navigator.clipboard.writeText(feedback);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 p-8 relative overflow-hidden">
       {/* Animated background elements */}
@@ -68,19 +77,20 @@ export default function Home() {
           transition={{ duration: 0.8 }}
           className="text-center mb-12"
         >
-          <h1 className="text-5xl font-bold text-white mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-200 to-white">
+          <h1 className="text-5xl font-bold text-white mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-200 to-white drop-shadow-lg">
             Pitch Deck Roaster
           </h1>
-          <p className="text-xl text-gray-300">
+          <p className="text-xl text-gray-300 mb-2">
             Get brutally honest feedback from AI-powered VCs
           </p>
         </motion.div>
 
+        {/* Glassmorphic Upload Card */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-2xl border border-white/10"
+          transition={{ duration: 0.5 }}
+          className="glass-card max-w-2xl mx-auto p-8 mb-10 shadow-glass animate-fade-in"
         >
           <div
             {...getRootProps()}
@@ -107,7 +117,8 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="mt-8">
+          {/* Roast Intensity */}
+          <div className="mt-4">
             <label className="block text-white mb-3 font-medium">Roast Intensity:</label>
             <div className="grid grid-cols-3 gap-4">
               {[
@@ -118,7 +129,7 @@ export default function Home() {
                 <button
                   key={value}
                   onClick={() => setRoastIntensity(value as any)}
-                  className={`flex items-center justify-center gap-2 p-4 rounded-xl transition-all duration-300 ${
+                  className={`flex items-center justify-center gap-2 p-4 rounded-xl transition-all duration-300 focus-ring active-scale hover-lift ${
                     roastIntensity === value
                       ? 'bg-purple-600 text-white shadow-lg scale-105'
                       : 'bg-white/5 text-gray-300 hover:bg-white/10'
@@ -131,6 +142,7 @@ export default function Home() {
             </div>
           </div>
 
+          {/* VC Selector */}
           <div className="mt-8">
             <VCPersonalitySelector
               selectedPersonality={selectedPersonality}
@@ -138,37 +150,50 @@ export default function Home() {
             />
           </div>
 
+          {/* Roast Button */}
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={handleSubmit}
             disabled={!file || !selectedPersonality || loading}
-            className="mt-8 w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-4 rounded-xl font-medium text-lg shadow-lg hover:shadow-purple-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+            className="mt-8 w-full glass-button bg-gradient-to-r from-purple-600 to-purple-700 text-white py-4 rounded-xl font-medium text-lg shadow-lg hover:shadow-purple-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 active-scale"
           >
             {loading ? (
               <div className="flex items-center justify-center gap-2">
-                <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                <div className="spinner" />
                 Processing...
               </div>
             ) : (
               'Roast My Pitch Deck'
             )}
           </motion.button>
-
-          <AnimatePresence>
-            {feedback && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="mt-8 p-6 bg-white/5 rounded-xl border border-white/10"
-              >
-                <h2 className="text-xl font-semibold text-white mb-4">Feedback:</h2>
-                <p className="text-white/90 whitespace-pre-wrap leading-relaxed">{feedback}</p>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </motion.div>
+
+        {/* Feedback Card */}
+        <AnimatePresence>
+          {feedback && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="mt-8 max-w-2xl mx-auto gradient-border animate-scale-in"
+            >
+              <div className="p-6 bg-white/10 rounded-xl border border-white/10 relative">
+                <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                  Feedback
+                  <button
+                    onClick={handleCopy}
+                    className="ml-2 glass-button px-2 py-1 rounded-lg text-sm flex items-center gap-1 hover:bg-white/20 transition-all duration-200 focus-ring"
+                  >
+                    <ClipboardCopy className="w-4 h-4" />
+                    {copied ? 'Copied!' : 'Copy'}
+                  </button>
+                </h2>
+                <p className="text-white/90 whitespace-pre-wrap leading-relaxed text-lg">{feedback}</p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </main>
   );
