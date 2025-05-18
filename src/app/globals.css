@@ -97,6 +97,10 @@ body {
   .hover-glow {
     @apply transition-all duration-200 hover:shadow-[0_0_15px_rgba(99,102,241,0.3)];
   }
+
+  .glass {
+    @apply bg-white/5 backdrop-blur-lg border-b border-white/10;
+  }
 }
 
 /* Custom scrollbar */
@@ -179,25 +183,24 @@ body {
   animation: scale-in 0.2s ease-out;
 }
 
-.animate-shimmer {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.05) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  background-size: 1000px 100%;
-  animation: shimmer 2s infinite linear;
+/* Glass morphism effects */
+.glass-card {
+  @apply bg-white/10 backdrop-blur-lg border border-white/10 rounded-2xl shadow-xl;
 }
 
-/* Glass effect */
-.glass {
-  @apply bg-gray-900/50 backdrop-blur-sm border border-gray-800/50;
+.glass-button {
+  @apply bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl 
+         hover:bg-white/20 transition-all duration-300;
 }
 
 /* Gradient text */
 .gradient-text {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500;
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-200 to-white;
+}
+
+/* Loading spinner */
+.spinner {
+  @apply w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin;
 }
 
 /* Hover effects */
