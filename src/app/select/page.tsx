@@ -2,16 +2,16 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { realVCPersonalities } from '@/types/realVCPersonalities';
+import { realVCPersonalities, RealVCPersonality } from '@/types/realVCPersonalities';
 import { FiSearch, FiFilter } from 'react-icons/fi';
 
 export default function SelectPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedVC, setSelectedVC] = useState<string | null>(null);
-  const [filter, setFilter] = useState('all');
+  const [filter, setFilter] = useState<'all' | 'seed' | 'series-a' | 'growth'>('all');
 
-  const filteredVCs = realVCPersonalities.filter(vc => {
+  const filteredVCs = realVCPersonalities.filter((vc: RealVCPersonality) => {
     const matchesSearch = vc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          vc.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesFilter = filter === 'all' || vc.type === filter;
@@ -68,7 +68,7 @@ export default function SelectPage() {
               <FiFilter className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
               <select
                 value={filter}
-                onChange={(e) => setFilter(e.target.value)}
+                onChange={(e) => setFilter(e.target.value as 'all' | 'seed' | 'series-a' | 'growth')}
                 className="pl-12 pr-8 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-pink-500/50 appearance-none"
               >
                 <option value="all">All Types</option>
@@ -96,7 +96,7 @@ export default function SelectPage() {
             >
               <div className="flex items-start gap-4">
                 <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 flex items-center justify-center">
-                  <span className="text-2xl">{vc.emoji}</span>
+                  <span className="text-2xl">🔥</span>
                 </div>
                 <div className="flex-1">
                   <h3 className="text-xl font-semibold text-white mb-2">{vc.name}</h3>
