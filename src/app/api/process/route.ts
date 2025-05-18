@@ -11,16 +11,6 @@ const openai = new OpenAI({
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-// Configure PDF.js log level to suppress warnings
-let pdfjs: any;
-if (typeof window === 'undefined') {
-  import('pdfjs-dist/legacy/build/pdf.js').then((module) => {
-    pdfjs = module;
-    // Set worker source
-    pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
-  });
-}
-
 // Validate roast intensity
 const isValidRoastIntensity = (intensity: string): intensity is 'gentle' | 'balanced' | 'brutal' => {
   return ['gentle', 'balanced', 'brutal'].includes(intensity);
@@ -69,7 +59,18 @@ export async function POST(request: Request) {
     try {
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
-      const pdfData = await pdfParse(buffer);
+      
+      // Configure pdf-parse options to ignore font warnings
+      const options = {
+        pagerender: function(pageData: any) {
+          return pageData.getTextContent()
+            .then(function(textContent: any) {
+              return textContent.items.map((item: any) => item.str).join(' ');
+            });
+        }
+      };
+
+      const pdfData = await pdfParse(buffer, options);
       
       if (!pdfData || !pdfData.text) {
         throw new Error('Failed to extract text from PDF');
