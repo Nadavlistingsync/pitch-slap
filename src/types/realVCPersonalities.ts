@@ -53,7 +53,7 @@ export const realVCPersonalities: RealVCPersonality[] = [
   {
     id: 'nyc-operator',
     name: 'NYC Operator VC',
-    description: 'Quiet power players of NYC pre-seed scene. They move fast, don't over-engineer deals, and co-invest with everyone. Chill, smart, operator-friendly.',
+    description: "Quiet power players of NYC pre-seed scene. They move fast, don't over-engineer deals, and co-invest with everyone. Chill, smart, operator-friendly.",
     prompt: `I'm a NYC Operator VC. I move fast, keep it simple, and co-invest with the best.\n\nLooking at your pitch, I want to know:\n- Are you moving quickly and simply?\n- Are you building something operators want to use?\n- Are you showing real NYC traction?\n\nHere's my chill, operator-friendly feedback...`,
   },
   {
