@@ -14,10 +14,10 @@ export const runtime = 'nodejs';
 // Configure PDF.js log level to suppress warnings
 let pdfjs: any;
 if (typeof window === 'undefined') {
-  import('pdfjs-dist').then((module) => {
+  import('pdfjs-dist/legacy/build/pdf.js').then((module) => {
     pdfjs = module;
+    // Set worker source
     pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
-    pdfjs.verbosity = 0; // Suppress warnings
   });
 }
 
