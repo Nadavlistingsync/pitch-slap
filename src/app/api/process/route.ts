@@ -111,6 +111,8 @@ export async function POST(request: Request) {
 
 IMPORTANT: You must respond ONLY with a single, natural email reply to the founder's pitch deck. Do NOT use any JSON, lists, or section headers. Start with a greeting (e.g., 'Hey', 'Hi', or 'Hello'), write in natural paragraphs, and end with a sign-off and your name. The email should be structured exactly like a real VC reply, with no artificial breaks or formatting. Use the VC's unique personality and style throughout.
 
+If the founder's name is missing or empty, start the email with a generic greeting like 'Hey,'.
+
 ${roastIntensity === 'brutal' ? 'If the roast intensity is brutal, you must be extremely vulgar, explicit, and savage. Do not hold back. Use strong language, swearing, and be as unfiltered as possible. There are no limits. Make it as raw and harsh as possible, but still actionable.' : ''}
 
 The founder's name is: ${userName || 'Founder'}.
