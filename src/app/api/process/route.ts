@@ -106,42 +106,83 @@ export async function POST(request: Request) {
         messages: [
           {
             role: 'system',
-            content: `You are ${selectedPersonality.name}, a ${selectedPersonality.description}. ${selectedPersonality.prompt}\n\nProvide feedback in the following JSON format:
-            {
-              "hook": { "roast": "string", "constructive": "string" },
-              "pain": { "roast": "string", "constructive": "string" },
-              "numbers": { "roast": "string", "constructive": "string" },
-              "solution": { "roast": "string", "constructive": "string" },
-              "visual": { "roast": "string", "constructive": "string" },
-              "ease": { "roast": "string", "constructive": "string" },
-              "demo": { "roast": "string", "constructive": "string" },
-              "team": { "roast": "string", "constructive": "string" },
-              "story": { "roast": "string", "constructive": "string" },
-              "icp": { "roast": "string", "constructive": "string" },
-              "whynow": { "roast": "string", "constructive": "string" },
-              "competition": { "roast": "string", "constructive": "string" },
-              "bizmodel": { "roast": "string", "constructive": "string" }
-            }`
+            content: `You are ${selectedPersonality.name}, a ${selectedPersonality.description}. ${selectedPersonality.prompt}
+
+IMPORTANT: You must respond with valid JSON only. Do not include any other text or explanations.
+The response must be a single JSON object with the following structure:
+
+{
+  "hook": { "roast": "string", "constructive": "string" },
+  "pain": { "roast": "string", "constructive": "string" },
+  "numbers": { "roast": "string", "constructive": "string" },
+  "solution": { "roast": "string", "constructive": "string" },
+  "visual": { "roast": "string", "constructive": "string" },
+  "ease": { "roast": "string", "constructive": "string" },
+  "demo": { "roast": "string", "constructive": "string" },
+  "team": { "roast": "string", "constructive": "string" },
+  "story": { "roast": "string", "constructive": "string" },
+  "icp": { "roast": "string", "constructive": "string" },
+  "whynow": { "roast": "string", "constructive": "string" },
+  "competition": { "roast": "string", "constructive": "string" },
+  "bizmodel": { "roast": "string", "constructive": "string" }
+}
+
+Ensure all values are strings and properly escaped. Do not include any markdown formatting or special characters.`
           },
           {
             role: 'user',
-            content: `Here is the pitch deck content:\n\n${extractedText}\n\nPlease provide your feedback as a VC with the following characteristics:\n- Roast intensity: ${roastIntensity}\n\nEnsure your feedback is in the specified JSON format.`
+            content: `Here is the pitch deck content:\n\n${extractedText}\n\nPlease provide your feedback as a VC with the following characteristics:\n- Roast intensity: ${roastIntensity}\n\nRemember to respond with valid JSON only.`
           }
         ],
         max_tokens: 2000,
-        temperature: 0.7
+        temperature: 0.7,
+        response_format: { type: "json_object" }
       });
 
       if (!completion.choices?.[0]?.message?.content) {
+        console.error('OpenAI response missing content:', completion);
         throw new Error('No response generated from OpenAI');
       }
 
       let feedback;
-      try {
-        feedback = JSON.parse(completion.choices[0].message.content);
-      } catch (e) {
-        console.error('Failed to parse feedback JSON:', e);
-        throw new Error('Failed to parse feedback response');
+      let retryCount = 0;
+      const maxRetries = 3;
+
+      while (retryCount < maxRetries) {
+        try {
+          const content = completion.choices[0].message.content.trim();
+          console.log('Attempting to parse OpenAI response:', content.substring(0, 100) + '...');
+          
+          feedback = JSON.parse(content);
+          
+          // Validate the feedback structure
+          const requiredSections = ['hook', 'pain', 'numbers', 'solution', 'visual', 'ease', 'demo', 'team', 'story', 'icp', 'whynow', 'competition', 'bizmodel'];
+          const requiredFields = ['roast', 'constructive'];
+          
+          for (const section of requiredSections) {
+            if (!feedback[section] || typeof feedback[section] !== 'object') {
+              throw new Error(`Missing or invalid section: ${section}`);
+            }
+            for (const field of requiredFields) {
+              if (!feedback[section][field] || typeof feedback[section][field] !== 'string') {
+                throw new Error(`Missing or invalid field ${field} in section ${section}`);
+              }
+            }
+          }
+          
+          break; // If we get here, parsing and validation succeeded
+        } catch (e) {
+          retryCount++;
+          console.error(`JSON parsing attempt ${retryCount} failed:`, e);
+          
+          if (retryCount === maxRetries) {
+            console.error('All JSON parsing attempts failed. Raw response:', completion.choices[0].message.content);
+            throw new Error('Failed to parse feedback response after multiple attempts');
+          }
+          
+          // Add a small delay before retrying
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
       }
 
       // Generate a unique ID for this feedback
