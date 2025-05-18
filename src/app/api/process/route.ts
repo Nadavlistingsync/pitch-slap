@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import pdfParse from 'pdf-parse';
 import { realVCPersonalities } from '../../../types/realVCPersonalities';
+import { storeFeedback } from '../feedback/[id]/route';
 
 // Initialize OpenAI
 const openai = new OpenAI({
@@ -105,29 +106,61 @@ export async function POST(request: Request) {
         messages: [
           {
             role: 'system',
-            content: selectedPersonality.prompt
+            content: `You are ${selectedPersonality.name}, a ${selectedPersonality.description}. ${selectedPersonality.prompt}\n\nProvide feedback in the following JSON format:
+            {
+              "hook": { "roast": "string", "constructive": "string" },
+              "pain": { "roast": "string", "constructive": "string" },
+              "numbers": { "roast": "string", "constructive": "string" },
+              "solution": { "roast": "string", "constructive": "string" },
+              "visual": { "roast": "string", "constructive": "string" },
+              "ease": { "roast": "string", "constructive": "string" },
+              "demo": { "roast": "string", "constructive": "string" },
+              "team": { "roast": "string", "constructive": "string" },
+              "story": { "roast": "string", "constructive": "string" },
+              "icp": { "roast": "string", "constructive": "string" },
+              "whynow": { "roast": "string", "constructive": "string" },
+              "competition": { "roast": "string", "constructive": "string" },
+              "bizmodel": { "roast": "string", "constructive": "string" }
+            }`
           },
           {
             role: 'user',
-            content: `Here is the pitch deck content:\n\n${extractedText}\n\nPlease provide your feedback as a VC with the following characteristics:\n- Roast intensity: ${roastIntensity}`
+            content: `Here is the pitch deck content:\n\n${extractedText}\n\nPlease provide your feedback as a VC with the following characteristics:\n- Roast intensity: ${roastIntensity}\n\nEnsure your feedback is in the specified JSON format.`
           }
         ],
-        max_tokens: 1000,
-        temperature: 0.7
+        max_tokens: 2000,
+        temperature: 0.7,
+        response_format: { type: "json_object" }
       });
 
       if (!completion.choices?.[0]?.message?.content) {
         throw new Error('No response generated from OpenAI');
       }
 
-      const feedback = completion.choices[0].message.content;
+      let feedback;
+      try {
+        feedback = JSON.parse(completion.choices[0].message.content);
+      } catch (e) {
+        console.error('Failed to parse feedback JSON:', e);
+        throw new Error('Failed to parse feedback response');
+      }
 
-      return NextResponse.json({
+      // Generate a unique ID for this feedback
+      const feedbackId = crypto.randomUUID();
+
+      const feedbackData = {
         success: true,
         feedback,
         roastIntensity,
-        personality: selectedPersonality.name
-      });
+        personality: selectedPersonality.name,
+        feedbackId,
+        timestamp: new Date().toISOString()
+      };
+
+      // Store feedback for sharing
+      storeFeedback(feedbackId, feedbackData);
+
+      return NextResponse.json(feedbackData);
 
     } catch (pdfError) {
       console.error('Error processing PDF:', pdfError);
