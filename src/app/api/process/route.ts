@@ -129,8 +129,7 @@ export async function POST(request: Request) {
           }
         ],
         max_tokens: 2000,
-        temperature: 0.7,
-        response_format: { type: "json_object" }
+        temperature: 0.7
       });
 
       if (!completion.choices?.[0]?.message?.content) {
