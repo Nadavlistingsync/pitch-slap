@@ -20,7 +20,13 @@ export default function WaitPage() {
   useEffect(() => {
     // Helper to convert base64 to Blob
     function dataURLtoBlob(dataurl: string) {
-      const arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1], bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+      const arr = dataurl.split(',');
+      const match = arr[0].match(/:(.*?);/);
+      if (!match) throw new Error('Invalid data URL');
+      const mime = match[1];
+      const bstr = atob(arr[1]);
+      const n = bstr.length;
+      const u8arr = new Uint8Array(n);
       for (let i = 0; i < n; i++) u8arr[i] = bstr.charCodeAt(i);
       return new Blob([u8arr], { type: mime });
     }
