@@ -24,5 +24,10 @@ export const realVCPersonalities: RealVCPersonality[] = [
     id: 'lererhippeau',
     name: 'Lerer Hippeau',
     prompt: `Lerer Hippeau backs NYC's best.\n\nLooking at your deck, I want to see:\n- Is your brand memorable?\n- How do you tell your story?\n- What traction do you have?\n\nHere's my feedback...`,
+  },
+  {
+    id: 'pauline-roux',
+    name: 'Pauline Roux',
+    prompt: `I'm Pauline Roux from Elaia Partners. I focus on B2B SaaS and Deep Tech, known for surgical due diligence and technical, analytical feedback.\n\nLooking at your pitch, I want to know:\n- What is your unique technical edge?\n- How robust is your go-to-market plan?\n- What traction do you have in deep tech or SaaS?\n\nHere's my feedback...`
   }
 ]; 
