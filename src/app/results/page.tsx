@@ -89,7 +89,7 @@ export default function ResultsPage() {
 
   const handleShareLinkedIn = () => {
     if (shareUrl) {
-      const text = `I just got feedback on my pitch deck from ${vcName} using PitchDeck Roaster! Check it out:`;
+      const text = `🔥 Just got my pitch deck absolutely ROASTED by ${vcName} on PitchDeck Roaster! No sugar coating, just brutal honesty. Check out this savage feedback:`;
       const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}&summary=${encodeURIComponent(text)}`;
       window.open(linkedInUrl, '_blank');
     }
@@ -97,7 +97,7 @@ export default function ResultsPage() {
 
   const handleShareTwitter = () => {
     if (shareUrl) {
-      const text = `I just got feedback on my pitch deck from ${vcName} using @PitchDeckRoaster! Check it out:`;
+      const text = `🔥 My pitch deck just got absolutely DESTROYED by ${vcName} on @PitchDeckRoaster! No mercy, just pure unfiltered truth. Check out this brutal feedback:`;
       const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl)}`;
       window.open(twitterUrl, '_blank');
     }

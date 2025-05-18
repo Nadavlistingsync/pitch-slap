@@ -1,198 +1,117 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FiArrowRight, FiInfo } from 'react-icons/fi';
-import VCSelector from '../components/VCSelector';
-
-const roastLevels = [
-  { value: 'gentle', label: 'Gentle', description: 'Constructive feedback with a soft touch' },
-  { value: 'balanced', label: 'Balanced', description: 'Mix of tough love and helpful advice' },
-  { value: 'brutal', label: 'Brutal', description: 'No holds barred, prepare for impact' },
-];
-
-const feedbackStyles = [
-  { value: 'helpful', label: 'Helpful VC', description: 'Focus on actionable improvements' },
-  { value: 'brutal', label: 'Brutal Honesty', description: 'Direct and unfiltered feedback' },
-  { value: 'roast', label: 'Roast Mode', description: 'Maximum entertainment value' },
-  { value: 'wildcard', label: 'Wildcard', description: 'Surprise me with any style' },
-];
+import { motion } from 'framer-motion';
+import { realVCPersonalities } from '@/types/realVCPersonalities';
+import { FiSearch, FiFilter } from 'react-icons/fi';
 
 export default function SelectPage() {
   const router = useRouter();
-  const [roastLevel, setRoastLevel] = useState('balanced');
-  const [feedbackStyle, setFeedbackStyle] = useState('helpful');
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedVC, setSelectedVC] = useState<string | null>(null);
-  const [showTooltip, setShowTooltip] = useState<string | null>(null);
-  const [fileName, setFileName] = useState<string>('');
-  const [userName, setUserName] = useState('');
+  const [filter, setFilter] = useState('all');
 
-  useEffect(() => {
-    // Get the uploaded file name from sessionStorage
-    const storedFileName = sessionStorage.getItem('uploadedFileName');
-    if (storedFileName) {
-      setFileName(storedFileName);
-    } else {
-      // No file found, redirect to home
-      router.push('/');
-    }
-  }, [router]);
+  const filteredVCs = realVCPersonalities.filter(vc => {
+    const matchesSearch = vc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         vc.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesFilter = filter === 'all' || vc.type === filter;
+    return matchesSearch && matchesFilter;
+  });
 
-  const handleContinue = () => {
-    if (!selectedVC || !userName.trim()) return;
-    localStorage.setItem('selectedVC', selectedVC);
-    localStorage.setItem('roastLevel', roastLevel);
-    localStorage.setItem('feedbackStyle', feedbackStyle);
-    localStorage.setItem('userName', userName.trim());
-    router.push('/wait');
+  const handleSelect = (vcId: string) => {
+    setSelectedVC(vcId);
+    localStorage.setItem('selectedVC', vcId);
+    router.push('/roast-level');
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-purple-900 to-indigo-950 py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
-        >
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Customize Your Feedback
-          </h2>
-          <p className="text-xl text-gray-300">
-            Select your preferred VC and feedback style for {fileName}
-          </p>
-        </motion.div>
+    <main className="min-h-screen bg-gradient-to-br from-[#18181b] via-[#23272f] to-[#1a1a1a] relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120vw] h-64 bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-indigo-500/20 blur-3xl opacity-60 animate-pulse" />
+        <div className="absolute bottom-0 right-0 w-[80vw] h-[80vh] bg-gradient-to-tl from-[#ff4154]/20 to-transparent blur-3xl opacity-40" />
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
+        <div className="text-center mb-12">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-5xl font-bold text-white mb-4"
+          >
+            Choose Your VC
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="bg-white/10 rounded-2xl p-6"
+            className="text-xl text-gray-300 max-w-2xl mx-auto"
           >
-            <h3 className="text-xl font-semibold text-white mb-4">Roast Intensity</h3>
-            <div className="space-y-4">
-              {roastLevels.map(level => (
-                <div
-                  key={level.value}
-                  className="relative"
-                  onMouseEnter={() => setShowTooltip(level.value)}
-                  onMouseLeave={() => setShowTooltip(null)}
-                >
-                  <button
-                    className={`w-full px-4 py-3 rounded-xl font-medium transition-all ${
-                      roastLevel === level.value
-                        ? 'bg-pink-500 text-white'
-                        : 'bg-white/20 text-white hover:bg-pink-400/40'
-                    }`}
-                    onClick={() => setRoastLevel(level.value)}
-                  >
-                    {level.label}
-                  </button>
-                  <AnimatePresence>
-                    {showTooltip === level.value && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        className="absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-black/90 text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap"
-                      >
-                        {level.description}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-white/10 rounded-2xl p-6"
-          >
-            <h3 className="text-xl font-semibold text-white mb-4">Feedback Style</h3>
-            <div className="space-y-4">
-              {feedbackStyles.map(style => (
-                <div
-                  key={style.value}
-                  className="relative"
-                  onMouseEnter={() => setShowTooltip(style.value)}
-                  onMouseLeave={() => setShowTooltip(null)}
-                >
-                  <button
-                    className={`w-full px-4 py-3 rounded-xl font-medium transition-all ${
-                      feedbackStyle === style.value
-                        ? 'bg-indigo-500 text-white'
-                        : 'bg-white/20 text-white hover:bg-indigo-400/40'
-                    }`}
-                    onClick={() => setFeedbackStyle(style.value)}
-                  >
-                    {style.label}
-                  </button>
-                  <AnimatePresence>
-                    {showTooltip === style.value && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        className="absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-black/90 text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap"
-                      >
-                        {style.description}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              ))}
-            </div>
-          </motion.div>
+            Select the VC personality that will roast your pitch deck
+          </motion.p>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="bg-white/10 rounded-2xl p-6 mb-8"
-        >
-          <h3 className="text-xl font-semibold text-white mb-4">Select Your VC</h3>
-          <VCSelector onSelect={setSelectedVC} />
-        </motion.div>
+        {/* Search and Filter */}
+        <div className="max-w-2xl mx-auto mb-12">
+          <div className="flex gap-4">
+            <div className="flex-1 relative">
+              <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search VCs..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:border-pink-500/50"
+              />
+            </div>
+            <div className="relative">
+              <FiFilter className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+              <select
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                className="pl-12 pr-8 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-pink-500/50 appearance-none"
+              >
+                <option value="all">All Types</option>
+                <option value="seed">Seed</option>
+                <option value="series-a">Series A</option>
+                <option value="growth">Growth</option>
+              </select>
+            </div>
+          </div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.45 }}
-          className="bg-white/10 rounded-2xl p-6 mb-8"
-        >
-          <h3 className="text-xl font-semibold text-white mb-4">Your Name</h3>
-          <input
-            type="text"
-            className="w-full px-4 py-3 rounded-xl font-medium bg-white/80 text-gray-900 placeholder-gray-400 mb-2"
-            placeholder="Enter your name (for personalization)"
-            value={userName}
-            onChange={e => setUserName(e.target.value)}
-            maxLength={40}
-          />
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="flex justify-center"
-        >
-          <button
-            className={
-              `px-8 py-4 rounded-full font-bold text-lg shadow-lg transition-all flex items-center gap-2 ${selectedVC && userName.trim() ? 'bg-pink-500 text-white hover:bg-pink-600' : 'bg-white/20 text-white/50 cursor-not-allowed'}`
-            }
-            onClick={handleContinue}
-            disabled={!selectedVC || !userName.trim()}
-          >
-            Continue
-            <FiArrowRight className="w-5 h-5" />
-          </button>
-        </motion.div>
+        {/* VC Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredVCs.map((vc) => (
+            <motion.div
+              key={vc.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              whileHover={{ scale: 1.02 }}
+              className={`bg-white/5 backdrop-blur-sm rounded-2xl p-6 border transition-all cursor-pointer
+                ${selectedVC === vc.id 
+                  ? 'border-pink-500 shadow-lg shadow-pink-500/20' 
+                  : 'border-white/10 hover:border-pink-500/50'}`}
+              onClick={() => handleSelect(vc.id)}
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 flex items-center justify-center">
+                  <span className="text-2xl">{vc.emoji}</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold text-white mb-2">{vc.name}</h3>
+                  <p className="text-gray-300 text-sm line-clamp-2">{vc.description}</p>
+                </div>
+              </div>
+              <div className="mt-4 pt-4 border-t border-white/10">
+                <div className="flex items-center gap-2 text-sm text-gray-400">
+                  <span className="px-2 py-1 rounded-full bg-white/5">{vc.type}</span>
+                  <span className="px-2 py-1 rounded-full bg-white/5">{vc.focus}</span>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </main>
   );

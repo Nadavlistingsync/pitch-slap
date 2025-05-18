@@ -71,13 +71,13 @@ export default function SharedFeedbackPage({ params }: { params: { id: string } 
   const emailBody = feedback?.email || feedback;
 
   const handleShareLinkedIn = () => {
-    const text = `Check out this pitch deck feedback from ${feedback.personality} using PitchDeck Roaster!`;
+    const text = `🔥 Check out this absolutely SAVAGE pitch deck feedback from ${feedback.personality} on PitchDeck Roaster! No holds barred, just pure unfiltered truth:`;
     const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}&summary=${encodeURIComponent(text)}`;
     window.open(linkedInUrl, '_blank');
   };
 
   const handleShareTwitter = () => {
-    const text = `Check out this pitch deck feedback from ${feedback.personality} using @PitchDeckRoaster!`;
+    const text = `🔥 This pitch deck just got absolutely MURDERED by ${feedback.personality} on @PitchDeckRoaster! No mercy, just brutal honesty. Check it out:`;
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.href)}`;
     window.open(twitterUrl, '_blank');
   };
