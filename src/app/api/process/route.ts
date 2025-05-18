@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import pdfParse from 'pdf-parse';
-import { vcPersonalities } from '../../../types/vcPersonalities';
+import { realVCPersonalities } from '../../../types/realVCPersonalities';
 
 // Initialize OpenAI
 const openai = new OpenAI({
@@ -19,7 +19,7 @@ const isValidRoastIntensity = (intensity: string): intensity is 'gentle' | 'bala
 
 // Validate VC personality
 const isValidVCPersonality = (personalityId: string): boolean => {
-  return vcPersonalities.some(p => p.id === personalityId);
+  return realVCPersonalities.some(p => p.id === personalityId);
 };
 
 export async function POST(request: Request) {
@@ -71,7 +71,7 @@ export async function POST(request: Request) {
     }
 
     // Get selected personality
-    const selectedPersonality = vcPersonalities.find(p => p.id === personalityId);
+    const selectedPersonality = realVCPersonalities.find(p => p.id === personalityId);
     if (!selectedPersonality) {
       throw new Error('Selected personality not found');
     }
@@ -103,23 +103,13 @@ export async function POST(request: Request) {
       const completion = await openai.chat.completions.create({
         model: 'gpt-4',
         messages: [
-          { 
-            role: 'system', 
-            content: `You are a venture capitalist with the following personality:
-            Name: ${selectedPersonality.name}
-            Description: ${selectedPersonality.description}
-            Investment Style: ${selectedPersonality.investmentStyle}
-            Risk Tolerance: ${selectedPersonality.riskTolerance}
-            Focus Areas: ${selectedPersonality.focusAreas.join(', ')}
-            
-            Give feedback on startup pitch decks from this perspective. Be direct, critical, and provide actionable feedback that aligns with your investment style and focus areas.` 
+          {
+            role: 'system',
+            content: selectedPersonality.prompt
           },
-          { 
-            role: 'user', 
-            content: `Here is the pitch deck content:\n\n${extractedText}\n\nPlease provide your feedback as a VC with the following characteristics:
-            - Roast intensity: ${roastIntensity}
-            - Typical questions you would ask: ${selectedPersonality.typicalQuestions.join(', ')}
-            - Your key characteristics: ${selectedPersonality.characteristics.join(', ')}` 
+          {
+            role: 'user',
+            content: `Here is the pitch deck content:\n\n${extractedText}\n\nPlease provide your feedback as a VC with the following characteristics:\n- Roast intensity: ${roastIntensity}`
           }
         ],
         max_tokens: 1000,

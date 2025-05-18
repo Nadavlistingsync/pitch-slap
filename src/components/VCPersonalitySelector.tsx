@@ -1,5 +1,5 @@
 import React from 'react';
-import { VCPersonality, vcPersonalities } from '../types/vcPersonalities';
+import { RealVCPersonality, realVCPersonalities } from '../types/realVCPersonalities';
 
 interface VCPersonalitySelectorProps {
   selectedPersonality: string | null;
@@ -14,7 +14,7 @@ const VCPersonalitySelector: React.FC<VCPersonalitySelectorProps> = ({
     <div className="w-full max-w-4xl mx-auto p-4">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">Select VC Personality</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {vcPersonalities.map((personality) => (
+        {realVCPersonalities.map((personality) => (
           <div
             key={personality.id}
             className={`p-6 rounded-lg border-2 transition-all duration-200 cursor-pointer hover:shadow-lg ${
@@ -25,7 +25,7 @@ const VCPersonalitySelector: React.FC<VCPersonalitySelectorProps> = ({
             onClick={() => onPersonalitySelect(personality.id)}
           >
             <h3 className="text-xl font-semibold mb-2 text-gray-800">{personality.name}</h3>
-            <p className="text-gray-600 mb-4">{personality.description}</p>
+            <p className="text-gray-600 mb-4">{personality.prompt.split('\n')[0]}</p>
             
             <div className="mb-4">
               <h4 className="font-medium text-gray-700 mb-2">Characteristics:</h4>
