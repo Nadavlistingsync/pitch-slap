@@ -26,38 +26,6 @@ const VCPersonalitySelector: React.FC<VCPersonalitySelectorProps> = ({
           >
             <h3 className="text-xl font-semibold mb-2 text-gray-800">{personality.name}</h3>
             <p className="text-gray-600 mb-4">{personality.prompt.split('\n')[0]}</p>
-            
-            <div className="mb-4">
-              <h4 className="font-medium text-gray-700 mb-2">Characteristics:</h4>
-              <ul className="list-disc list-inside text-gray-600">
-                {personality.characteristics.map((char, index) => (
-                  <li key={index}>{char}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="mb-4">
-              <h4 className="font-medium text-gray-700 mb-2">Focus Areas:</h4>
-              <div className="flex flex-wrap gap-2">
-                {personality.focusAreas.map((area, index) => (
-                  <span
-                    key={index}
-                    className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600"
-                  >
-                    {area}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-600">
-                Risk Tolerance: {personality.riskTolerance}
-              </span>
-              <span className="text-sm font-medium text-gray-600">
-                {personality.investmentStyle}
-              </span>
-            </div>
           </div>
         ))}
       </div>
