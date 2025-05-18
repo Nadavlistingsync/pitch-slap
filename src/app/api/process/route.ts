@@ -129,44 +129,13 @@ Do not include any markdown formatting, special characters, or explanations. Jus
       }
 
       let feedback;
-      let retryCount = 0;
-      const maxRetries = 3;
-
-      while (retryCount < maxRetries) {
-        try {
-          const content = completion.choices[0].message.content.trim();
-          console.log('Attempting to parse OpenAI response:', content.substring(0, 100) + '...');
-          
-          feedback = JSON.parse(content);
-          
-          // Validate the feedback structure
-          const requiredSections = ['hook', 'pain', 'numbers', 'solution', 'visual', 'ease', 'demo', 'team', 'story', 'icp', 'whynow', 'competition', 'bizmodel'];
-          const requiredFields = ['feedback'];
-          
-          for (const section of requiredSections) {
-            if (!feedback[section] || typeof feedback[section] !== 'object') {
-              throw new Error(`Missing or invalid section: ${section}`);
-            }
-            for (const field of requiredFields) {
-              if (!feedback[section][field] || typeof feedback[section][field] !== 'string') {
-                throw new Error(`Missing or invalid field ${field} in section ${section}`);
-              }
-            }
-          }
-          
-          break; // If we get here, parsing and validation succeeded
-        } catch (e) {
-          retryCount++;
-          console.error(`JSON parsing attempt ${retryCount} failed:`, e);
-          
-          if (retryCount === maxRetries) {
-            console.error('All JSON parsing attempts failed. Raw response:', completion.choices[0].message.content);
-            throw new Error('Failed to parse feedback response after multiple attempts');
-          }
-          
-          // Add a small delay before retrying
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        }
+      const content = completion.choices[0].message.content.trim();
+      try {
+        feedback = JSON.parse(content);
+        // Optionally, keep your validation logic here if you want to support JSON structure in the future
+      } catch (e) {
+        // If not JSON, treat as plain text email
+        feedback = content;
       }
 
       // Generate a unique ID for this feedback
