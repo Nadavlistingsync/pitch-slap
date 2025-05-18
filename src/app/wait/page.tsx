@@ -15,19 +15,57 @@ export default function WaitPage() {
   const router = useRouter();
   const [progress, setProgress] = useState(0);
   const [messageIdx, setMessageIdx] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    // Helper to convert base64 to Blob
+    function dataURLtoBlob(dataurl: string) {
+      const arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1], bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+      for (let i = 0; i < n; i++) u8arr[i] = bstr.charCodeAt(i);
+      return new Blob([u8arr], { type: mime });
+    }
+
+    async function processFeedback() {
+      const fileDataUrl = sessionStorage.getItem('uploadedFile');
+      const fileName = sessionStorage.getItem('uploadedFileName') || 'deck.pdf';
+      const roastLevel = localStorage.getItem('roastLevel') || 'balanced';
+      const personality = localStorage.getItem('selectedVC') || 'sequoia';
+      if (!fileDataUrl) {
+        setError('No uploaded file found. Please start over.');
+        return;
+      }
+      const file = dataURLtoBlob(fileDataUrl);
+      const formData = new FormData();
+      formData.append('file', file, fileName);
+      formData.append('roastIntensity', roastLevel);
+      formData.append('personality', personality);
+      try {
+        const res = await fetch('/api/process', {
+          method: 'POST',
+          body: formData
+        });
+        const result = await res.json();
+        if (!result.success) throw new Error(result.error || 'Unknown error');
+        sessionStorage.setItem('feedbackResult', JSON.stringify(result));
+        setProgress(100);
+        setTimeout(() => router.push('/results'), 800);
+      } catch (e: any) {
+        setError(e.message || 'Failed to process feedback.');
+      }
+    }
+
+    // Animate progress and messages
+    let interval: NodeJS.Timeout;
+    let progressValue = 0;
+    interval = setInterval(() => {
       setProgress((p) => {
-        if (p >= 100) {
-          clearInterval(interval);
-          setTimeout(() => router.push('/results'), 800);
-          return 100;
-        }
-        return p + 10;
+        if (p >= 90) return p;
+        progressValue = p + 10;
+        return progressValue;
       });
       setMessageIdx((i) => (i + 1) % messages.length);
     }, 600);
+    processFeedback();
     return () => clearInterval(interval);
   }, [router]);
 
@@ -41,7 +79,11 @@ export default function WaitPage() {
             style={{ width: `${progress}%` }}
           />
         </div>
-        <p className="text-lg text-white/80 animate-pulse">{messages[messageIdx]}</p>
+        {error ? (
+          <p className="text-lg text-red-400 animate-pulse">{error}</p>
+        ) : (
+          <p className="text-lg text-white/80 animate-pulse">{messages[messageIdx]}</p>
+        )}
       </div>
     </main>
   );

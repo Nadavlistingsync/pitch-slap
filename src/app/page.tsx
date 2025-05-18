@@ -16,7 +16,20 @@ export default function Home() {
   });
 
   const handleNext = () => {
-    if (file) router.push('/select');
+    if (file) {
+      // Persist file in sessionStorage for later steps
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        if (e.target?.result) {
+          // Store as base64 string
+          sessionStorage.setItem('uploadedFile', e.target.result as string);
+          sessionStorage.setItem('uploadedFileName', file.name);
+        }
+        // Navigate to next step
+        router.push('/select');
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
