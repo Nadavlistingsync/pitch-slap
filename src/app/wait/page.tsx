@@ -21,8 +21,38 @@ export default function WaitPage() {
   const router = useRouter();
   const [progress, setProgress] = useState(0);
   const [messageIdx, setMessageIdx] = useState(0);
+  const [typedMessage, setTypedMessage] = useState('');
+  const [charIdx, setCharIdx] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [showRetry, setShowRetry] = useState(false);
+
+  // Typewriter effect
+  useEffect(() => {
+    if (error) return;
+    setTypedMessage('');
+    setCharIdx(0);
+    const message = messages[messageIdx];
+    let typingTimeout: NodeJS.Timeout;
+    let pauseTimeout: NodeJS.Timeout;
+    function typeChar() {
+      setTypedMessage((prev) => {
+        if (prev.length < message.length) {
+          typingTimeout = setTimeout(typeChar, 40);
+          return message.slice(0, prev.length + 1);
+        } else {
+          pauseTimeout = setTimeout(() => {
+            setMessageIdx((i) => (i + 1) % messages.length);
+          }, 1200);
+          return prev;
+        }
+      });
+    }
+    typingTimeout = setTimeout(typeChar, 40);
+    return () => {
+      clearTimeout(typingTimeout);
+      clearTimeout(pauseTimeout);
+    };
+  }, [messageIdx, error]);
 
   useEffect(() => {
     // Helper to convert base64 to Blob
@@ -71,7 +101,7 @@ export default function WaitPage() {
       }
     }
 
-    // Animate progress and messages
+    // Animate progress
     let interval: NodeJS.Timeout;
     let progressValue = 0;
     interval = setInterval(() => {
@@ -80,7 +110,6 @@ export default function WaitPage() {
         progressValue = p + 10;
         return progressValue;
       });
-      setMessageIdx((i) => (i + 1) % messages.length);
     }, 600);
     processFeedback();
     return () => clearInterval(interval);
@@ -127,9 +156,11 @@ export default function WaitPage() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="text-lg text-white/80"
+                className="text-lg text-white/80 font-mono min-h-[2.5em]"
+                style={{letterSpacing: '0.01em'}}
               >
-                {messages[messageIdx]}
+                {typedMessage}
+                <span className="animate-pulse">|</span>
               </motion.div>
             )}
           </AnimatePresence>
