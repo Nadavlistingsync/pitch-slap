@@ -13,13 +13,21 @@ export default function RoastLevelPage() {
   const [roastLevel, setRoastLevel] = useState<string>("balanced");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [redirecting, setRedirecting] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       setSelectedVC(localStorage.getItem("selectedVC"));
+      const file = sessionStorage.getItem("uploadedFile");
+      if (!file || !localStorage.getItem("selectedVC")) {
+        setRedirecting(true);
+        setTimeout(() => {
+          router.push("/");
+        }, 2000);
+      }
     }
-  }, []);
+  }, [router]);
 
   const handleRoast = async () => {
     setError(null);
@@ -65,6 +73,15 @@ export default function RoastLevelPage() {
       setLoading(false);
     }
   };
+
+  if (redirecting) {
+    return (
+      <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#18181b] via-[#23272f] to-[#1a1a1a] px-4">
+        <h1 className="text-3xl font-bold text-white mb-4">Missing file or VC selection</h1>
+        <p className="text-lg text-gray-300 mb-8">Redirecting you to the start page...</p>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#18181b] via-[#23272f] to-[#1a1a1a] px-4">
