@@ -5,6 +5,9 @@ import { useDropzone } from 'react-dropzone';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { FiUpload, FiArrowRight, FiCheck, FiStar, FiAward, FiTrendingUp } from 'react-icons/fi';
+import RoastMeter from './components/RoastMeter';
+import VCGrid from './components/VCGrid';
+import TrustBar from './components/TrustBar';
 
 export default function Home() {
   const router = useRouter();
@@ -397,6 +400,160 @@ export default function Home() {
           </div>
         </div>
       </motion.div>
+
+      {/* How it Works Section */}
+      <section className="max-w-5xl mx-auto py-24 px-4">
+        <motion.h2
+          className="text-4xl font-bold text-center mb-12 gradient-text"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+        >
+          How It Works
+        </motion.h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          {[
+            {
+              title: 'Upload',
+              desc: 'Drop your pitch deck (PDF) and get ready for the roast.',
+              icon: <FiUpload className="w-10 h-10 text-pink-500" />,
+            },
+            {
+              title: 'Get Roasted',
+              desc: 'Receive brutally honest, actionable feedback from real VCs.',
+              icon: <FiArrowRight className="w-10 h-10 text-purple-500" />,
+            },
+            {
+              title: 'Level Up',
+              desc: 'Use the feedback to improve and impress investors.',
+              icon: <FiCheck className="w-10 h-10 text-indigo-500" />,
+            },
+          ].map((step, i) => (
+            <motion.div
+              key={step.title}
+              className="bg-white/5 rounded-2xl p-8 text-center shadow-xl card-hover"
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 * i, duration: 0.7 }}
+            >
+              <div className="mb-4 flex justify-center">{step.icon}</div>
+              <div className="text-2xl font-bold mb-2 text-white">{step.title}</div>
+              <div className="text-gray-300">{step.desc}</div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* RoastMeter Demo Section */}
+      <section className="max-w-4xl mx-auto py-24 px-4 flex flex-col items-center">
+        <motion.h2
+          className="text-4xl font-bold text-center mb-8 gradient-text"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+        >
+          See Your Roast Level
+        </motion.h2>
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          whileInView={{ scale: 1, opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+        >
+          <RoastMeter score={87} />
+        </motion.div>
+        <div className="mt-6 text-lg text-gray-400 text-center max-w-xl">
+          Our AI + VC panel gives you a roast score and detailed feedback. The higher the score, the spicier the roast!
+        </div>
+      </section>
+
+      {/* Featured VCs Section */}
+      <section className="py-24 bg-gradient-to-br from-[#23272f]/60 to-[#18181b]/60">
+        <motion.h2
+          className="text-4xl font-bold text-center mb-12 gradient-text"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+        >
+          Meet Some of Our VCs
+        </motion.h2>
+        <VCGrid />
+      </section>
+
+      {/* Animated Testimonials Section */}
+      <section className="max-w-5xl mx-auto py-24 px-4">
+        <motion.h2
+          className="text-4xl font-bold text-center mb-12 gradient-text"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+        >
+          What VCs Say
+        </motion.h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          {[
+            {
+              name: 'VC Name 1',
+              comment: "This is a brutally good idea. Nobody else is doing it this raw. I'm in.",
+              logo: 'https://via.placeholder.com/80x40?text=Logo+1',
+            },
+            {
+              name: 'VC Name 2',
+              comment: 'Finally, someone who tells it like it is. This is exactly what founders need.',
+              logo: 'https://via.placeholder.com/80x40?text=Logo+2',
+            },
+            {
+              name: 'VC Name 3',
+              comment: "The feedback is harsh but fair. It's what makes this platform unique.",
+              logo: 'https://via.placeholder.com/80x40?text=Logo+3',
+            },
+          ].map((t, i) => (
+            <motion.div
+              key={t.name}
+              className="bg-white/5 rounded-2xl p-8 text-center shadow-xl card-hover"
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 * i, duration: 0.7 }}
+            >
+              <img src={t.logo} alt={t.name} className="mx-auto mb-4 h-10" />
+              <div className="text-lg text-gray-300 mb-4">"{t.comment}"</div>
+              <div className="text-sm text-gray-400 font-bold">{t.name}</div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Trust Bar Section */}
+      <section className="max-w-5xl mx-auto py-24 px-4">
+        <TrustBar />
+      </section>
+
+      {/* Big Animated CTA Section */}
+      <section className="py-24 flex flex-col items-center justify-center">
+        <motion.h2
+          className="text-4xl font-bold text-center mb-8 gradient-text"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+        >
+          Ready to Get Roasted?
+        </motion.h2>
+        <motion.button
+          className="btn-gradient text-white text-2xl font-bold py-6 px-16 rounded-full shadow-xl hover:scale-105 transition-all"
+          whileHover={{ scale: 1.08 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={() => router.push('/select')}
+        >
+          Upload Your Deck &rarr;
+        </motion.button>
+      </section>
     </main>
   );
 } 
