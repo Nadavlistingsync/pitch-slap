@@ -23,6 +23,42 @@ const vcs = [
     image: "/vcs/yc.png",
     description: "Startup accelerator and venture capital firm"
   },
+  {
+    id: 4,
+    name: "Accel",
+    image: "/vcs/accel.png",
+    description: "Global venture capital firm"
+  },
+  {
+    id: 5,
+    name: "Kleiner Perkins",
+    image: "/vcs/kleiner.png",
+    description: "Venture capital firm focused on early-stage investments"
+  },
+  {
+    id: 6,
+    name: "First Round Capital",
+    image: "/vcs/firstround.png",
+    description: "Seed-stage venture capital firm"
+  },
+  {
+    id: 7,
+    name: "Benchmark",
+    image: "/vcs/benchmark.png",
+    description: "Venture capital firm investing in early-stage startups"
+  },
+  {
+    id: 8,
+    name: "Founders Fund",
+    image: "/vcs/founders.png",
+    description: "Venture capital firm founded by Peter Thiel"
+  },
+  {
+    id: 9,
+    name: "Greylock Partners",
+    image: "/vcs/greylock.png",
+    description: "Venture capital firm investing in consumer and enterprise software"
+  }
 ];
 
 export default function RoastPage({ params }: { params: { id: string } }) {
