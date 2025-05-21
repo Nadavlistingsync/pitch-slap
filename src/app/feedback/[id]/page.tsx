@@ -107,7 +107,7 @@ export default function FeedbackDetailPage({ params }: { params: { id: string } 
   }
 
   // Determine the email body (feedback)
-  const emailBody = feedback?.content || feedback;
+  const emailBody = feedback.content;
 
   const handleShareLinkedIn = () => {
     const text = `🔥 Check out this absolutely SAVAGE pitch deck feedback from ${feedback.vcName} on PitchDeck Roaster! No holds barred, just pure unfiltered truth:`;
