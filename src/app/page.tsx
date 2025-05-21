@@ -7,57 +7,57 @@ import { motion } from 'framer-motion';
 const vcs = [
   {
     id: 1,
-    name: "Sequoia Capital",
-    image: "/vcs/sequoia.png",
-    description: "Early-stage venture capital firm"
+    name: "Marc Andreessen",
+    image: "/vcs/andreessen.png",
+    description: "Co-founder of Andreessen Horowitz"
   },
   {
     id: 2,
-    name: "Andreessen Horowitz",
-    image: "/vcs/a16z.png",
-    description: "Silicon Valley venture capital firm"
+    name: "Naval Ravikant",
+    image: "/vcs/naval.png",
+    description: "Founder of AngelList"
   },
   {
     id: 3,
-    name: "Y Combinator",
-    image: "/vcs/yc.png",
-    description: "Startup accelerator and venture capital firm"
+    name: "Paul Graham",
+    image: "/vcs/paul.png",
+    description: "Co-founder of Y Combinator"
   },
   {
     id: 4,
-    name: "Accel",
-    image: "/vcs/accel.png",
-    description: "Global venture capital firm"
+    name: "Sam Altman",
+    image: "/vcs/sam.png",
+    description: "CEO of OpenAI, former YC President"
   },
   {
     id: 5,
-    name: "Kleiner Perkins",
-    image: "/vcs/kleiner.png",
-    description: "Venture capital firm focused on early-stage investments"
+    name: "Fred Wilson",
+    image: "/vcs/fred.png",
+    description: "Co-founder of Union Square Ventures"
   },
   {
     id: 6,
-    name: "First Round Capital",
-    image: "/vcs/firstround.png",
-    description: "Seed-stage venture capital firm"
+    name: "Chris Sacca",
+    image: "/vcs/sacca.png",
+    description: "Founder of Lowercase Capital"
   },
   {
     id: 7,
-    name: "Benchmark",
-    image: "/vcs/benchmark.png",
-    description: "Venture capital firm investing in early-stage startups"
+    name: "Peter Thiel",
+    image: "/vcs/thiel.png",
+    description: "Co-founder of PayPal, Founders Fund"
   },
   {
     id: 8,
-    name: "Founders Fund",
-    image: "/vcs/founders.png",
-    description: "Venture capital firm founded by Peter Thiel"
+    name: "Reid Hoffman",
+    image: "/vcs/reid.png",
+    description: "Co-founder of LinkedIn, Greylock"
   },
   {
     id: 9,
-    name: "Greylock Partners",
-    image: "/vcs/greylock.png",
-    description: "Venture capital firm investing in consumer and enterprise software"
+    name: "Chamath Palihapitiya",
+    image: "/vcs/chamath.png",
+    description: "Founder of Social Capital"
   }
 ];
 
