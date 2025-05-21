@@ -7,57 +7,66 @@ import { motion } from 'framer-motion';
 const vcs = [
   {
     id: 1,
-    name: "Marc Andreessen",
-    image: "/vcs/andreessen.png",
-    description: "Co-founder of Andreessen Horowitz"
+    name: "Jean de La Rochebrochard",
+    image: "/vcs/jean.png",
+    description: "Kima Ventures - High-velocity investing, founder-first approach",
+    personality: "Twitter-native, blunt, speed-obsessed operator"
   },
   {
     id: 2,
-    name: "Naval Ravikant",
-    image: "/vcs/naval.png",
-    description: "Founder of AngelList"
+    name: "Pauline Roux",
+    image: "/vcs/pauline.png",
+    description: "Elaia Partners - B2B SaaS + Deep Tech conviction",
+    personality: "Quiet force, clear-eyed, precision over hype"
   },
   {
     id: 3,
-    name: "Paul Graham",
-    image: "/vcs/paul.png",
-    description: "Co-founder of Y Combinator"
+    name: "Roxanne Varza",
+    image: "/vcs/roxanne.png",
+    description: "Station F - Community queen of French tech",
+    personality: "Visionary with IRL warmth and startup empathy"
   },
   {
     id: 4,
-    name: "Sam Altman",
-    image: "/vcs/sam.png",
-    description: "CEO of OpenAI, former YC President"
+    name: "Guillaume Moubeche",
+    image: "/vcs/guillaume.png",
+    description: "Lemlist - Bootstrapped success, marketing-native founder",
+    personality: "Internet-native, Gen Z-style hype meets founder grit"
   },
   {
     id: 5,
-    name: "Fred Wilson",
-    image: "/vcs/fred.png",
-    description: "Co-founder of Union Square Ventures"
+    name: "Partech",
+    image: "/vcs/partech.png",
+    description: "Global firm with Paris HQ - B2B SaaS, fintech, climate",
+    personality: "Smart, structured, a bit formal but founder-centric"
   },
   {
     id: 6,
-    name: "Chris Sacca",
-    image: "/vcs/sacca.png",
-    description: "Founder of Lowercase Capital"
+    name: "Y Combinator",
+    image: "/vcs/yc.png",
+    description: "Launchpad of unicorns (Airbnb, Stripe, Reddit)",
+    personality: "Blunt, pragmatic, growth-obsessed"
   },
   {
     id: 7,
-    name: "Peter Thiel",
-    image: "/vcs/thiel.png",
-    description: "Co-founder of PayPal, Founders Fund"
+    name: "Andreessen Horowitz",
+    image: "/vcs/a16z.png",
+    description: "Big bets, big checks, content-rich thought leadership",
+    personality: "Intellectual, polished, often thesis-first"
   },
   {
     id: 8,
-    name: "Reid Hoffman",
-    image: "/vcs/reid.png",
-    description: "Co-founder of LinkedIn, Greylock"
+    name: "BoxGroup",
+    image: "/vcs/boxgroup.png",
+    description: "Quiet power players of NYC pre-seed scene",
+    personality: "Chill, smart, operator-friendly"
   },
   {
     id: 9,
-    name: "Chamath Palihapitiya",
-    image: "/vcs/chamath.png",
-    description: "Founder of Social Capital"
+    name: "Lerer Hippeau",
+    image: "/vcs/lerer.png",
+    description: "NYC DTC + SaaS engine - Glossier, Warby Parker, Allbirds",
+    personality: "Brand-builder brain meets savvy NYC operator"
   }
 ];
 

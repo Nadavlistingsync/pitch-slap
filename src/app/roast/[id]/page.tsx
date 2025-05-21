@@ -7,57 +7,66 @@ import { motion } from 'framer-motion';
 const vcs = [
   {
     id: 1,
-    name: "Marc Andreessen",
-    image: "/vcs/andreessen.png",
-    description: "Co-founder of Andreessen Horowitz"
+    name: "Jean de La Rochebrochard",
+    image: "/vcs/jean.png",
+    description: "Kima Ventures - High-velocity investing, founder-first approach",
+    personality: "Twitter-native, blunt, speed-obsessed operator"
   },
   {
     id: 2,
-    name: "Naval Ravikant",
-    image: "/vcs/naval.png",
-    description: "Founder of AngelList"
+    name: "Pauline Roux",
+    image: "/vcs/pauline.png",
+    description: "Elaia Partners - B2B SaaS + Deep Tech conviction",
+    personality: "Quiet force, clear-eyed, precision over hype"
   },
   {
     id: 3,
-    name: "Paul Graham",
-    image: "/vcs/paul.png",
-    description: "Co-founder of Y Combinator"
+    name: "Roxanne Varza",
+    image: "/vcs/roxanne.png",
+    description: "Station F - Community queen of French tech",
+    personality: "Visionary with IRL warmth and startup empathy"
   },
   {
     id: 4,
-    name: "Sam Altman",
-    image: "/vcs/sam.png",
-    description: "CEO of OpenAI, former YC President"
+    name: "Guillaume Moubeche",
+    image: "/vcs/guillaume.png",
+    description: "Lemlist - Bootstrapped success, marketing-native founder",
+    personality: "Internet-native, Gen Z-style hype meets founder grit"
   },
   {
     id: 5,
-    name: "Fred Wilson",
-    image: "/vcs/fred.png",
-    description: "Co-founder of Union Square Ventures"
+    name: "Partech",
+    image: "/vcs/partech.png",
+    description: "Global firm with Paris HQ - B2B SaaS, fintech, climate",
+    personality: "Smart, structured, a bit formal but founder-centric"
   },
   {
     id: 6,
-    name: "Chris Sacca",
-    image: "/vcs/sacca.png",
-    description: "Founder of Lowercase Capital"
+    name: "Y Combinator",
+    image: "/vcs/yc.png",
+    description: "Launchpad of unicorns (Airbnb, Stripe, Reddit)",
+    personality: "Blunt, pragmatic, growth-obsessed"
   },
   {
     id: 7,
-    name: "Peter Thiel",
-    image: "/vcs/thiel.png",
-    description: "Co-founder of PayPal, Founders Fund"
+    name: "Andreessen Horowitz",
+    image: "/vcs/a16z.png",
+    description: "Big bets, big checks, content-rich thought leadership",
+    personality: "Intellectual, polished, often thesis-first"
   },
   {
     id: 8,
-    name: "Reid Hoffman",
-    image: "/vcs/reid.png",
-    description: "Co-founder of LinkedIn, Greylock"
+    name: "BoxGroup",
+    image: "/vcs/boxgroup.png",
+    description: "Quiet power players of NYC pre-seed scene",
+    personality: "Chill, smart, operator-friendly"
   },
   {
     id: 9,
-    name: "Chamath Palihapitiya",
-    image: "/vcs/chamath.png",
-    description: "Founder of Social Capital"
+    name: "Lerer Hippeau",
+    image: "/vcs/lerer.png",
+    description: "NYC DTC + SaaS engine - Glossier, Warby Parker, Allbirds",
+    personality: "Brand-builder brain meets savvy NYC operator"
   }
 ];
 
@@ -66,6 +75,7 @@ export default function RoastPage({ params }: { params: { id: string } }) {
   const [pitchDeck, setPitchDeck] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [roastLevel, setRoastLevel] = useState<number | null>(null);
+  const [feedback, setFeedback] = useState<string>('');
 
   const selectedVC = vcs.find(vc => vc.id === parseInt(params.id));
 
@@ -85,11 +95,54 @@ export default function RoastPage({ params }: { params: { id: string } }) {
     }
   };
 
+  const getFeedbackByVC = (level: number, vc: typeof vcs[0]) => {
+    const feedbacks = {
+      low: {
+        "Jean de La Rochebrochard": "Not bad, but you're moving too slow. Speed up or get left behind.",
+        "Pauline Roux": "Interesting technical foundation, but your market approach needs refinement.",
+        "Roxanne Varza": "You've got potential, but need to build stronger community connections.",
+        "Guillaume Moubeche": "Solid start, but your marketing needs more growth hacking.",
+        "Partech": "Good fundamentals, but need more global ambition.",
+        "Y Combinator": "Ship faster, iterate quicker. Your MVP needs more velocity.",
+        "Andreessen Horowitz": "Interesting thesis, but needs more intellectual rigor.",
+        "BoxGroup": "You're on the right track, but need more operator focus.",
+        "Lerer Hippeau": "Good product, but your brand story needs work."
+      },
+      medium: {
+        "Jean de La Rochebrochard": "You're taking too long to make decisions. Move faster!",
+        "Pauline Roux": "Your technical depth is good, but market fit is unclear.",
+        "Roxanne Varza": "You need to leverage the ecosystem better. Network more.",
+        "Guillaume Moubeche": "Your growth metrics are decent, but not exceptional.",
+        "Partech": "You're thinking too small. Scale your ambition.",
+        "Y Combinator": "Your execution is mediocre. Need more focus and speed.",
+        "Andreessen Horowitz": "Your thesis is weak. Need stronger market analysis.",
+        "BoxGroup": "You're moving too slow. Need more operator mindset.",
+        "Lerer Hippeau": "Your brand needs work. Focus on storytelling."
+      },
+      high: {
+        "Jean de La Rochebrochard": "This is taking forever! Where's the speed?",
+        "Pauline Roux": "Your technical approach is fundamentally flawed.",
+        "Roxanne Varza": "You're not leveraging the ecosystem at all.",
+        "Guillaume Moubeche": "Your growth strategy is completely wrong.",
+        "Partech": "You're thinking way too small. Think global!",
+        "Y Combinator": "This is going nowhere. Start over.",
+        "Andreessen Horowitz": "Your thesis is completely wrong.",
+        "BoxGroup": "You're not thinking like an operator at all.",
+        "Lerer Hippeau": "Your brand story is a complete mess."
+      }
+    };
+
+    if (level < 30) return feedbacks.low[vc.name as keyof typeof feedbacks.low];
+    if (level < 70) return feedbacks.medium[vc.name as keyof typeof feedbacks.medium];
+    return feedbacks.high[vc.name as keyof typeof feedbacks.high];
+  };
+
   const handleRoast = () => {
-    if (pitchDeck) {
+    if (pitchDeck && selectedVC) {
       // Simulate roast level generation
       const randomRoastLevel = Math.floor(Math.random() * 100);
       setRoastLevel(randomRoastLevel);
+      setFeedback(getFeedbackByVC(randomRoastLevel, selectedVC));
     }
   };
 
@@ -125,7 +178,8 @@ export default function RoastPage({ params }: { params: { id: string } }) {
             </div>
             <div>
               <h2 className="text-2xl font-semibold mb-2">{selectedVC.name}</h2>
-              <p className="text-gray-400">{selectedVC.description}</p>
+              <p className="text-gray-400 mb-2">{selectedVC.description}</p>
+              <p className="text-pink-400 italic">{selectedVC.personality}</p>
             </div>
           </div>
 
@@ -186,12 +240,13 @@ export default function RoastPage({ params }: { params: { id: string } }) {
                 style={{ width: `${roastLevel}%` }}
               />
             </div>
-            <p className="text-gray-300">
+            <p className="text-gray-300 mb-4">{feedback}</p>
+            <p className="text-sm text-gray-500 italic">
               {roastLevel < 30
-                ? "Your pitch deck is actually pretty good! But we can still find some things to roast..."
+                ? "Not bad, but there's room for improvement..."
                 : roastLevel < 70
-                ? "Oof, there's definitely room for improvement here. Let's get into the details."
-                : "This is going to be brutal. Your pitch deck needs some serious work."}
+                ? "Oof, this needs some serious work."
+                : "This is going to be brutal. Your pitch deck needs a complete overhaul."}
             </p>
           </motion.div>
         )}
