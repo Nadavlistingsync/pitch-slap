@@ -1,43 +1,102 @@
-import { FC, useState } from 'react';
+'use client';
+
+import { motion } from 'framer-motion';
 import Image from 'next/image';
 
-const tags = ['All', 'Seed', 'Series A', 'Series B+', 'AI', 'Fintech', 'Health', 'Enterprise'];
+interface VC {
+  name: string;
+  firm: string;
+  avatar: string;
+  description: string;
+  specialties: string[];
+}
 
-const VCGrid: FC = () => {
-  const [selectedTag, setSelectedTag] = useState('All');
+const vcs: VC[] = [
+  {
+    name: 'Sarah Chen',
+    firm: 'Sequoia Capital',
+    avatar: 'https://via.placeholder.com/150',
+    description: 'Early-stage investor with a focus on AI and enterprise software. Known for brutal honesty and high standards.',
+    specialties: ['AI', 'Enterprise', 'SaaS']
+  },
+  {
+    name: 'Michael Rodriguez',
+    firm: 'Andreessen Horowitz',
+    avatar: 'https://via.placeholder.com/150',
+    description: 'Consumer tech investor with a passion for disruptive marketplaces. No sugar coating, just straight talk.',
+    specialties: ['Consumer', 'Marketplaces', 'Mobile']
+  },
+  {
+    name: 'Alex Thompson',
+    firm: 'First Round Capital',
+    avatar: 'https://via.placeholder.com/150',
+    description: 'Fintech and crypto specialist. Expect detailed technical feedback and market analysis.',
+    specialties: ['Fintech', 'Crypto', 'Payments']
+  },
+  {
+    name: 'Priya Patel',
+    firm: 'Accel',
+    avatar: 'https://via.placeholder.com/150',
+    description: 'Healthcare and biotech investor. Brings scientific rigor to pitch deck reviews.',
+    specialties: ['Healthcare', 'Biotech', 'Medtech']
+  },
+  {
+    name: 'David Kim',
+    firm: 'Founders Fund',
+    avatar: 'https://via.placeholder.com/150',
+    description: 'Deep tech and hardware investor. Known for asking the tough questions.',
+    specialties: ['Hardware', 'Deep Tech', 'Robotics']
+  },
+  {
+    name: 'Emma Wilson',
+    firm: 'Benchmark',
+    avatar: 'https://via.placeholder.com/150',
+    description: 'Consumer and social media investor. Expert at spotting viral potential.',
+    specialties: ['Social', 'Consumer', 'Mobile']
+  }
+];
 
+export default function VCGrid() {
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 py-20 bg-transparent">
-      <div className="flex flex-wrap gap-3 mb-10 justify-center">
-        {tags.map((tag) => (
-          <button
-            key={tag}
-            onClick={() => setSelectedTag(tag)}
-            className={`px-6 py-2 rounded-full text-base font-semibold transition-colors shadow-sm border border-[#23272f] backdrop-blur-sm
-              ${selectedTag === tag
-                ? 'bg-[#ff4154] text-white border-[#ff4154] shadow-lg'
-                : 'bg-[#18181b] text-gray-200 hover:bg-[#23272f] border-[#23272f]'
-              }`}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {vcs.map((vc, index) => (
+          <motion.div
+            key={vc.name}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: index * 0.1 }}
+            className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-colors"
           >
-            {tag}
-          </button>
-        ))}
-      </div>
-      
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-        {Array.from({ length: 20 }).map((_, i) => (
-          <div key={i} className="aspect-square relative rounded-3xl overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.25)] border-2 border-[#23272f] bg-[#23272f] hover:scale-105 hover:shadow-xl transition-transform duration-200">
-            <Image
-              src={`/vcs/vc${i + 1}.jpg`}
-              alt={`VC ${i + 1}`}
-              fill
-              className="object-cover"
-            />
-          </div>
+            <div className="flex items-start gap-4">
+              <div className="relative w-16 h-16 rounded-full overflow-hidden">
+                <Image
+                  src={vc.avatar}
+                  alt={vc.name}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-white mb-1">{vc.name}</h3>
+                <p className="text-gray-400 mb-2">{vc.firm}</p>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {vc.specialties.map((specialty) => (
+                    <span
+                      key={specialty}
+                      className="px-2 py-1 text-xs rounded-full bg-white/10 text-gray-300"
+                    >
+                      {specialty}
+                    </span>
+                  ))}
+                </div>
+                <p className="text-gray-300 text-sm">{vc.description}</p>
+              </div>
+            </div>
+          </motion.div>
         ))}
       </div>
     </div>
   );
-};
-
-export default VCGrid; 
+} 
