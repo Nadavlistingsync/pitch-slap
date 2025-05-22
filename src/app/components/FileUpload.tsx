@@ -30,8 +30,16 @@ export default function FileUpload({
         return;
       }
       
-      setFile(selectedFile);
-      onFileSelect(selectedFile);
+      // Convert file to base64 for storage
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64 = reader.result as string;
+        sessionStorage.setItem('uploadedFile', base64);
+        sessionStorage.setItem('uploadedFileName', selectedFile.name);
+        setFile(selectedFile);
+        onFileSelect(selectedFile);
+      };
+      reader.readAsDataURL(selectedFile);
     }
   }, [maxSize, onFileSelect]);
 
@@ -45,6 +53,8 @@ export default function FileUpload({
   const removeFile = () => {
     setFile(null);
     setError(null);
+    sessionStorage.removeItem('uploadedFile');
+    sessionStorage.removeItem('uploadedFileName');
   };
 
   return (

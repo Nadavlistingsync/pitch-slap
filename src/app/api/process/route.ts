@@ -78,36 +78,35 @@ export async function POST(request: Request) {
       throw new Error('Selected personality not found');
     }
 
-    // Read and parse PDF
-    try {
-      const arrayBuffer = await file.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
-      
-      // Configure pdf-parse options to ignore font warnings
-      const options = {
-        pagerender: function(pageData: any) {
-          return pageData.getTextContent()
-            .then(function(textContent: any) {
-              return textContent.items.map((item: any) => item.str).join(' ');
-            });
-        }
-      };
-
-      const pdfData = await pdfParse(buffer, options);
-      
-      if (!pdfData || !pdfData.text) {
-        throw new Error('Failed to extract text from PDF');
+    // Read and parse PDF directly from memory
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    
+    // Configure pdf-parse options to ignore font warnings
+    const options = {
+      pagerender: function(pageData: any) {
+        return pageData.getTextContent()
+          .then(function(textContent: any) {
+            return textContent.items.map((item: any) => item.str).join(' ');
+          });
       }
-      
-      const extractedText = pdfData.text;
+    };
 
-      // Generate roast using GPT with personality context
-      const completion = await openai.chat.completions.create({
-        model: 'gpt-4',
-        messages: [
-          {
-            role: 'system',
-            content: `You are ${selectedPersonality.name}, a ${selectedPersonality.description}. ${selectedPersonality.prompt}
+    const pdfData = await pdfParse(buffer, options);
+    
+    if (!pdfData || !pdfData.text) {
+      throw new Error('Failed to extract text from PDF');
+    }
+    
+    const extractedText = pdfData.text;
+
+    // Generate roast using GPT with personality context
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4',
+      messages: [
+        {
+          role: 'system',
+          content: `You are ${selectedPersonality.name}, a ${selectedPersonality.description}. ${selectedPersonality.prompt}
 
 IMPORTANT: You must respond ONLY with a single, natural email reply to the founder's pitch deck. Do NOT use any JSON, lists, or section headers. Start with a greeting (e.g., 'Hey', 'Hi', or 'Hello'), write in natural paragraphs, and end with a sign-off and your name. The email should be structured exactly like a real VC reply, with no artificial breaks or formatting. Use the VC's unique personality and style throughout.
 
@@ -118,55 +117,47 @@ ${roastIntensity === 'brutal' ? 'If the roast intensity is brutal, you must be e
 The founder's name is: ${userName || 'Founder'}.
 
 Do not include any markdown formatting, special characters, or explanations. Just the email body.`
-          },
-          {
-            role: 'user',
-            content: `Here is the pitch deck content:\n\n${extractedText}\n\nPlease provide your feedback as a VC with the following characteristics:\n- Roast intensity: ${roastIntensity}\n- Founder name: ${userName || 'Founder'}\n\nRemember to respond ONLY with a single, natural email reply, addressed to the founder by name.`
-          }
-        ],
-        max_tokens: 2000,
-        temperature: 0.7
-      });
+        },
+        {
+          role: 'user',
+          content: `Here is the pitch deck content:\n\n${extractedText}\n\nPlease provide your feedback as a VC with the following characteristics:\n- Roast intensity: ${roastIntensity}\n- Founder name: ${userName || 'Founder'}\n\nRemember to respond ONLY with a single, natural email reply, addressed to the founder by name.`
+        }
+      ],
+      max_tokens: 2000,
+      temperature: 0.7
+    });
 
-      if (!completion.choices?.[0]?.message?.content) {
-        console.error('OpenAI response missing content:', completion);
-        throw new Error('No response generated from OpenAI');
-      }
-
-      let feedback;
-      const content = completion.choices[0].message.content.trim();
-      try {
-        feedback = JSON.parse(content);
-        // Optionally, keep your validation logic here if you want to support JSON structure in the future
-      } catch (e) {
-        // If not JSON, treat as plain text email
-        feedback = content;
-      }
-
-      // Generate a unique ID for this feedback
-      const feedbackId = crypto.randomUUID();
-
-      const feedbackData = {
-        success: true,
-        feedback,
-        roastIntensity,
-        personality: selectedPersonality.name,
-        feedbackId,
-        timestamp: new Date().toISOString()
-      };
-
-      // Store feedback for sharing
-      storeFeedback(feedbackId, feedbackData);
-
-      return NextResponse.json(feedbackData);
-
-    } catch (pdfError) {
-      console.error('Error processing PDF:', pdfError);
-      return NextResponse.json(
-        { error: 'Failed to process PDF file' },
-        { status: 500 }
-      );
+    if (!completion.choices?.[0]?.message?.content) {
+      console.error('OpenAI response missing content:', completion);
+      throw new Error('No response generated from OpenAI');
     }
+
+    let feedback;
+    const content = completion.choices[0].message.content.trim();
+    try {
+      feedback = JSON.parse(content);
+      // Optionally, keep your validation logic here if you want to support JSON structure in the future
+    } catch (e) {
+      // If not JSON, treat as plain text email
+      feedback = content;
+    }
+
+    // Generate a unique ID for this feedback
+    const feedbackId = crypto.randomUUID();
+
+    const feedbackData = {
+      success: true,
+      feedback,
+      roastIntensity,
+      personality: selectedPersonality.name,
+      feedbackId,
+      timestamp: new Date().toISOString()
+    };
+
+    // Store feedback for sharing
+    storeFeedback(feedbackId, feedbackData);
+
+    return NextResponse.json(feedbackData);
 
   } catch (error) {
     console.error('Error in /api/process:', error);

@@ -1,58 +1,14 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { FiLoader } from 'react-icons/fi';
-
-const messages = [
-  "VCs reviewing your brilliance...",
-  "Counting buzzwords...",
-  "Checking for real traction...",
-  "Roast mode engaged...",
-  "Looking for LinkedIn links...",
-  "Summoning brutal honesty...",
-  "Analyzing market size claims...",
-  "Verifying founder credentials...",
-  "Calculating burn rate...",
-  "Evaluating product-market fit..."
-];
 
 export default function WaitPage() {
   const router = useRouter();
   const [progress, setProgress] = useState(0);
-  const [messageIdx, setMessageIdx] = useState(0);
-  const [typedMessage, setTypedMessage] = useState('');
-  const [charIdx, setCharIdx] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [showRetry, setShowRetry] = useState(false);
-
-  // Typewriter effect
-  useEffect(() => {
-    if (error) return;
-    setTypedMessage('');
-    setCharIdx(0);
-    const message = messages[messageIdx];
-    let typingTimeout: NodeJS.Timeout;
-    let pauseTimeout: NodeJS.Timeout;
-    function typeChar() {
-      setTypedMessage((prev) => {
-        if (prev.length < message.length) {
-          typingTimeout = setTimeout(typeChar, 40);
-          return message.slice(0, prev.length + 1);
-        } else {
-          pauseTimeout = setTimeout(() => {
-            setMessageIdx((i) => (i + 1) % messages.length);
-          }, 1200);
-          return prev;
-        }
-      });
-    }
-    typingTimeout = setTimeout(typeChar, 40);
-    return () => {
-      clearTimeout(typingTimeout);
-      clearTimeout(pauseTimeout);
-    };
-  }, [messageIdx, error]);
 
   useEffect(() => {
     // Helper to convert base64 to Blob
@@ -74,24 +30,29 @@ export default function WaitPage() {
       const roastLevel = localStorage.getItem('roastLevel') || 'balanced';
       const personality = localStorage.getItem('selectedVC') || 'sequoia';
       const userName = localStorage.getItem('userName') || '';
+
       if (!fileDataUrl) {
         setError('No uploaded file found. Please start over.');
         setShowRetry(true);
         return;
       }
-      const file = dataURLtoBlob(fileDataUrl);
-      const formData = new FormData();
-      formData.append('file', file, fileName);
-      formData.append('roastIntensity', roastLevel);
-      formData.append('personality', personality);
-      formData.append('userName', userName);
+
       try {
+        const file = dataURLtoBlob(fileDataUrl);
+        const formData = new FormData();
+        formData.append('file', file, fileName);
+        formData.append('roastIntensity', roastLevel);
+        formData.append('personality', personality);
+        formData.append('userName', userName);
+
         const res = await fetch('/api/process', {
           method: 'POST',
           body: formData
         });
+
         const result = await res.json();
         if (!result.success) throw new Error(result.error || 'Unknown error');
+        
         sessionStorage.setItem('feedbackResult', JSON.stringify(result));
         setProgress(100);
         setTimeout(() => router.push('/results'), 800);
@@ -104,94 +65,76 @@ export default function WaitPage() {
     // Animate progress
     let interval: NodeJS.Timeout;
     let progressValue = 0;
-    interval = setInterval(() => {
-      setProgress((p) => {
-        if (p >= 90) return p;
-        progressValue = p + 10;
-        return progressValue;
-      });
-    }, 600);
+
+    const startProgress = () => {
+      interval = setInterval(() => {
+        progressValue += Math.random() * 10;
+        if (progressValue > 90) {
+          clearInterval(interval);
+          setProgress(90);
+        } else {
+          setProgress(progressValue);
+        }
+      }, 500);
+    };
+
+    startProgress();
     processFeedback();
-    return () => clearInterval(interval);
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
   }, [router]);
 
-  const handleRetry = () => {
-    setError(null);
-    setShowRetry(false);
-    setProgress(0);
-    router.push('/');
-  };
-
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-purple-900 to-indigo-950">
-      <div className="max-w-lg w-full bg-white/10 rounded-2xl p-8 shadow-xl text-center">
+    <main className="min-h-screen bg-gray-900 text-white p-8 flex items-center justify-center">
+      <div className="max-w-md w-full text-center">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          className="mx-auto w-16 h-16 mb-8"
         >
-          <h2 className="text-2xl font-bold text-white mb-6">Generating Your Feedback</h2>
-          <div className="w-full bg-white/20 rounded-full h-6 mb-4 overflow-hidden">
-            <motion.div
-              className="bg-pink-500 h-6 rounded-full"
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.3 }}
-            />
-          </div>
-          <AnimatePresence mode="wait">
-            {error ? (
-              <motion.div
-                key="error"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="text-lg text-red-400"
-              >
-                {error}
-              </motion.div>
-            ) : (
-              <motion.div
-                key="message"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="text-lg text-white/80 font-mono min-h-[2.5em]"
-                style={{letterSpacing: '0.01em'}}
-              >
-                {typedMessage}
-                <span className="animate-pulse">|</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <FiLoader className="w-full h-full text-pink-500" />
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="flex justify-center"
-        >
-          <FiLoader className="w-8 h-8 text-white/60 animate-spin" />
-        </motion.div>
+        <h1 className="text-3xl font-bold mb-4">Processing Your Pitch Deck</h1>
+        
+        <div className="w-full bg-gray-800 rounded-full h-2 mb-8">
+          <motion.div
+            className="bg-gradient-to-r from-pink-500 to-purple-500 h-2 rounded-full"
+            initial={{ width: 0 }}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.5 }}
+          />
+        </div>
 
-        <AnimatePresence>
-          {showRetry && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              className="mt-8"
-            >
+        <p className="text-gray-400 mb-8">
+          {progress < 30
+            ? "Reading your pitch deck..."
+            : progress < 60
+            ? "Analyzing your content..."
+            : progress < 90
+            ? "Generating feedback..."
+            : "Almost there..."}
+        </p>
+
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-8"
+          >
+            <p className="text-red-400">{error}</p>
+            {showRetry && (
               <button
-                onClick={handleRetry}
-                className="px-6 py-3 rounded-full font-bold text-lg bg-pink-500 text-white hover:bg-pink-600 shadow-lg transition-all"
+                onClick={() => router.push('/')}
+                className="mt-4 text-sm text-red-400 hover:text-red-300 underline"
               >
-                Try Again
+                Start Over
               </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            )}
+          </motion.div>
+        )}
       </div>
     </main>
   );
