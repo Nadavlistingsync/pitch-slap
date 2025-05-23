@@ -5,25 +5,23 @@ import { motion } from "framer-motion";
 import { FiCoffee, FiZap } from "react-icons/fi";
 import { FaFire } from "react-icons/fa";
 import { realVCPersonalities } from "../../types/realVCPersonalities";
-import { RoastLevelSelector } from "@/components/RoastLevelSelector";
-
-type RoastLevel = "gentle" | "balanced" | "brutal";
+import { RoastLevelSelector, RoastLevel } from "@/components/RoastLevelSelector";
 
 const roastLevels: { level: RoastLevel; label: string; description: string; icon: React.ReactNode }[] = [
   {
-    level: "gentle",
+    level: "light",
     label: "Gentle",
     description: "Constructive feedback with a soft touch",
     icon: <FiCoffee className="w-6 h-6" />
   },
   {
-    level: "balanced",
+    level: "medium",
     label: "Balanced",
     description: "Mix of tough love and helpful advice",
     icon: <FiZap className="w-6 h-6" />
   },
   {
-    level: "brutal",
+    level: "dark",
     label: "Brutal",
     description: "No holds barred, prepare for impact",
     icon: <FaFire className="w-6 h-6" />
@@ -33,7 +31,7 @@ const roastLevels: { level: RoastLevel; label: string; description: string; icon
 export default function RoastLevelPage() {
   const router = useRouter();
   const [selectedVC, setSelectedVC] = useState<string | null>(null);
-  const [roastLevel, setRoastLevel] = useState<RoastLevel>("balanced");
+  const [roastLevel, setRoastLevel] = useState<RoastLevel>("medium");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
