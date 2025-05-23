@@ -4,7 +4,7 @@ import React from 'react';
 import { RoastLevelSelector, RoastLevel } from '@/components/RoastLevelSelector';
 
 export default function RoastPage() {
-  const [selectedLevel, setSelectedLevel] = React.useState<RoastLevel>('medium');
+  const [selectedLevel, setSelectedLevel] = React.useState<RoastLevel>('balanced');
   const [roastContent, setRoastContent] = React.useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
