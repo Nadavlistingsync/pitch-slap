@@ -35,6 +35,7 @@ export default function RoastLevelPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
+  const [uploadedFile, setUploadedFile] = useState<string | null>(null);
 
   useEffect(() => {
     const checkRequirements = () => {
@@ -52,6 +53,7 @@ export default function RoastLevelPage() {
       }
 
       setSelectedVC(storedVC);
+      setUploadedFile(uploadedFile);
       return true;
     };
 
@@ -60,51 +62,69 @@ export default function RoastLevelPage() {
   }, [router]);
 
   const handleRoast = async () => {
-    setError(null);
+    if (!selectedVC || !roastLevel || !uploadedFile) {
+      setError('Please select a VC and roast level, and upload a pitch deck');
+      return;
+    }
+
     setLoading(true);
+    setError(null);
+
     try {
-      const fileDataUrl = sessionStorage.getItem("uploadedFile");
-      const fileName = sessionStorage.getItem("uploadedFileName") || "deck.pdf";
-      const userName = localStorage.getItem("userName") || "";
-      
-      if (!fileDataUrl || !selectedVC) {
-        setError("Missing file or VC selection. Please start over.");
-        setLoading(false);
-        return;
-      }
-
       // Convert base64 to Blob
-      const dataURLtoBlob = (dataurl: string) => {
-        const arr = dataurl.split(",");
-        const match = arr[0].match(/:(.*?);/);
-        if (!match) throw new Error("Invalid data URL");
-        const mime = match[1];
-        const bstr = atob(arr[1]);
-        let n = bstr.length;
-        const u8arr = new Uint8Array(n);
-        while (n--) u8arr[n] = bstr.charCodeAt(n);
-        return new Blob([u8arr], { type: mime });
-      };
+      const base64Data = uploadedFile.split(',')[1];
+      const byteCharacters = atob(base64Data);
+      const byteArrays = [];
+      
+      for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+        const slice = byteCharacters.slice(offset, offset + 512);
+        const byteNumbers = new Array(slice.length);
+        
+        for (let i = 0; i < slice.length; i++) {
+          byteNumbers[i] = slice.charCodeAt(i);
+        }
+        
+        const byteArray = new Uint8Array(byteNumbers);
+        byteArrays.push(byteArray);
+      }
+      
+      const blob = new Blob(byteArrays, { type: 'application/pdf' });
+      const file = new File([blob], 'pitch-deck.pdf', { type: 'application/pdf' });
 
-      const file = dataURLtoBlob(fileDataUrl);
       const formData = new FormData();
-      formData.append("file", file, fileName);
-      formData.append("roastIntensity", roastLevel);
-      formData.append("personality", selectedVC);
-      formData.append("userName", userName);
+      formData.append('file', file);
+      formData.append('roastIntensity', roastLevel);
+      formData.append('personality', selectedVC.id);
+      formData.append('userName', localStorage.getItem("userName") || '');
 
-      const res = await fetch("/api/process", {
-        method: "POST",
+      console.log('Sending request to process pitch deck...');
+      const response = await fetch('/api/process', {
+        method: 'POST',
         body: formData,
       });
 
-      const result = await res.json();
-      if (!result.success) throw new Error(result.error || "Unknown error");
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error response:', errorData);
+        throw new Error(errorData.error || 'Failed to process pitch deck');
+      }
+
+      const data = await response.json();
+      console.log('Received response:', data);
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to generate feedback');
+      }
+
+      // Store the feedback ID in localStorage for the wait page
+      localStorage.setItem('feedbackId', data.feedbackId);
       
-      sessionStorage.setItem("feedbackResult", JSON.stringify(result));
-      router.push("/results");
-    } catch (e: any) {
-      setError(e.message || "Failed to process feedback.");
+      // Navigate to wait page
+      router.push('/wait');
+    } catch (err) {
+      console.error('Error processing pitch deck:', err);
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+    } finally {
       setLoading(false);
     }
   };
