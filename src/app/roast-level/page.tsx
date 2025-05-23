@@ -34,20 +34,29 @@ export default function RoastLevelPage() {
   const [roastLevel, setRoastLevel] = useState<RoastLevel>("balanced");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
-    const storedVC = localStorage.getItem("selectedVC");
-    if (!storedVC) {
-      router.push("/select");
-      return;
-    }
-    setSelectedVC(storedVC);
+    const checkRequirements = () => {
+      const storedVC = localStorage.getItem("selectedVC");
+      const uploadedFile = sessionStorage.getItem("uploadedFile");
 
-    const uploadedFile = sessionStorage.getItem("uploadedFile");
-    if (!uploadedFile) {
-      router.push("/upload");
-      return;
-    }
+      if (!storedVC) {
+        router.push("/select");
+        return false;
+      }
+
+      if (!uploadedFile) {
+        router.push("/upload");
+        return false;
+      }
+
+      setSelectedVC(storedVC);
+      return true;
+    };
+
+    const requirementsMet = checkRequirements();
+    setIsInitializing(false);
   }, [router]);
 
   const handleRoast = async () => {
@@ -101,6 +110,17 @@ export default function RoastLevelPage() {
   };
 
   const selectedVCData = selectedVC ? realVCPersonalities.find(vc => vc.id === selectedVC) : null;
+
+  if (isInitializing) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#18181b] via-[#23272f] to-[#1a1a1a] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500 mx-auto mb-4"></div>
+          <p className="text-white">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#18181b] via-[#23272f] to-[#1a1a1a] px-4 py-12">
