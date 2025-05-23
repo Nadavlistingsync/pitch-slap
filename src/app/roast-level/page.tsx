@@ -6,6 +6,7 @@ import { FiCoffee, FiZap } from "react-icons/fi";
 import { FaFire } from "react-icons/fa";
 import { realVCPersonalities } from "../../types/realVCPersonalities";
 import { RoastLevelSelector, RoastLevel } from "@/components/RoastLevelSelector";
+import type { RealVCPersonality } from '@/types/realVCPersonalities';
 
 const roastLevels: { level: RoastLevel; label: string; description: string; icon: React.ReactNode }[] = [
   {
@@ -30,8 +31,8 @@ const roastLevels: { level: RoastLevel; label: string; description: string; icon
 
 export default function RoastLevelPage() {
   const router = useRouter();
-  const [selectedVC, setSelectedVC] = useState<string | null>(null);
-  const [roastLevel, setRoastLevel] = useState<RoastLevel>("balanced");
+  const [selectedVC, setSelectedVC] = useState<RealVCPersonality | null>(null);
+  const [roastLevel, setRoastLevel] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
@@ -39,26 +40,29 @@ export default function RoastLevelPage() {
 
   useEffect(() => {
     const checkRequirements = () => {
-      const storedVC = localStorage.getItem("selectedVC");
-      const uploadedFile = sessionStorage.getItem("uploadedFile");
-
-      if (!storedVC) {
-        router.push("/select");
+      const storedVC = localStorage.getItem('selectedVC');
+      const storedFile = sessionStorage.getItem('uploadedFile');
+      
+      if (!storedVC || !storedFile) {
+        router.push('/');
         return false;
       }
 
-      if (!uploadedFile) {
-        router.push("/upload");
+      try {
+        const vcData = JSON.parse(storedVC);
+        setSelectedVC(vcData);
+        setUploadedFile(storedFile);
+        return true;
+      } catch (err) {
+        console.error('Error parsing stored VC data:', err);
+        router.push('/');
         return false;
       }
-
-      setSelectedVC(storedVC);
-      setUploadedFile(uploadedFile);
-      return true;
     };
 
-    const requirementsMet = checkRequirements();
-    setIsInitializing(false);
+    if (checkRequirements()) {
+      setIsInitializing(false);
+    }
   }, [router]);
 
   const handleRoast = async () => {
@@ -129,64 +133,69 @@ export default function RoastLevelPage() {
     }
   };
 
-  const selectedVCData = selectedVC ? realVCPersonalities.find(vc => vc.id === selectedVC) : null;
-
   if (isInitializing) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#18181b] via-[#23272f] to-[#1a1a1a] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500 mx-auto mb-4"></div>
-          <p className="text-white">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p>Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-[#18181b] via-[#23272f] to-[#1a1a1a] px-4 py-12">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-4xl mx-auto"
-      >
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-white mb-4">
-            Choose Your Roast Level
-          </h1>
-          {selectedVCData && (
-            <p className="text-xl text-gray-300">
-              Selected VC: <span className="text-pink-400 font-semibold">{selectedVCData.name}</span>
-            </p>
-          )}
-        </div>
-
-        <RoastLevelSelector
-          selectedLevel={roastLevel}
-          onSelect={setRoastLevel}
-        />
-
-        <div className="text-center mt-8">
-          <motion.button
-            onClick={handleRoast}
-            disabled={loading || !selectedVC}
-            className="px-10 py-4 rounded-full bg-pink-500 text-white font-bold text-xl shadow-lg hover:bg-pink-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            {loading ? "Processing..." : "Get Roasted"}
-          </motion.button>
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white p-8">
+      <div className="max-w-4xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <h1 className="text-4xl font-bold mb-8 text-center">Choose Your Roast Level</h1>
           
+          <div className="mb-12">
+            <RoastLevelSelector
+              onSelect={setRoastLevel}
+              selectedLevel={roastLevel}
+            />
+          </div>
+
           {error && (
-            <motion.p
-              initial={{ opacity: 0, y: -10 }}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-6 text-red-400 font-semibold"
+              className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-8"
             >
-              {error}
-            </motion.p>
+              <p className="text-red-400">{error}</p>
+            </motion.div>
           )}
-        </div>
-      </motion.div>
-    </main>
+
+          <div className="text-center mt-8">
+            <button
+              onClick={handleRoast}
+              disabled={loading || !roastLevel}
+              className={`px-8 py-3 rounded-lg font-bold text-lg transition-all ${
+                loading || !roastLevel
+                  ? 'bg-gray-600 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700'
+              }`}
+            >
+              {loading ? (
+                <span className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Processing...
+                </span>
+              ) : (
+                'Get Roasted'
+              )}
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    </div>
   );
 } 
