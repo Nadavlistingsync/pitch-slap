@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { FiCoffee, FiZap } from "react-icons/fi";
 import { FaFire } from "react-icons/fa";
 import { realVCPersonalities } from "../../types/realVCPersonalities";
-import RoastLevelSelector from "@/components/RoastLevelSelector";
+import { RoastLevelSelector } from "@/components/RoastLevelSelector";
 
 type RoastLevel = "gentle" | "balanced" | "brutal";
 
