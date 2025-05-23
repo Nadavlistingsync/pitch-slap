@@ -92,13 +92,36 @@ export async function POST(request: Request) {
       }
     };
 
-    const pdfData = await pdfParse(buffer, options);
+    let pdfData;
+    try {
+      pdfData = await pdfParse(buffer, options);
+      console.log('PDF parsed successfully, pages:', pdfData.numpages);
+    } catch (error) {
+      console.error('Error parsing PDF:', error);
+      return NextResponse.json(
+        { error: 'Failed to parse PDF file. Please ensure it is a valid PDF.' },
+        { status: 400 }
+      );
+    }
     
     if (!pdfData || !pdfData.text) {
-      throw new Error('Failed to extract text from PDF');
+      console.error('No text content extracted from PDF');
+      return NextResponse.json(
+        { error: 'Could not extract text from PDF. Please ensure the PDF contains text and is not scanned.' },
+        { status: 400 }
+      );
     }
     
     const extractedText = pdfData.text;
+    console.log('Extracted text length:', extractedText.length);
+
+    if (extractedText.length < 10) {
+      console.error('Extracted text too short:', extractedText);
+      return NextResponse.json(
+        { error: 'Could not extract meaningful text from PDF. Please ensure the PDF contains text and is not scanned.' },
+        { status: 400 }
+      );
+    }
 
     // Generate roast using GPT with personality context
     const completion = await openai.chat.completions.create({
