@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FiCoffee, FiZap, FiFire } from 'react-icons/fi';
+import { FiCoffee, FiZap } from 'react-icons/fi';
 
 export type RoastLevel = 'gentle' | 'balanced' | 'brutal';
 
@@ -26,7 +26,7 @@ const roastLevels: { level: RoastLevel; label: string; description: string; icon
     level: 'brutal',
     label: 'Brutal',
     description: 'No holds barred, prepare for impact',
-    icon: <FiFire className="w-6 h-6" />
+    icon: <FiZap className="w-6 h-6" />
   }
 ];
 
