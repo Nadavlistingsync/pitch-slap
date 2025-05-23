@@ -2,7 +2,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { FiCoffee, FiZap, FiFlame } from "react-icons/fi";
+import { FiCoffee, FiZap } from "react-icons/fi";
+import { FaFire } from "react-icons/fa";
 import { realVCPersonalities } from "../../types/realVCPersonalities";
 
 type RoastLevel = "gentle" | "balanced" | "brutal";
@@ -24,7 +25,7 @@ const roastLevels: { level: RoastLevel; label: string; description: string; icon
     level: "brutal",
     label: "Brutal",
     description: "No holds barred, prepare for impact",
-    icon: <FiFlame className="w-6 h-6" />
+    icon: <FaFire className="w-6 h-6" />
   }
 ];
 
