@@ -9,19 +9,19 @@ import { RoastLevelSelector, RoastLevel } from "@/components/RoastLevelSelector"
 
 const roastLevels: { level: RoastLevel; label: string; description: string; icon: React.ReactNode }[] = [
   {
-    level: "light",
+    level: "gentle",
     label: "Gentle",
     description: "Constructive feedback with a soft touch",
     icon: <FiCoffee className="w-6 h-6" />
   },
   {
-    level: "medium",
+    level: "balanced",
     label: "Balanced",
     description: "Mix of tough love and helpful advice",
     icon: <FiZap className="w-6 h-6" />
   },
   {
-    level: "dark",
+    level: "brutal",
     label: "Brutal",
     description: "No holds barred, prepare for impact",
     icon: <FaFire className="w-6 h-6" />
@@ -31,7 +31,7 @@ const roastLevels: { level: RoastLevel; label: string; description: string; icon
 export default function RoastLevelPage() {
   const router = useRouter();
   const [selectedVC, setSelectedVC] = useState<string | null>(null);
-  const [roastLevel, setRoastLevel] = useState<RoastLevel>("medium");
+  const [roastLevel, setRoastLevel] = useState<RoastLevel>("balanced");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
