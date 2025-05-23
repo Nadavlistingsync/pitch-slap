@@ -125,7 +125,7 @@ export default function RoastLevelPage() {
           onSelect={setRoastLevel}
         />
 
-        <div className="text-center">
+        <div className="text-center mt-8">
           <motion.button
             onClick={handleRoast}
             disabled={loading || !selectedVC}

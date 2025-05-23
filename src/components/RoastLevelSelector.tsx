@@ -42,6 +42,11 @@ export const RoastLevelSelector: React.FC<RoastLevelSelectorProps> = ({
   selectedLevel,
   onSelect,
 }) => {
+  const handleSelect = (level: RoastLevel) => {
+    console.log('Selecting roast level:', level);
+    onSelect(level);
+  };
+
   return (
     <div className="space-y-6">
       <div className="text-center">
@@ -53,7 +58,7 @@ export const RoastLevelSelector: React.FC<RoastLevelSelectorProps> = ({
         {roastLevels.map(({ level, label, description, icon, color, intensity }) => (
           <motion.button
             key={level}
-            onClick={() => onSelect(level)}
+            onClick={() => handleSelect(level)}
             className={`relative p-8 rounded-2xl border-2 transition-all duration-300 ${
               selectedLevel === level
                 ? 'border-pink-500 bg-pink-500/10 shadow-lg shadow-pink-500/20'
