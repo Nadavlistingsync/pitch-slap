@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { FiCoffee, FiZap } from "react-icons/fi";
 import { FaFire } from "react-icons/fa";
 import { realVCPersonalities } from "../../types/realVCPersonalities";
+import RoastLevelSelector from "@/components/RoastLevelSelector";
 
 type RoastLevel = "gentle" | "balanced" | "brutal";
 
@@ -37,12 +38,18 @@ export default function RoastLevelPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const vcId = localStorage.getItem("selectedVC");
-    if (!vcId) {
-      router.push("/");
+    const storedVC = localStorage.getItem("selectedVC");
+    if (!storedVC) {
+      router.push("/select");
       return;
     }
-    setSelectedVC(vcId);
+    setSelectedVC(storedVC);
+
+    const uploadedFile = sessionStorage.getItem("uploadedFile");
+    if (!uploadedFile) {
+      router.push("/upload");
+      return;
+    }
   }, [router]);
 
   const handleRoast = async () => {
@@ -106,7 +113,7 @@ export default function RoastLevelPage() {
       >
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-white mb-4">
-            Choose Your Roast Intensity
+            Choose Your Roast Level
           </h1>
           {selectedVCData && (
             <p className="text-xl text-gray-300">
@@ -115,41 +122,10 @@ export default function RoastLevelPage() {
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          {roastLevels.map(({ level, label, description, icon }) => (
-            <motion.button
-              key={level}
-              onClick={() => setRoastLevel(level)}
-              className={`relative p-6 rounded-xl border-2 transition-all ${
-                roastLevel === level
-                  ? "border-pink-500 bg-pink-500/10"
-                  : "border-gray-700 hover:border-pink-500/50"
-              }`}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <div className="flex flex-col items-center text-center">
-                <div className={`mb-4 p-3 rounded-full ${
-                  roastLevel === level
-                    ? "bg-pink-500/20 text-pink-400"
-                    : "bg-gray-800 text-gray-400"
-                }`}>
-                  {icon}
-                </div>
-                <h3 className="text-xl font-semibold text-white mb-2">{label}</h3>
-                <p className="text-sm text-gray-400">{description}</p>
-              </div>
-              
-              {roastLevel === level && (
-                <motion.div
-                  className="absolute inset-0 border-2 border-pink-500 rounded-xl"
-                  layoutId="selectedRoastLevel"
-                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                />
-              )}
-            </motion.button>
-          ))}
-        </div>
+        <RoastLevelSelector
+          selectedLevel={roastLevel}
+          onSelect={setRoastLevel}
+        />
 
         <div className="text-center">
           <motion.button
@@ -159,7 +135,7 @@ export default function RoastLevelPage() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            {loading ? "Roasting..." : "Get Roasted"}
+            {loading ? "Processing..." : "Get Roasted"}
           </motion.button>
           
           {error && (

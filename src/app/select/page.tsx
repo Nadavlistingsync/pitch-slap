@@ -21,37 +21,21 @@ export default function SelectPage() {
   const handleSelect = (vcId: string) => {
     setSelectedVC(vcId);
     localStorage.setItem('selectedVC', vcId);
-    router.push('/roast-level');
+    router.push('/upload');
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-[#18181b] via-[#23272f] to-[#1a1a1a] relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120vw] h-64 bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-indigo-500/20 blur-3xl opacity-60 animate-pulse" />
-        <div className="absolute bottom-0 right-0 w-[80vw] h-[80vh] bg-gradient-to-tl from-[#ff4154]/20 to-transparent blur-3xl opacity-40" />
-      </div>
+    <main className="min-h-screen bg-gray-900 text-white p-8">
+      <div className="max-w-6xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-12"
+        >
+          <h1 className="text-4xl font-bold mb-4">Select Your VC</h1>
+          <p className="text-gray-400">Choose a VC to get feedback in their unique style</p>
+        </motion.div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
-        <div className="text-center mb-12">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-5xl font-bold text-white mb-4"
-          >
-            Choose Your VC
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="text-xl text-gray-300 max-w-2xl mx-auto"
-          >
-            Select the VC personality that will roast your pitch deck
-          </motion.p>
-        </div>
-
-        {/* Search and Filter */}
         <div className="max-w-2xl mx-auto mb-12">
           <div className="flex gap-4">
             <div className="flex-1 relative">
@@ -80,7 +64,6 @@ export default function SelectPage() {
           </div>
         </div>
 
-        {/* VC Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredVCs.map((vc) => (
             <motion.div
@@ -112,6 +95,12 @@ export default function SelectPage() {
             </motion.div>
           ))}
         </div>
+
+        {filteredVCs.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-gray-400">No VCs found matching your search criteria.</p>
+          </div>
+        )}
       </div>
     </main>
   );
