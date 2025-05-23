@@ -32,7 +32,7 @@ const roastLevels: { level: RoastLevel; label: string; description: string; icon
 export default function RoastLevelPage() {
   const router = useRouter();
   const [selectedVC, setSelectedVC] = useState<RealVCPersonality | null>(null);
-  const [roastLevel, setRoastLevel] = useState<string | null>(null);
+  const [roastLevel, setRoastLevel] = useState<RoastLevel | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
@@ -157,7 +157,7 @@ export default function RoastLevelPage() {
           <div className="mb-12">
             <RoastLevelSelector
               onSelect={setRoastLevel}
-              selectedLevel={roastLevel}
+              selectedLevel={roastLevel ?? undefined}
             />
           </div>
 

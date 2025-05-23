@@ -7,7 +7,7 @@ import { FaFire, FaSkull, FaBomb } from 'react-icons/fa';
 export type RoastLevel = 'gentle' | 'balanced' | 'brutal';
 
 interface RoastLevelSelectorProps {
-  selectedLevel: RoastLevel;
+  selectedLevel?: RoastLevel;
   onSelect: (level: RoastLevel) => void;
 }
 
