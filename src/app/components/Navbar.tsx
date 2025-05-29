@@ -48,6 +48,9 @@ export default function Navbar() {
             <Link href="/about" className="text-gray-300 hover:text-white transition-colors">
               About
             </Link>
+            <Link href="/ego-dump" className="text-gray-300 hover:text-white transition-colors">
+              Ego Dump
+            </Link>
           </div>
 
           {/* Profile Button */}
@@ -129,6 +132,12 @@ export default function Navbar() {
                 className="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-md"
               >
                 About
+              </Link>
+              <Link
+                href="/ego-dump"
+                className="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-md"
+              >
+                Ego Dump
               </Link>
               <Link
                 href="/profile"
