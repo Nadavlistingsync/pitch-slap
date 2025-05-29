@@ -8,6 +8,8 @@ Get brutally honest feedback on your pitch deck from AI-powered VCs. No sugar co
 - Get feedback from different VC personalities
 - Choose your preferred feedback intensity
 - Modern, responsive UI with smooth animations
+- Roast Level: Get feedback on your pitch deck
+- VC Prompts: Get AI-powered feedback on your VC outreach messages
 
 ## Tech Stack
 
@@ -96,4 +98,19 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Next.js team for the amazing framework
 - Tailwind CSS for the utility-first CSS framework
-- Framer Motion for the smooth animations 
+- Framer Motion for the smooth animations
+
+## VC Prompts Feature
+
+The VC Prompts feature helps you craft better outreach messages to VCs by:
+
+1. Providing templates and guidelines for different VCs
+2. Analyzing your message against specific feedback rules
+3. Giving you a score and suggestions for improvement
+
+To use the feature:
+
+1. Navigate to the VC Prompts page
+2. Select a VC from the list
+3. Write your pitch following the provided guidelines
+4. Click "Get Feedback" to receive AI-powered analysis 
