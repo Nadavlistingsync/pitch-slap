@@ -39,16 +39,16 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="/feedback" className="text-gray-300 hover:text-white transition-colors">
+            <Link href="/feedback" className="text-gray-300 hover:text-white transition-colors" onClick={() => console.log('Clicked Feedback link')}>
               Feedback
             </Link>
-            <Link href="/pricing" className="text-gray-300 hover:text-white transition-colors">
+            <Link href="/pricing" className="text-gray-300 hover:text-white transition-colors" onClick={() => console.log('Clicked Pricing link')}>
               Pricing
             </Link>
-            <Link href="/about" className="text-gray-300 hover:text-white transition-colors">
+            <Link href="/about" className="text-gray-300 hover:text-white transition-colors" onClick={() => console.log('Clicked About link')}>
               About
             </Link>
-            <Link href="/ego-dump" className="text-gray-300 hover:text-white transition-colors">
+            <Link href="/ego-dump" className="text-gray-300 hover:text-white transition-colors" onClick={() => console.log('Clicked Ego Dump link')}>
               Ego Dump
             </Link>
           </div>
@@ -118,30 +118,35 @@ export default function Navbar() {
               <Link
                 href="/feedback"
                 className="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-md"
+                onClick={() => console.log('Clicked Feedback link (mobile)')}
               >
                 Feedback
               </Link>
               <Link
                 href="/pricing"
                 className="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-md"
+                onClick={() => console.log('Clicked Pricing link (mobile)')}
               >
                 Pricing
               </Link>
               <Link
                 href="/about"
                 className="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-md"
+                onClick={() => console.log('Clicked About link (mobile)')}
               >
                 About
               </Link>
               <Link
                 href="/ego-dump"
                 className="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-md"
+                onClick={() => console.log('Clicked Ego Dump link (mobile)')}
               >
                 Ego Dump
               </Link>
               <Link
                 href="/profile"
                 className="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-md"
+                onClick={() => console.log('Clicked Profile link (mobile)')}
               >
                 Profile
               </Link>
