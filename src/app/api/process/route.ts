@@ -132,6 +132,12 @@ export async function POST(request: Request) {
     }
 
     try {
+      console.log('Preparing to call OpenAI API with extracted text and personality:', {
+        personality: selectedPersonality.name,
+        roastIntensity,
+        userName,
+        textSample: extractedText.slice(0, 100)
+      });
       // Generate roast using GPT with personality context
       const completion = await openai.chat.completions.create({
         model: 'gpt-4',
@@ -158,6 +164,7 @@ Do not include any markdown formatting, special characters, or explanations. Jus
         max_tokens: 2000,
         temperature: 0.7
       });
+      console.log('OpenAI API call completed. Completion object:', completion);
 
       if (!completion.choices?.[0]?.message?.content) {
         console.error('OpenAI response missing content:', completion);
@@ -185,7 +192,11 @@ Do not include any markdown formatting, special characters, or explanations. Jus
       return NextResponse.json(feedbackData);
 
     } catch (error) {
-      console.error('Error generating feedback:', error);
+      if (error instanceof Error) {
+        console.error('Error generating feedback:', error.message, error.stack);
+      } else {
+        console.error('Unknown error generating feedback:', error);
+      }
       return NextResponse.json(
         { error: 'Failed to generate feedback. Please try again.' },
         { status: 500 }
