@@ -224,7 +224,12 @@ export default function VCPrompts() {
           <div
             key={vc.id}
             className="card hover-lift cursor-pointer transition-all duration-300"
-            onClick={() => router.push(`/roast/${vc.id}`)}
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                localStorage.setItem('selectedVC', JSON.stringify(vc));
+              }
+              router.push('/upload');
+            }}
           >
             <div className="flex items-start justify-between mb-4">
               <div>
