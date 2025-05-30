@@ -104,9 +104,10 @@ export async function POST(request: Request) {
       pdfData = await pdfParse(buffer, options);
       console.log('PDF parsed successfully, pages:', pdfData.numpages);
     } catch (error) {
-      console.error('Error parsing PDF:', error);
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      console.error('Error parsing PDF:', errorMsg);
       return NextResponse.json(
-        { error: 'Failed to parse PDF file. Please ensure it is a valid PDF.' },
+        { error: `Failed to parse PDF file. This may be due to unsupported fonts, encryption, or unusual formatting. Please try a simpler, text-based PDF. (Error: ${errorMsg})` },
         { status: 400 }
       );
     }
