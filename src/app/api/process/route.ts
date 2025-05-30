@@ -94,33 +94,44 @@ export async function POST(request: Request) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     
-    // Configure pdf-parse options to ignore font warnings
+    // Configure pdf-parse options to ignore font warnings and handle errors better
     const options = {
       pagerender: function(pageData: any) {
         return pageData.getTextContent()
           .then(function(textContent: any) {
             return textContent.items.map((item: any) => item.str).join(' ');
+          })
+          .catch(function(error: any) {
+            console.warn('Warning during page text extraction:', error);
+            return ''; // Return empty string for failed pages
           });
-      }
+      },
+      max: 0 // No page limit
     };
 
     let pdfData;
     try {
       pdfData = await pdfParse(buffer, options);
       console.log('PDF parsed successfully, pages:', pdfData.numpages);
+      
+      // Additional validation of extracted text
+      if (!pdfData.text || pdfData.text.trim().length === 0) {
+        throw new Error('No text content could be extracted from the PDF');
+      }
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error);
       console.error('Error parsing PDF:', errorMsg);
+      
+      // More specific error messages based on the error type
+      if (errorMsg.includes('TT')) {
+        return NextResponse.json(
+          { error: 'The PDF contains some unsupported fonts, but we\'ll try to extract as much text as possible. Please ensure your PDF is text-based and not scanned.' },
+          { status: 400 }
+        );
+      }
+      
       return NextResponse.json(
-        { error: `Failed to parse PDF file. This may be due to unsupported fonts, encryption, or unusual formatting. Please try a simpler, text-based PDF. (Error: ${errorMsg})` },
-        { status: 400 }
-      );
-    }
-    
-    if (!pdfData || !pdfData.text) {
-      console.error('No text content extracted from PDF');
-      return NextResponse.json(
-        { error: 'Could not extract text from PDF. Please ensure the PDF contains text and is not scanned.' },
+        { error: `Failed to parse PDF file. Please ensure your PDF is text-based, not scanned, and not password-protected. (Error: ${errorMsg})` },
         { status: 400 }
       );
     }
