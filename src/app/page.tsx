@@ -21,7 +21,7 @@ export default function Home() {
 
   const handleSelect = (vcId: string) => {
     localStorage.setItem('selectedVC', vcId);
-    router.push('/roast-level');
+    router.push('/upload');
   };
 
   return (

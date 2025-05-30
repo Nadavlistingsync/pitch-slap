@@ -40,6 +40,7 @@ export default function UploadPage() {
         const base64 = reader.result as string;
         sessionStorage.setItem('uploadedFile', base64);
         sessionStorage.setItem('uploadedFileName', selectedFile.name);
+        router.push('/roast-level');
       };
       reader.readAsDataURL(selectedFile);
     }
@@ -67,14 +68,9 @@ export default function UploadPage() {
         const base64 = reader.result as string;
         sessionStorage.setItem('uploadedFile', base64);
         sessionStorage.setItem('uploadedFileName', droppedFile.name);
+        router.push('/roast-level');
       };
       reader.readAsDataURL(droppedFile);
-    }
-  };
-
-  const handleContinue = () => {
-    if (file) {
-      router.push('/roast-level');
     }
   };
 
@@ -107,12 +103,6 @@ export default function UploadPage() {
                 <FiFile className="w-8 h-8 text-pink-500" />
                 <span className="text-lg">{file.name}</span>
               </div>
-              <button
-                onClick={handleContinue}
-                className="px-6 py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg font-medium"
-              >
-                Continue
-              </button>
             </div>
           ) : (
             <div>
