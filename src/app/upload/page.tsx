@@ -10,6 +10,7 @@ export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     // Check if VC is selected
@@ -33,13 +34,15 @@ export default function UploadPage() {
       }
       setFile(selectedFile);
       setError(null);
-
+      setLoading(true);
+      console.log('Uploading file:', selectedFile.name);
       // Convert file to base64 and store in sessionStorage
       const reader = new FileReader();
       reader.onload = () => {
         const base64 = reader.result as string;
         sessionStorage.setItem('uploadedFile', base64);
         sessionStorage.setItem('uploadedFileName', selectedFile.name);
+        console.log('File uploaded and stored, navigating to /roast-level');
         router.push('/roast-level');
       };
       reader.readAsDataURL(selectedFile);
@@ -61,13 +64,15 @@ export default function UploadPage() {
       }
       setFile(droppedFile);
       setError(null);
-
+      setLoading(true);
+      console.log('Uploading file:', droppedFile.name);
       // Convert file to base64 and store in sessionStorage
       const reader = new FileReader();
       reader.onload = () => {
         const base64 = reader.result as string;
         sessionStorage.setItem('uploadedFile', base64);
         sessionStorage.setItem('uploadedFileName', droppedFile.name);
+        console.log('File uploaded and stored, navigating to /roast-level');
         router.push('/roast-level');
       };
       reader.readAsDataURL(droppedFile);
@@ -97,7 +102,12 @@ export default function UploadPage() {
           onDragLeave={() => setIsDragging(false)}
           onDrop={handleDrop}
         >
-          {file ? (
+          {loading ? (
+            <div className="flex flex-col items-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500 mb-4"></div>
+              <span className="text-lg text-pink-500">Uploading and processing...</span>
+            </div>
+          ) : file ? (
             <div className="flex flex-col items-center">
               <div className="flex items-center gap-3 mb-4">
                 <FiFile className="w-8 h-8 text-pink-500" />
