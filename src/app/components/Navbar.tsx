@@ -42,9 +42,6 @@ export default function Navbar() {
             <Link href="/feedback" className="text-gray-300 hover:text-white transition-colors" onClick={() => console.log('Clicked Feedback link')}>
               Feedback
             </Link>
-            <Link href="/pricing" className="text-gray-300 hover:text-white transition-colors" onClick={() => console.log('Clicked Pricing link')}>
-              Pricing
-            </Link>
             <Link href="/about" className="text-gray-300 hover:text-white transition-colors" onClick={() => console.log('Clicked About link')}>
               About
             </Link>
@@ -127,13 +124,6 @@ export default function Navbar() {
                 onClick={() => console.log('Clicked Feedback link (mobile)')}
               >
                 Feedback
-              </Link>
-              <Link
-                href="/pricing"
-                className="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-md"
-                onClick={() => console.log('Clicked Pricing link (mobile)')}
-              >
-                Pricing
               </Link>
               <Link
                 href="/about"
