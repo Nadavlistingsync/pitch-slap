@@ -48,6 +48,12 @@ export default function Navbar() {
             <Link href="/about" className="text-gray-300 hover:text-white transition-colors" onClick={() => console.log('Clicked About link')}>
               About
             </Link>
+            <Link href="/blog" className="text-gray-300 hover:text-white transition-colors" onClick={() => console.log('Clicked Blog link')}>
+              Blog
+            </Link>
+            <Link href="/contact" className="text-gray-300 hover:text-white transition-colors" onClick={() => console.log('Clicked Contact link')}>
+              Contact
+            </Link>
             <Link href="/ego-dump" className="text-gray-300 hover:text-white transition-colors" onClick={() => console.log('Clicked Ego Dump link')}>
               Ego Dump
             </Link>
@@ -135,6 +141,20 @@ export default function Navbar() {
                 onClick={() => console.log('Clicked About link (mobile)')}
               >
                 About
+              </Link>
+              <Link
+                href="/blog"
+                className="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-md"
+                onClick={() => console.log('Clicked Blog link (mobile)')}
+              >
+                Blog
+              </Link>
+              <Link
+                href="/contact"
+                className="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-md"
+                onClick={() => console.log('Clicked Contact link (mobile)')}
+              >
+                Contact
               </Link>
               <Link
                 href="/ego-dump"
