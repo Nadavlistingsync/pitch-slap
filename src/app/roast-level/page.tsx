@@ -120,11 +120,10 @@ export default function RoastLevelPage() {
         throw new Error(data.error || 'Failed to generate feedback');
       }
 
-      // Store the feedback ID in localStorage for the wait page
-      localStorage.setItem('feedbackId', data.feedbackId);
-      
-      // Navigate to wait page
-      router.push('/wait');
+      // Store feedback result in sessionStorage for results page
+      sessionStorage.setItem('feedbackResult', JSON.stringify(data));
+      // Navigate directly to results page
+      router.push('/results');
     } catch (err) {
       console.error('Error processing pitch deck:', err);
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');

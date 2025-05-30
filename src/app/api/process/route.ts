@@ -2,11 +2,14 @@ import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import pdfParse from 'pdf-parse';
 import { realVCPersonalities } from '../../../types/realVCPersonalities';
+import { Pool } from '@neondatabase/serverless';
 
 // Initialize OpenAI
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -176,20 +179,13 @@ Do not include any markdown formatting, special characters, or explanations. Jus
       const content = completion.choices[0].message.content.trim();
       console.log('Generated feedback length:', content.length);
 
-      // Generate a unique ID for this feedback
-      const feedbackId = crypto.randomUUID();
-
       const feedbackData = {
         success: true,
         feedback: content,
         roastIntensity,
         personality: selectedPersonality.name,
-        feedbackId,
         timestamp: new Date().toISOString()
       };
-
-      // Store feedback for sharing
-      feedbackStore.set(feedbackId, feedbackData);
 
       return NextResponse.json(feedbackData);
 

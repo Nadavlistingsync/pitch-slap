@@ -41,12 +41,6 @@ export default function ResultsPage() {
         } else if (typeof result.feedback === 'string') {
           setRawFeedback(result.feedback);
         }
-        if (result.feedbackId) {
-          setFeedbackId(result.feedbackId);
-          // Generate share URL
-          const url = `${window.location.origin}/feedback/${result.feedbackId}`;
-          setShareUrl(url);
-        }
         if (result.personality) {
           setVcName(result.personality);
         }
