@@ -20,8 +20,11 @@ export default function Home() {
   });
 
   const handleSelect = (vcId: string) => {
-    localStorage.setItem('selectedVC', vcId);
-    router.push('/upload');
+    const vcObj = realVCPersonalities.find(vc => vc.id === vcId);
+    if (vcObj) {
+      localStorage.setItem('selectedVC', JSON.stringify(vcObj));
+      router.push('/upload');
+    }
   };
 
   return (

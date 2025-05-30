@@ -16,7 +16,7 @@ export default function UploadPage() {
     // Check if VC is selected
     const selectedVC = localStorage.getItem('selectedVC');
     if (!selectedVC) {
-      router.push('/select');
+      router.push('/');
       return;
     }
   }, [router]);
