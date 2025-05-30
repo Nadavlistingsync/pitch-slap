@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { VCPrompt } from '@/types/vc';
+import { VCPrompt, FeedbackRule } from '@/types/vc';
 import OpenAI from 'openai';
 
 const openai = new OpenAI({
@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     const prompt = `
 You are an expert VC pitch coach. Analyze the following pitch based on these rules:
 
-${vc.feedback_rules.map(rule => `- ${rule.rule}`).join('\n')}
+${vc.feedback_rules.map((rule: FeedbackRule) => `- ${rule.rule}`).join('\n')}
 
 Pitch to analyze:
 ${userInput}

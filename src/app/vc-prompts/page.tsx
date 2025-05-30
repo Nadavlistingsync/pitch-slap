@@ -8,17 +8,25 @@ export default function VCPromptsPage() {
   const [selectedVC, setSelectedVC] = useState<VCPrompt | null>(null);
   const [userInput, setUserInput] = useState('');
   const [feedback, setFeedback] = useState<string[]>([]);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [score, setScore] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleVCSelect = (vc: VCPrompt) => {
     setSelectedVC(vc);
     setUserInput('');
     setFeedback([]);
+    setSuggestions([]);
     setScore(null);
+    setError(null);
   };
 
   const handleSubmit = async () => {
     if (!selectedVC || !userInput) return;
+
+    setIsLoading(true);
+    setError(null);
 
     try {
       const response = await fetch('/api/vc-feedback', {
@@ -32,11 +40,19 @@ export default function VCPromptsPage() {
         }),
       });
 
+      if (!response.ok) {
+        throw new Error('Failed to get feedback');
+      }
+
       const data = await response.json();
       setFeedback(data.feedback);
+      setSuggestions(data.suggestions);
       setScore(data.score);
     } catch (error) {
       console.error('Error getting feedback:', error);
+      setError('Failed to get feedback. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -80,34 +96,59 @@ export default function VCPromptsPage() {
                   onChange={(e) => setUserInput(e.target.value)}
                   className="w-full h-48 p-4 border rounded-lg"
                   placeholder="Write your pitch here..."
+                  disabled={isLoading}
                 />
               </div>
 
               <button
                 onClick={handleSubmit}
-                disabled={!userInput}
-                className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 disabled:bg-gray-300"
+                disabled={!userInput || isLoading}
+                className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
               >
-                Get Feedback
+                {isLoading ? 'Getting Feedback...' : 'Get Feedback'}
               </button>
 
+              {error && (
+                <div className="mt-4 p-4 bg-red-50 text-red-700 rounded-lg">
+                  {error}
+                </div>
+              )}
+
               {feedback.length > 0 && (
-                <div className="mt-6">
-                  <h2 className="text-xl font-semibold mb-2">Feedback</h2>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <div className="mb-4">
-                      <span className="font-medium">Score: </span>
-                      <span className="text-lg">{score}/10</span>
+                <div className="mt-6 space-y-6">
+                  <div>
+                    <h2 className="text-xl font-semibold mb-2">Feedback</h2>
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <div className="mb-4">
+                        <span className="font-medium">Score: </span>
+                        <span className="text-lg">{score}/10</span>
+                      </div>
+                      <ul className="space-y-2">
+                        {feedback.map((item, index) => (
+                          <li key={index} className="flex items-start">
+                            <span className="text-blue-500 mr-2">•</span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
-                    <ul className="space-y-2">
-                      {feedback.map((item, index) => (
-                        <li key={index} className="flex items-start">
-                          <span className="text-blue-500 mr-2">•</span>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
                   </div>
+
+                  {suggestions.length > 0 && (
+                    <div>
+                      <h2 className="text-xl font-semibold mb-2">Suggestions</h2>
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <ul className="space-y-2">
+                          {suggestions.map((item, index) => (
+                            <li key={index} className="flex items-start">
+                              <span className="text-green-500 mr-2">→</span>
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
