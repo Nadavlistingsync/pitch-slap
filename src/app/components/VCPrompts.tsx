@@ -3,8 +3,10 @@
 import { useState } from 'react';
 import { Search, MapPin, Building2, Award, Users, MessageSquare } from 'lucide-react';
 import { realVCPersonalities } from '../../types/realVCPersonalities';
+import { useRouter } from 'next/navigation';
 
 interface VC {
+  id: string;
   name: string;
   firm: string;
   location: string;
@@ -17,6 +19,7 @@ interface VC {
 
 const vcs: VC[] = [
   {
+    id: "jean-de-la-rochebrochard",
     name: "Jean de La Rochebrochard",
     firm: "Kima Ventures",
     location: "🇫🇷 Paris",
@@ -33,6 +36,7 @@ const vcs: VC[] = [
     ]
   },
   {
+    id: "pauline-roux",
     name: "Pauline Roux",
     firm: "Elaia Partners",
     location: "🇫🇷 Paris",
@@ -49,6 +53,7 @@ const vcs: VC[] = [
     ]
   },
   {
+    id: "roxanne-varza",
     name: "Roxanne Varza",
     firm: "Station F",
     location: "🇫🇷 Paris",
@@ -65,6 +70,7 @@ const vcs: VC[] = [
     ]
   },
   {
+    id: "guillaume-moubeche",
     name: "Guillaume Moubeche",
     firm: "Lemlist",
     location: "🇫🇷 Paris",
@@ -81,6 +87,7 @@ const vcs: VC[] = [
     ]
   },
   {
+    id: "partech",
     name: "Partech",
     firm: "Partech",
     location: "🇫🇷 Paris",
@@ -97,6 +104,7 @@ const vcs: VC[] = [
     ]
   },
   {
+    id: "y-combinator",
     name: "Y Combinator",
     firm: "Y Combinator",
     location: "🇺🇸 NYC",
@@ -113,6 +121,7 @@ const vcs: VC[] = [
     ]
   },
   {
+    id: "andreessen-horowitz",
     name: "Andreessen Horowitz",
     firm: "a16z",
     location: "🇺🇸 NYC",
@@ -129,6 +138,7 @@ const vcs: VC[] = [
     ]
   },
   {
+    id: "nyc-operator-vc",
     name: "NYC Operator VC",
     firm: "NYC Operator VC",
     location: "🇺🇸 NYC",
@@ -145,6 +155,7 @@ const vcs: VC[] = [
     ]
   },
   {
+    id: "lerer-hippeau",
     name: "Lerer Hippeau",
     firm: "Lerer Hippeau",
     location: "🇺🇸 NYC",
@@ -181,6 +192,7 @@ const vcData = [
 ];
 
 export default function VCPrompts() {
+  const router = useRouter();
   const [selectedVC, setSelectedVC] = useState<VC | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -208,11 +220,11 @@ export default function VCPrompts() {
 
       {/* VC Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredVCs.map((vc, index) => (
+        {filteredVCs.map((vc) => (
           <div
-            key={index}
+            key={vc.id}
             className="card hover-lift cursor-pointer transition-all duration-300"
-            onClick={() => setSelectedVC(vc)}
+            onClick={() => router.push(`/roast/${vc.id}`)}
           >
             <div className="flex items-start justify-between mb-4">
               <div>
