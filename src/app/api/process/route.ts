@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import pdfParse from 'pdf-parse';
 import { realVCPersonalities } from '../../../types/realVCPersonalities';
-import { storeFeedback } from '@/lib/feedback';
 
 // Initialize OpenAI
 const openai = new OpenAI({
@@ -22,6 +21,9 @@ const isValidRoastIntensity = (intensity: string): intensity is 'gentle' | 'bala
 const isValidVCPersonality = (personalityId: string): boolean => {
   return realVCPersonalities.some(p => p.id === personalityId);
 };
+
+// In-memory feedback store for server-side storage
+const feedbackStore = new Map<string, any>();
 
 export async function POST(request: Request) {
   try {
@@ -187,7 +189,7 @@ Do not include any markdown formatting, special characters, or explanations. Jus
       };
 
       // Store feedback for sharing
-      storeFeedback(feedbackId, feedbackData);
+      feedbackStore.set(feedbackId, feedbackData);
 
       return NextResponse.json(feedbackData);
 
