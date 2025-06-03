@@ -5,6 +5,8 @@ import './globals.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { ToastProvider } from './components/ToastContext';
+import { UIProvider } from '../lib/UIContext';
+import ErrorBoundary from '../components/ErrorBoundary';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -57,13 +59,17 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className={`${inter.variable} font-sans min-h-screen bg-gradient-to-br from-[#18181b] via-[#23272f] to-[#1a1a1a] text-white`}>
-        <ToastProvider>
-          <Navbar />
-          <main className="pt-16">
-            {children}
-          </main>
-          <Footer />
-        </ToastProvider>
+        <ErrorBoundary>
+          <UIProvider>
+            <ToastProvider>
+              <Navbar />
+              <main className="pt-16">
+                {children}
+              </main>
+              <Footer />
+            </ToastProvider>
+          </UIProvider>
+        </ErrorBoundary>
         <script dangerouslySetInnerHTML={{
           __html: `
             window.addEventListener('load', ${logPerformance.toString()});
