@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { FiCoffee } from 'react-icons/fi';
 import { FiZap } from 'react-icons/fi';
 import { FaFire, FaSkull, FaBomb } from 'react-icons/fa';
@@ -56,7 +55,7 @@ export const RoastLevelSelector: React.FC<RoastLevelSelectorProps> = ({
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {roastLevels.map(({ level, label, description, icon, color, intensity }) => (
-          <motion.button
+          <button
             key={level}
             onClick={() => handleSelect(level)}
             className={`relative p-8 rounded-2xl border-2 transition-all duration-300 ${
@@ -64,8 +63,6 @@ export const RoastLevelSelector: React.FC<RoastLevelSelectorProps> = ({
                 ? 'border-pink-500 bg-pink-500/10 shadow-lg shadow-pink-500/20'
                 : 'border-gray-800 hover:border-pink-500/50 hover:bg-gray-800/50'
             }`}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
           >
             <div className="flex flex-col items-center text-center space-y-4">
               <div className={`p-4 rounded-full bg-gradient-to-r ${color} text-white transform transition-transform duration-300 ${
@@ -99,10 +96,8 @@ export const RoastLevelSelector: React.FC<RoastLevelSelectorProps> = ({
             </div>
 
             {selectedLevel === level && (
-              <motion.div
+              <div
                 className="absolute inset-0 border-2 border-pink-500 rounded-2xl"
-                layoutId="selectedRoastLevel"
-                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
               />
             )}
 
@@ -113,21 +108,19 @@ export const RoastLevelSelector: React.FC<RoastLevelSelectorProps> = ({
                 <FaBomb className="absolute bottom-2 left-2 text-red-500/20 w-6 h-6" />
               </>
             )}
-          </motion.button>
+          </button>
         ))}
       </div>
 
       {/* Warning message for brutal level */}
       {selectedLevel === 'brutal' && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
+        <div
           className="text-center p-4 bg-red-500/10 border border-red-500/20 rounded-lg"
         >
           <p className="text-red-400 font-medium">
             ⚠️ Warning: Brutal mode will provide extremely direct and unfiltered feedback
           </p>
-        </motion.div>
+        </div>
       )}
     </div>
   );

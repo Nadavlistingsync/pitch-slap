@@ -1,6 +1,5 @@
 import React, { useCallback, useState, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { motion, AnimatePresence } from 'framer-motion';
 import { FiUpload, FiX, FiCheck, FiAlertCircle } from 'react-icons/fi';
 
 interface FileUploadProps {
@@ -114,79 +113,64 @@ const FileUpload: React.FC<FileUploadProps> = ({
         </p>
       </div>
 
-      <AnimatePresence>
-        {files.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="mt-4 space-y-4"
-          >
-            {files.map((file, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-              >
-                <div className="flex items-center space-x-3">
-                  {file.preview ? (
-                    <img
-                      src={file.preview}
-                      alt={file.file.name}
-                      className="w-12 h-12 object-cover rounded"
-                    />
-                  ) : (
-                    <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center">
-                      <FiUpload className="text-gray-400" />
-                    </div>
-                  )}
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">{file.file.name}</p>
-                    <p className="text-xs text-gray-500">
-                      {(file.file.size / 1024 / 1024).toFixed(2)}MB
-                    </p>
+      {files.length > 0 && (
+        <div className="mt-4 space-y-4">
+          {files.map((file, index) => (
+            <div
+              key={index}
+              className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+            >
+              <div className="flex items-center space-x-3">
+                {file.preview ? (
+                  <img
+                    src={file.preview}
+                    alt={file.file.name}
+                    className="w-12 h-12 object-cover rounded"
+                  />
+                ) : (
+                  <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center">
+                    <FiUpload className="text-gray-400" />
                   </div>
+                )}
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{file.file.name}</p>
+                  <p className="text-xs text-gray-500">
+                    {(file.file.size / 1024 / 1024).toFixed(2)}MB
+                  </p>
                 </div>
+              </div>
 
-                <div className="flex items-center space-x-2">
-                  {isUploading && (
-                    <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <motion.div
-                        className="h-full bg-blue-500"
-                        initial={{ width: 0 }}
-                        animate={{ width: `${file.progress}%` }}
-                        transition={{ duration: 0.2 }}
-                      />
-                    </div>
-                  )}
-                  {file.error ? (
-                    <FiAlertCircle className="text-red-500" />
-                  ) : file.progress === 100 ? (
-                    <FiCheck className="text-green-500" />
-                  ) : null}
-                  <button
-                    onClick={() => removeFile(index)}
-                    className="p-1 hover:bg-gray-200 rounded-full transition-colors"
-                  >
-                    <FiX className="text-gray-500" />
-                  </button>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
+              <div className="flex items-center space-x-2">
+                {isUploading && (
+                  <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-blue-500"
+                    />
+                  </div>
+                )}
+                {file.error ? (
+                  <FiAlertCircle className="text-red-500" />
+                ) : file.progress === 100 ? (
+                  <FiCheck className="text-green-500" />
+                ) : null}
+                <button
+                  onClick={() => removeFile(index)}
+                  className="p-1 hover:bg-gray-200 rounded-full transition-colors"
+                >
+                  <FiX className="text-gray-500" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {externalError && (
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+        <p
           className="mt-2 text-sm text-red-500"
         >
           {externalError}
-        </motion.p>
+        </p>
       )}
     </div>
   );
