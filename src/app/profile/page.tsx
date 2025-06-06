@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { FiUser, FiMail, FiPhone, FiMapPin, FiEdit2, FiSave, FiX } from 'react-icons/fi';
 import { useToast } from '../components/ToastContext';
 
@@ -62,30 +61,16 @@ export default function ProfilePage() {
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="text-center">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-4xl font-bold tracking-tight sm:text-5xl"
-          >
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
             Profile Settings
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="mt-4 text-xl text-gray-400"
-          >
+          </h1>
+          <p className="mt-4 text-xl text-gray-400">
             Manage your account settings and preferences
-          </motion.p>
+          </p>
         </div>
 
         {/* Profile Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="mt-12 rounded-2xl bg-white/5 backdrop-blur-lg p-8"
-        >
+        <div className="mt-12 rounded-2xl bg-white/5 backdrop-blur-lg p-8">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl font-bold">Personal Information</h2>
             {!isEditing ? (
@@ -224,15 +209,10 @@ export default function ProfilePage() {
               )}
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Account Settings */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="mt-8 rounded-2xl bg-white/5 backdrop-blur-lg p-8"
-        >
+        <div className="mt-8 rounded-2xl bg-white/5 backdrop-blur-lg p-8">
           <h2 className="text-2xl font-bold mb-6">Account Settings</h2>
           <div className="space-y-6">
             <div>
@@ -265,7 +245,7 @@ export default function ProfilePage() {
               </button>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

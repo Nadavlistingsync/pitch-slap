@@ -1,7 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
 import { FaLinkedin, FaTwitter } from 'react-icons/fa';
 import { FiStar, FiTrash2, FiArchive, FiMail, FiCheck, FiClock, FiArrowLeft } from 'react-icons/fi';
 
@@ -153,11 +152,7 @@ export default function FeedbackDetailPage({ params }: { params: { id: string } 
       {/* Main Content */}
       <div className="pt-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-lg shadow-lg p-8"
-          >
+          <div className="bg-white rounded-lg shadow-lg p-8">
             {/* Feedback Header */}
             <div className="flex items-start gap-4 mb-8">
               <img 
@@ -195,11 +190,8 @@ export default function FeedbackDetailPage({ params }: { params: { id: string } 
               {/* Sections */}
               <div className="space-y-8">
                 {feedback.sections.map((section, index) => (
-                  <motion.div
+                  <div
                     key={section.title}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
                     className="bg-gray-50 rounded-lg p-6"
                   >
                     <div className="flex items-center justify-between mb-4">
@@ -209,7 +201,7 @@ export default function FeedbackDetailPage({ params }: { params: { id: string } 
                       </span>
                     </div>
                     <p className="text-gray-700">{section.content}</p>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </div>
@@ -227,7 +219,7 @@ export default function FeedbackDetailPage({ params }: { params: { id: string } 
                 </button>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </main>

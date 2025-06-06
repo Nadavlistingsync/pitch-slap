@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 
 interface Comment {
@@ -65,22 +64,12 @@ export default function EgoDump() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-12"
-        >
+        <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">Ego Dump</h1>
           <p className="text-gray-400">Dump your thoughts, feedback, or anything else on your mind.</p>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="bg-gray-800 rounded-lg p-6 mb-8"
-        >
+        <div className="bg-gray-800 rounded-lg p-6 mb-8">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="author" className="block text-sm font-medium text-gray-300 mb-2">
@@ -118,19 +107,12 @@ export default function EgoDump() {
               {isLoading ? 'Posting...' : 'Post Comment'}
             </button>
           </form>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="space-y-4"
-        >
+        <div className="space-y-4">
           {comments.map((comment) => (
-            <motion.div
+            <div
               key={comment.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
               className="bg-gray-800 rounded-lg p-6"
             >
               <div className="flex justify-between items-start mb-2">
@@ -140,9 +122,9 @@ export default function EgoDump() {
                 </span>
               </div>
               <p className="text-gray-300 whitespace-pre-wrap">{comment.text}</p>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </div>
   );

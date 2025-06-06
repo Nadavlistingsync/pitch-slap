@@ -2,7 +2,6 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { realVCPersonalities } from '../../types/realVCPersonalities';
 
 const roastLevels = [
@@ -104,15 +103,13 @@ export default function FeedbackStylePage() {
           )}
         </div>
         <div className="mt-12 text-center">
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+          <button
             onClick={handleContinue}
             disabled={!selected}
             className="inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-200 disabled:opacity-50"
           >
             Continue to Upload
-          </motion.button>
+          </button>
         </div>
       </div>
     </main>
