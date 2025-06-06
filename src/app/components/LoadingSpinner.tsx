@@ -1,5 +1,10 @@
 'use client';
 
+interface LoadingSpinnerProps {
+  size?: 'sm' | 'md' | 'lg';
+  color?: string;
+}
+
 export default function LoadingSpinner({ 
   size = 'md', 
   color = 'text-pink-500' 
