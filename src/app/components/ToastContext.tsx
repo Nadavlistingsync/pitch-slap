@@ -1,7 +1,6 @@
 'use client';
 
 import { createContext, useContext, useState, useCallback } from 'react';
-import { AnimatePresence } from 'framer-motion';
 import Toast, { ToastType } from './Toast';
 
 interface ToastContextType {
@@ -26,16 +25,14 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     <ToastContext.Provider value={{ showToast }}>
       {children}
       <div className="fixed bottom-4 right-4 z-50 space-y-2">
-        <AnimatePresence>
-          {toasts.map((toast) => (
-            <Toast
-              key={toast.id}
-              message={toast.message}
-              type={toast.type}
-              onClose={() => removeToast(toast.id)}
-            />
-          ))}
-        </AnimatePresence>
+        {toasts.map((toast) => (
+          <Toast
+            key={toast.id}
+            message={toast.message}
+            type={toast.type}
+            onClose={() => removeToast(toast.id)}
+          />
+        ))}
       </div>
     </ToastContext.Provider>
   );

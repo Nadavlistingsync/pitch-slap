@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 
 interface SlideFeedback {
@@ -71,10 +70,8 @@ export default function DeckFeedbackPage({ params }: DeckFeedbackPageProps) {
 
         <div className="grid gap-8">
           {feedback.map((item) => (
-            <motion.div
+            <div
               key={item.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
               className="bg-white rounded-lg shadow-lg p-6"
             >
               <div className="flex justify-between items-start mb-4">
@@ -99,19 +96,17 @@ export default function DeckFeedbackPage({ params }: DeckFeedbackPageProps) {
               <div className="mt-4 text-sm text-gray-500">
                 {new Date(item.createdAt).toLocaleDateString()}
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
 
         <div className="mt-8 text-center">
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+          <button
             onClick={() => router.push('/preview')}
             className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors duration-200"
           >
             Back to Preview
-          </motion.button>
+          </button>
         </div>
       </div>
     </div>

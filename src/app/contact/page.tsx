@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { FiMail, FiPhone, FiMapPin, FiSend } from 'react-icons/fi';
 import { useToast } from '../components/ToastContext';
 
@@ -41,31 +40,17 @@ export default function ContactPage() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-4xl font-bold tracking-tight sm:text-5xl"
-          >
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
             Get in Touch
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="mt-4 text-xl text-gray-400"
-          >
+          </h1>
+          <p className="mt-4 text-xl text-gray-400">
             Have questions? We'd love to hear from you.
-          </motion.p>
+          </p>
         </div>
 
         <div className="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Contact Form */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            className="rounded-2xl bg-white/5 backdrop-blur-lg p-8"
-          >
+          <div className="rounded-2xl bg-white/5 backdrop-blur-lg p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-300">
@@ -146,15 +131,10 @@ export default function ContactPage() {
                 )}
               </button>
             </form>
-          </motion.div>
+          </div>
 
           {/* Contact Info */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
-            className="space-y-8"
-          >
+          <div className="space-y-8">
             <div className="rounded-2xl bg-white/5 backdrop-blur-lg p-8">
               <h2 className="text-2xl font-bold mb-6">Contact Information</h2>
               <div className="space-y-6">
@@ -217,7 +197,7 @@ export default function ContactPage() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </div>
