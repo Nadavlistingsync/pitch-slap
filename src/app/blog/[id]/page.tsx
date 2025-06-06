@@ -116,6 +116,13 @@ const posts: { [key: string]: BlogPost } = {
   },
 };
 
+// This function is required for static export
+export async function generateStaticParams() {
+  return Object.keys(posts).map((id) => ({
+    id,
+  }));
+}
+
 export default function BlogPostPage({ params }: { params: { id: string } }) {
   const post = posts[params.id];
 
