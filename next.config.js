@@ -1,9 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
   images: {
     domains: ['placehold.co'],
     unoptimized: true,
+  },
+  // Enable hybrid rendering
+  experimental: {
+    serverActions: true,
   },
 };
 
