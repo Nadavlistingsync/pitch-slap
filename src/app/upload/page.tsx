@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
 import { FiUpload, FiFile } from 'react-icons/fi';
 
 export default function UploadPage() {
@@ -82,14 +81,10 @@ export default function UploadPage() {
   return (
     <main className="min-h-screen bg-gray-900 text-white p-8">
       <div className="max-w-4xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
-        >
+        <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">Upload Your Pitch Deck</h1>
           <p className="text-gray-400">Upload your PDF pitch deck to get feedback</p>
-        </motion.div>
+        </div>
 
         <div
           className={`border-2 border-dashed rounded-xl p-12 text-center transition-colors ${

@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 import { FiCoffee, FiZap } from "react-icons/fi";
 import { FaFire } from "react-icons/fa";
 import { realVCPersonalities } from "../../types/realVCPersonalities";
@@ -146,54 +145,44 @@ export default function RoastLevelPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white p-8">
       <div className="max-w-4xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h1 className="text-4xl font-bold mb-8 text-center">Choose Your Roast Level</h1>
-          
-          <div className="mb-12">
-            <RoastLevelSelector
-              onSelect={setRoastLevel}
-              selectedLevel={roastLevel ?? undefined}
-            />
-          </div>
+        <h1 className="text-4xl font-bold mb-8 text-center">Choose Your Roast Level</h1>
+        
+        <div className="mb-12">
+          <RoastLevelSelector
+            onSelect={setRoastLevel}
+            selectedLevel={roastLevel ?? undefined}
+          />
+        </div>
 
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-8"
-            >
-              <p className="text-red-400">{error}</p>
-            </motion.div>
-          )}
-
-          <div className="text-center mt-8">
-            <button
-              onClick={handleRoast}
-              disabled={loading || !roastLevel}
-              className={`px-8 py-3 rounded-lg font-bold text-lg transition-all ${
-                loading || !roastLevel
-                  ? 'bg-gray-600 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700'
-              }`}
-            >
-              {loading ? (
-                <span className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Processing...
-                </span>
-              ) : (
-                'Get Roasted'
-              )}
-            </button>
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-8">
+            <p className="text-red-400">{error}</p>
           </div>
-        </motion.div>
+        )}
+
+        <div className="text-center mt-8">
+          <button
+            onClick={handleRoast}
+            disabled={loading || !roastLevel}
+            className={`px-8 py-3 rounded-lg font-bold text-lg transition-all ${
+              loading || !roastLevel
+                ? 'bg-gray-600 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700'
+            }`}
+          >
+            {loading ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Processing...
+              </span>
+            ) : (
+              'Get Roasted'
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );

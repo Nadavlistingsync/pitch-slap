@@ -1,9 +1,8 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { realVCPersonalities, RealVCPersonality } from '@/types/realVCPersonalities';
 import { FiSearch, FiFilter } from 'react-icons/fi';
+import { realVCPersonalities, RealVCPersonality } from '@/types/realVCPersonalities';
 
 export default function SelectPage() {
   const router = useRouter();
@@ -27,14 +26,10 @@ export default function SelectPage() {
   return (
     <main className="min-h-screen bg-gray-900 text-white p-8">
       <div className="max-w-6xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
-        >
+        <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">Select Your VC</h1>
           <p className="text-gray-400">Choose a VC to get feedback in their unique style</p>
-        </motion.div>
+        </div>
 
         <div className="max-w-2xl mx-auto mb-12">
           <div className="flex gap-4">
@@ -66,11 +61,8 @@ export default function SelectPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredVCs.map((vc) => (
-            <motion.div
+            <div
               key={vc.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              whileHover={{ scale: 1.02 }}
               className={`bg-white/5 backdrop-blur-sm rounded-2xl p-6 border transition-all cursor-pointer
                 ${selectedVC === vc.id 
                   ? 'border-pink-500 shadow-lg shadow-pink-500/20' 
@@ -92,7 +84,7 @@ export default function SelectPage() {
                   <span className="px-2 py-1 rounded-full bg-white/5">{vc.focus}</span>
                 </div>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
 

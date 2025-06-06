@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
 
 const vcs = [
   {
@@ -228,11 +227,7 @@ export default function RoastPage({ params }: { params: { id: string } }) {
         </div>
 
         {roastLevel !== null && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-gray-800 rounded-lg p-8"
-          >
+          <div className="bg-gray-800 rounded-lg p-8">
             <h3 className="text-2xl font-bold mb-4">Roast Level: {roastLevel}%</h3>
             <div className="w-full bg-gray-700 rounded-full h-4 mb-4">
               <div
@@ -248,7 +243,7 @@ export default function RoastPage({ params }: { params: { id: string } }) {
                 ? "Oof, this needs some serious work."
                 : "This is going to be brutal. Your pitch deck needs a complete overhaul."}
             </p>
-          </motion.div>
+          </div>
         )}
       </div>
     </main>
