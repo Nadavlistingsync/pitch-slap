@@ -31,25 +31,25 @@ const team = [
   {
     name: 'Sarah Chen',
     role: 'Founder & CEO',
-    image: '/team/sarah.jpg',
+    image: 'https://placehold.co/400x400',
     bio: 'Former VC with 10+ years of experience in early-stage investments.',
   },
   {
     name: 'Michael Rodriguez',
     role: 'Head of Product',
-    image: '/team/michael.jpg',
+    image: 'https://placehold.co/400x400',
     bio: 'Product leader with a passion for building tools that help startups succeed.',
   },
   {
     name: 'Emily Thompson',
     role: 'Lead VC Network',
-    image: '/team/emily.jpg',
+    image: 'https://placehold.co/400x400',
     bio: 'Connects startups with the right investors and mentors.',
   },
   {
     name: 'David Kim',
     role: 'Head of Design',
-    image: '/team/david.jpg',
+    image: 'https://placehold.co/400x400',
     bio: 'Award-winning designer focused on creating beautiful pitch decks.',
   },
 ];
@@ -85,7 +85,7 @@ export default function AboutPage() {
           transition={{ delay: 0.2 }}
           className="mt-16 grid grid-cols-2 gap-8 sm:grid-cols-4"
         >
-          {stats.map((stat, index) => (
+          {stats.map((stat) => (
             <div
               key={stat.label}
               className="text-center"
@@ -124,10 +124,11 @@ export default function AboutPage() {
             </div>
             <div className="relative h-96 rounded-2xl overflow-hidden">
               <Image
-                src="/about/office.jpg"
+                src="https://placehold.co/800x600"
                 alt="Our office"
                 fill
                 className="object-cover"
+                unoptimized
               />
             </div>
           </div>
@@ -153,6 +154,7 @@ export default function AboutPage() {
                     alt={member.name}
                     fill
                     className="object-cover"
+                    unoptimized
                   />
                 </div>
                 <h3 className="mt-4 text-xl font-semibold">{member.name}</h3>
