@@ -32,7 +32,7 @@ export default function Toast({
   return (
     <div
       className={`fixed bottom-4 right-4 flex items-center p-4 rounded-lg shadow-lg ${colors[type]} text-white`}
-      onAnimationComplete={() => {
+      onAnimationEnd={() => {
         setTimeout(onClose, duration);
       }}
     >

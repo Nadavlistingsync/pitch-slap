@@ -6,11 +6,11 @@ import { useState } from 'react';
 
 const categories = [
   { name: 'All', href: '/blog' },
-  { name: 'Pitch Deck Tips', href: '/blog/category/pitch-deck-tips' },
-  { name: 'Guides', href: '/blog/category/guides' },
-  { name: 'Presentation Skills', href: '/blog/category/presentation-skills' },
-  { name: 'Investor Insights', href: '/blog/category/investor-insights' },
-  { name: 'Success Stories', href: '/blog/category/success-stories' },
+  { name: 'Pitch Deck Tips', href: '/blog' },
+  { name: 'Guides', href: '/blog' },
+  { name: 'Presentation Skills', href: '/blog' },
+  { name: 'Investor Insights', href: '/blog' },
+  { name: 'Success Stories', href: '/blog' },
 ];
 
 export default function BlogLayout({
@@ -19,6 +19,7 @@ export default function BlogLayout({
   children: React.ReactNode;
 }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#18181b] via-[#23272f] to-[#1a1a1a]">
@@ -50,6 +51,8 @@ export default function BlogLayout({
                 <input
                   type="text"
                   placeholder="Search articles..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-64 rounded-lg bg-white/5 border border-gray-700 px-4 py-2 pl-10 text-white placeholder-gray-400 focus:border-pink-500 focus:ring-pink-500"
                 />
                 <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -78,6 +81,8 @@ export default function BlogLayout({
                 <input
                   type="text"
                   placeholder="Search articles..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full rounded-lg bg-white/5 border border-gray-700 px-4 py-2 pl-10 text-white placeholder-gray-400 focus:border-pink-500 focus:ring-pink-500"
                 />
                 <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />

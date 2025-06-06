@@ -1,5 +1,5 @@
 {
-  "name": "pitch-slap",
+  "name": "pitchdeck",
   "version": "0.1.0",
   "private": true,
   "main": "src/app/page.tsx",
@@ -10,9 +10,13 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "export": "next build && next export",
     "start": "next start",
     "lint": "next lint",
+    "type-check": "tsc --noEmit",
+    "test": "jest",
+    "push": "bash scripts/push-to-github.sh",
+    "deploy": "bash scripts/deploy-to-vercel.sh",
+    "check": "bash scripts/check-code.sh",
     "postinstall": "next telemetry disable"
   },
   "dependencies": {
@@ -30,7 +34,7 @@
     "eslint": "^8.56.0",
     "eslint-config-next": "14.1.0",
     "lucide-react": "^0.309.0",
-    "next": "14.1.0",
+    "next": "^14.1.0",
     "openai": "^4.24.7",
     "pdf-parse": "1.1.1",
     "postcss": "^8.4.35",
@@ -42,8 +46,13 @@
     "typescript": "^5.3.3"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.4.2",
+    "@testing-library/react": "^14.2.1",
+    "@types/jest": "^29.5.12",
     "@types/pdf-parse": "^1.1.5",
     "file-loader": "^6.2.0",
-    "ignore-loader": "^0.1.2"
+    "ignore-loader": "^0.1.2",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
   }
 }

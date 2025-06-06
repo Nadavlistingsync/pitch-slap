@@ -74,54 +74,28 @@ export default function RoastLevelPage() {
     setError(null);
 
     try {
-      // Convert base64 to Blob
-      const base64Data = uploadedFile.split(',')[1];
-      const byteCharacters = atob(base64Data);
-      const byteArrays = [];
-      
-      for (let offset = 0; offset < byteCharacters.length; offset += 512) {
-        const slice = byteCharacters.slice(offset, offset + 512);
-        const byteNumbers = new Array(slice.length);
-        
-        for (let i = 0; i < slice.length; i++) {
-          byteNumbers[i] = slice.charCodeAt(i);
-        }
-        
-        const byteArray = new Uint8Array(byteNumbers);
-        byteArrays.push(byteArray);
-      }
-      
-      const blob = new Blob(byteArrays, { type: 'application/pdf' });
-      const file = new File([blob], 'pitch-deck.pdf', { type: 'application/pdf' });
-
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('roastIntensity', roastLevel);
-      formData.append('personality', selectedVC.id);
-      formData.append('userName', localStorage.getItem("userName") || '');
-
-      console.log('Sending request to process pitch deck...');
-      const response = await fetch('/api/process', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Error response:', errorData);
-        throw new Error(errorData.error || 'Failed to process pitch deck');
-      }
-
-      const data = await response.json();
-      console.log('Received response:', data);
-
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to generate feedback');
-      }
-
-      // Store feedback result in sessionStorage for results page
+      // Simulate processing delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Mock feedback result
+      const data = {
+        success: true,
+        feedback: [
+          {
+            slide: 1,
+            comment: 'Great intro, but clarify your value proposition.',
+            score: 7,
+          },
+          {
+            slide: 2,
+            comment: 'Market size is good, but add more data.',
+            score: 6,
+          },
+        ],
+        overallScore: 6.5,
+        roastLevel,
+        personality: selectedVC.id,
+      };
       sessionStorage.setItem('feedbackResult', JSON.stringify(data));
-      // Navigate directly to results page
       router.push('/results');
     } catch (err) {
       console.error('Error processing pitch deck:', err);

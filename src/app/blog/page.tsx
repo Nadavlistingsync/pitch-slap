@@ -1,25 +1,8 @@
-'use client';
-
 import Image from 'next/image';
-import Link from 'next/link';
-import { FiClock, FiUser, FiTag } from 'react-icons/fi';
-
-interface BlogPost {
-  id: string;
-  title: string;
-  excerpt: string;
-  author: {
-    name: string;
-    avatar: string;
-  };
-  date: string;
-  readTime: string;
-  category: string;
-  image: string;
-}
+import { FiClock, FiTag } from 'react-icons/fi';
 
 // Static blog posts data
-const posts: BlogPost[] = [
+const posts = [
   {
     id: '1',
     title: '10 Common Pitch Deck Mistakes That Turn Off Investors',
@@ -95,43 +78,41 @@ export default function BlogPage() {
               key={post.id}
               className="rounded-2xl bg-white/5 backdrop-blur-lg overflow-hidden"
             >
-              <Link href={`/blog/${post.id}`}>
-                <div className="relative h-48">
-                  <Image
-                    src={post.image}
-                    alt={post.title}
-                    fill
-                    className="object-cover"
-                    unoptimized
-                  />
-                </div>
-                <div className="p-6">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="relative w-8 h-8">
-                      <Image
-                        src={post.author.avatar}
-                        alt={post.author.name}
-                        fill
-                        className="rounded-full object-cover"
-                        unoptimized
-                      />
-                    </div>
-                    <span className="text-sm text-gray-400">{post.author.name}</span>
+              <div className="relative h-48">
+                <Image
+                  src={post.image}
+                  alt={post.title}
+                  fill
+                  className="object-cover"
+                  unoptimized
+                />
+              </div>
+              <div className="p-6">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="relative w-8 h-8">
+                    <Image
+                      src={post.author.avatar}
+                      alt={post.author.name}
+                      fill
+                      className="rounded-full object-cover"
+                      unoptimized
+                    />
                   </div>
-                  <h2 className="text-xl font-semibold mb-2">{post.title}</h2>
-                  <p className="text-gray-400 mb-4">{post.excerpt}</p>
-                  <div className="flex items-center gap-4 text-sm text-gray-400">
-                    <div className="flex items-center gap-1">
-                      <FiClock className="w-4 h-4" />
-                      <span>{post.readTime}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <FiTag className="w-4 h-4" />
-                      <span>{post.category}</span>
-                    </div>
+                  <span className="text-sm text-gray-400">{post.author.name}</span>
+                </div>
+                <h2 className="text-xl font-semibold mb-2">{post.title}</h2>
+                <p className="text-gray-400 mb-4">{post.excerpt}</p>
+                <div className="flex items-center gap-4 text-sm text-gray-400">
+                  <div className="flex items-center gap-1">
+                    <FiClock className="w-4 h-4" />
+                    <span>{post.readTime}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <FiTag className="w-4 h-4" />
+                    <span>{post.category}</span>
                   </div>
                 </div>
-              </Link>
+              </div>
             </article>
           ))}
         </div>

@@ -4,6 +4,32 @@ import { useState } from 'react';
 import { vcPrompts } from '@/lib/vc-prompts';
 import { VCPrompt } from '@/types/vc';
 
+// Client-side feedback generation
+const generateFeedback = (vc: VCPrompt, userInput: string) => {
+  // Simple scoring based on input length and content
+  const score = Math.min(10, Math.max(1, Math.floor(userInput.length / 100)));
+  
+  const feedback = [
+    'Consider adding more specific details about your market opportunity.',
+    'Your value proposition could be more clearly stated.',
+    'Include more information about your team and their experience.',
+    'Add concrete examples of your traction or achievements.',
+  ];
+
+  const suggestions = [
+    'Try to quantify your market size with specific numbers.',
+    'Include a clear call to action for potential investors.',
+    'Add more details about your competitive advantage.',
+    'Consider adding a timeline for your funding needs.',
+  ];
+
+  return {
+    score,
+    feedback: feedback.slice(0, score),
+    suggestions: suggestions.slice(0, score),
+  };
+};
+
 export default function VCPromptsPage() {
   const [selectedVC, setSelectedVC] = useState<VCPrompt | null>(null);
   const [userInput, setUserInput] = useState('');
@@ -29,22 +55,10 @@ export default function VCPromptsPage() {
     setError(null);
 
     try {
-      const response = await fetch('/api/vc-feedback', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          vc: selectedVC,
-          userInput,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to get feedback');
-      }
-
-      const data = await response.json();
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const data = generateFeedback(selectedVC, userInput);
       setFeedback(data.feedback);
       setSuggestions(data.suggestions);
       setScore(data.score);

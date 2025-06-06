@@ -1,8 +1,3 @@
-'use client';
-
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-
 const colorOptions = [
   { name: 'PitchSlap Red', value: '#ff4154', bg: 'bg-[#ff4154]' },
   { name: 'Deep Purple', value: '#a78bfa', bg: 'bg-[#a78bfa]' },
@@ -18,10 +13,9 @@ const fontOptions = [
 ];
 
 export default function BrandingPage() {
-  const router = useRouter();
-  const [selectedColor, setSelectedColor] = useState(colorOptions[0]);
-  const [selectedFont, setSelectedFont] = useState(fontOptions[0]);
-  const [previewText, setPreviewText] = useState('Your Brand Name');
+  const selectedColor = colorOptions[0];
+  const selectedFont = fontOptions[0];
+  const previewText = 'Your Brand Name';
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12">
@@ -61,14 +55,9 @@ export default function BrandingPage() {
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Brand Color</h3>
             <div className="grid grid-cols-5 gap-4">
               {colorOptions.map((color) => (
-                <button
+                <div
                   key={color.value}
-                  onClick={() => setSelectedColor(color)}
-                  className={`relative p-4 rounded-xl border-2 transition-all duration-200 ${
-                    selectedColor.value === color.value
-                      ? 'border-[#ff4154] shadow-lg scale-105'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
+                  className={`relative p-4 rounded-xl border-2 ${color.value === selectedColor.value ? 'border-[#ff4154] shadow-lg scale-105' : 'border-gray-200'}`}
                 >
                   <div className="aspect-square rounded-lg overflow-hidden">
                     <div className={`w-full h-full ${color.bg}`} />
@@ -76,7 +65,7 @@ export default function BrandingPage() {
                   <span className="block text-sm font-medium text-gray-700 mt-2">
                     {color.name}
                   </span>
-                </button>
+                </div>
               ))}
             </div>
           </div>
@@ -86,14 +75,9 @@ export default function BrandingPage() {
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Typography</h3>
             <div className="grid grid-cols-3 gap-4">
               {fontOptions.map((font) => (
-                <button
+                <div
                   key={font.value}
-                  onClick={() => setSelectedFont(font)}
-                  className={`relative p-4 rounded-xl border-2 transition-all duration-200 ${
-                    selectedFont.value === font.value
-                      ? 'border-[#ff4154] shadow-lg scale-105'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
+                  className={`relative p-4 rounded-xl border-2 ${font.value === selectedFont.value ? 'border-[#ff4154] shadow-lg scale-105' : 'border-gray-200'}`}
                 >
                   <div className={`text-center ${font.className}`}>
                     <span className="block text-lg font-medium text-gray-900">
@@ -103,30 +87,24 @@ export default function BrandingPage() {
                       Aa
                     </span>
                   </div>
-                </button>
+                </div>
               ))}
             </div>
           </div>
 
-          {/* Action Buttons */}
+          {/* Action Buttons (static, no navigation) */}
           <div className="flex justify-end gap-4">
             <button
-              onClick={() => router.push('/')}
-              className="px-6 py-3 bg-gray-100 text-gray-700 rounded-full font-medium hover:bg-gray-200 transition-colors"
+              className="px-6 py-3 bg-gray-100 text-gray-700 rounded-full font-medium cursor-not-allowed opacity-50"
+              disabled
             >
               Cancel
             </button>
             <button
-              onClick={() => router.push('/roast')}
-              className="px-6 py-3 bg-[#ff4154] text-white rounded-full font-medium hover:bg-[#ff6b6b] transition-colors group relative overflow-hidden"
+              className="px-6 py-3 bg-[#ff4154] text-white rounded-full font-medium opacity-50 cursor-not-allowed"
+              disabled
             >
-              <span className="relative z-10 flex items-center gap-2">
-                Continue
-                <span>
-                  →
-                </span>
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-[#ff4154] to-[#ff6b6b] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              Continue →
             </button>
           </div>
         </div>

@@ -1,23 +1,4 @@
-'use client';
-
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-
-interface SlideFeedback {
-  id: string;
-  slideNumber: number;
-  content: string;
-  rating: number;
-  comments?: string;
-  brutalityLevel: string;
-  createdAt: string;
-}
-
-interface DeckFeedbackPageProps {
-  params: {
-    id: string;
-  };
-}
+import { FiArrowLeft } from 'react-icons/fi';
 
 const brutalityLevelColors = {
   gentle: 'bg-green-100 text-green-800',
@@ -26,42 +7,42 @@ const brutalityLevelColors = {
   savage: 'bg-red-100 text-red-800',
 };
 
-export default function DeckFeedbackPage({ params }: DeckFeedbackPageProps) {
-  const router = useRouter();
-  const [feedback, setFeedback] = useState<SlideFeedback[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [deckTitle, setDeckTitle] = useState('Your Pitch Deck');
+// Static mock feedback data
+const mockFeedback = [
+  {
+    id: '1',
+    slideNumber: 1,
+    content: 'Great introduction, but consider clarifying your value proposition.',
+    rating: 4,
+    brutalityLevel: 'moderate',
+    createdAt: '2024-03-15T10:00:00Z',
+  },
+  {
+    id: '2',
+    slideNumber: 2,
+    content: 'Market size is impressive, but add more data sources.',
+    rating: 3,
+    brutalityLevel: 'gentle',
+    createdAt: '2024-03-15T10:00:00Z',
+  },
+  {
+    id: '3',
+    slideNumber: 3,
+    content: 'Financial projections seem optimistic. Provide more realistic numbers.',
+    rating: 2,
+    brutalityLevel: 'brutal',
+    comments: 'Investors may be skeptical of high growth rates without supporting evidence.',
+    createdAt: '2024-03-15T10:00:00Z',
+  },
+];
 
-  useEffect(() => {
-    const fetchFeedback = async () => {
-      try {
-        const response = await fetch(`/api/slide-feedback?deckId=${params.id}`);
-        const data = await response.json();
-        setFeedback(data);
-      } catch (error) {
-        console.error('Error fetching feedback:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchFeedback();
-  }, [params.id]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
-
+export default function DeckFeedbackPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            {deckTitle} Feedback
+            Pitch Deck Feedback
           </h1>
           <p className="text-lg text-gray-600">
             Review feedback for each slide of your pitch deck
@@ -69,7 +50,7 @@ export default function DeckFeedbackPage({ params }: DeckFeedbackPageProps) {
         </div>
 
         <div className="grid gap-8">
-          {feedback.map((item) => (
+          {mockFeedback.map((item) => (
             <div
               key={item.id}
               className="bg-white rounded-lg shadow-lg p-6"
@@ -101,12 +82,13 @@ export default function DeckFeedbackPage({ params }: DeckFeedbackPageProps) {
         </div>
 
         <div className="mt-8 text-center">
-          <button
-            onClick={() => router.push('/preview')}
-            className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors duration-200"
+          <a
+            href="#"
+            className="inline-flex items-center px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors duration-200"
           >
+            <FiArrowLeft className="mr-2" />
             Back to Preview
-          </button>
+          </a>
         </div>
       </div>
     </div>

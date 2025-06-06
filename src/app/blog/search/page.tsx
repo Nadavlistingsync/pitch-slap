@@ -28,12 +28,12 @@ const posts: BlogPost[] = [
     excerpt: 'Learn about the most common mistakes founders make in their pitch decks and how to avoid them to increase your chances of securing funding.',
     author: {
       name: 'Sarah Chen',
-      avatar: '/team/sarah.jpg',
+      avatar: 'https://placehold.co/400x400',
     },
     date: '2024-03-15',
     readTime: '5 min read',
     category: 'Pitch Deck Tips',
-    image: '/blog/pitch-deck-mistakes.jpg',
+    image: 'https://placehold.co/800x600',
   },
   {
     id: '2',
@@ -41,12 +41,12 @@ const posts: BlogPost[] = [
     excerpt: 'A comprehensive guide that walks you through the process of creating a pitch deck that will impress investors and help you raise your next round.',
     author: {
       name: 'Michael Rodriguez',
-      avatar: '/team/michael.jpg',
+      avatar: 'https://placehold.co/400x400',
     },
     date: '2024-03-10',
     readTime: '8 min read',
     category: 'Guides',
-    image: '/blog/winning-pitch-deck.jpg',
+    image: 'https://placehold.co/800x600',
   },
   {
     id: '3',
@@ -54,12 +54,12 @@ const posts: BlogPost[] = [
     excerpt: 'Master the art of presenting your pitch deck with these proven techniques and tips from successful founders and investors.',
     author: {
       name: 'Emily Thompson',
-      avatar: '/team/emily.jpg',
+      avatar: 'https://placehold.co/400x400',
     },
     date: '2024-03-05',
     readTime: '6 min read',
     category: 'Presentation Skills',
-    image: '/blog/present-like-pro.jpg',
+    image: 'https://placehold.co/800x600',
   },
   {
     id: '4',
@@ -67,12 +67,12 @@ const posts: BlogPost[] = [
     excerpt: 'Understand how investors think and make decisions, and learn how to tailor your pitch deck to appeal to their psychology.',
     author: {
       name: 'David Kim',
-      avatar: '/team/david.jpg',
+      avatar: 'https://placehold.co/400x400',
     },
     date: '2024-02-28',
     readTime: '7 min read',
     category: 'Investor Insights',
-    image: '/blog/investor-psychology.jpg',
+    image: 'https://placehold.co/800x600',
   },
 ];
 
@@ -151,7 +151,7 @@ function SearchContent() {
               key={post.id}
               className="rounded-2xl bg-white/5 backdrop-blur-lg overflow-hidden"
             >
-              <Link href={`/blog/${post.id}`}>
+              <Link href="#">
                 <div className="relative h-48">
                   <Image
                     src={post.image}

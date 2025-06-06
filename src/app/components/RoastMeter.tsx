@@ -1,5 +1,9 @@
 'use client';
 
+interface RoastMeterProps {
+  score: number;
+}
+
 export default function RoastMeter({ score }: RoastMeterProps) {
   const getScoreColor = (score: number) => {
     if (score >= 90) return 'text-red-500';

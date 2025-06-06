@@ -1,40 +1,6 @@
-'use client';
-
-import { useState } from 'react';
-import { FiMail, FiPhone, FiMapPin, FiSend } from 'react-icons/fi';
-import { useToast } from '../components/ToastContext';
+import { FiMail, FiPhone, FiMapPin } from 'react-icons/fi';
 
 export default function ContactPage() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: '',
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { showToast } = useToast();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
-      // Add your form submission logic here
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulated API call
-      showToast('Message sent successfully!', 'success');
-      setFormData({ name: '', email: '', subject: '', message: '' });
-    } catch (error) {
-      showToast('Failed to send message. Please try again.', 'error');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -51,7 +17,7 @@ export default function ContactPage() {
         <div className="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Contact Form */}
           <div className="rounded-2xl bg-white/5 backdrop-blur-lg p-8">
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form action="#" method="POST" className="space-y-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-300">
                   Name
@@ -60,8 +26,6 @@ export default function ContactPage() {
                   type="text"
                   id="name"
                   name="name"
-                  value={formData.name}
-                  onChange={handleChange}
                   required
                   className="mt-1 block w-full rounded-lg bg-white/10 border border-gray-700 px-4 py-2 text-white placeholder-gray-400 focus:border-pink-500 focus:ring-pink-500"
                   placeholder="Your name"
@@ -76,8 +40,6 @@ export default function ContactPage() {
                   type="email"
                   id="email"
                   name="email"
-                  value={formData.email}
-                  onChange={handleChange}
                   required
                   className="mt-1 block w-full rounded-lg bg-white/10 border border-gray-700 px-4 py-2 text-white placeholder-gray-400 focus:border-pink-500 focus:ring-pink-500"
                   placeholder="your@email.com"
@@ -92,8 +54,6 @@ export default function ContactPage() {
                   type="text"
                   id="subject"
                   name="subject"
-                  value={formData.subject}
-                  onChange={handleChange}
                   required
                   className="mt-1 block w-full rounded-lg bg-white/10 border border-gray-700 px-4 py-2 text-white placeholder-gray-400 focus:border-pink-500 focus:ring-pink-500"
                   placeholder="What's this about?"
@@ -107,8 +67,6 @@ export default function ContactPage() {
                 <textarea
                   id="message"
                   name="message"
-                  value={formData.message}
-                  onChange={handleChange}
                   required
                   rows={4}
                   className="mt-1 block w-full rounded-lg bg-white/10 border border-gray-700 px-4 py-2 text-white placeholder-gray-400 focus:border-pink-500 focus:ring-pink-500"
@@ -118,17 +76,9 @@ export default function ContactPage() {
 
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className="w-full flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-pink-500 hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-pink-500 hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
               >
-                {isSubmitting ? (
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <>
-                    <FiSend className="mr-2" />
-                    Send Message
-                  </>
-                )}
+                Send Message
               </button>
             </form>
           </div>

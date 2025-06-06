@@ -18,18 +18,24 @@ export default function EgoDump() {
   const router = useRouter();
 
   useEffect(() => {
-    fetchComments();
+    // Simulate fetching comments with mock data
+    setTimeout(() => {
+      setComments([
+        {
+          id: '1',
+          text: 'This is a great platform! Love the feedback.',
+          timestamp: new Date().toISOString(),
+          author: 'Alice',
+        },
+        {
+          id: '2',
+          text: 'Can you add more VC personalities?',
+          timestamp: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
+          author: 'Bob',
+        },
+      ]);
+    }, 500);
   }, []);
-
-  const fetchComments = async () => {
-    try {
-      const response = await fetch('/api/comments');
-      const data = await response.json();
-      setComments(data);
-    } catch (error) {
-      console.error('Failed to fetch comments:', error);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,20 +43,14 @@ export default function EgoDump() {
 
     setIsLoading(true);
     try {
-      const response = await fetch('/api/comments', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          text: newComment,
-          author: author,
-        }),
-      });
-
-      if (!response.ok) throw new Error('Failed to post comment');
-
-      const comment = await response.json();
+      // Simulate posting comment
+      await new Promise(resolve => setTimeout(resolve, 500));
+      const comment: Comment = {
+        id: Math.random().toString(36).substr(2, 9),
+        text: newComment,
+        timestamp: new Date().toISOString(),
+        author,
+      };
       setComments([comment, ...comments]);
       setNewComment('');
       setAuthor('');

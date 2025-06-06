@@ -5,9 +5,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
 :root {
-  --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 24, 24, 27;
-  --background-end-rgb: 26, 26, 26;
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
   --primary: #ffffff;
   --accent: #6366f1;
   --accent-hover: #4f46e5;
@@ -16,7 +16,7 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(to bottom, rgb(var(--background-start-rgb)), rgb(var(--background-end-rgb)));
+  background: rgb(var(--background-end-rgb));
   min-height: 100vh;
   font-family: 'Inter', Arial, Helvetica, sans-serif;
 }
@@ -42,32 +42,28 @@ body {
 }
 
 .btn-primary {
-  background: var(--accent);
-  color: white;
-  font-family: 'Inter', Arial, Helvetica, sans-serif;
-  font-size: 1rem;
-  font-weight: 600;
-  border-radius: 0.75rem;
-  padding: 0.875rem 1.75rem;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
-  transition: all 0.2s ease;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
+  @apply inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500;
 }
 
-.btn-primary:hover {
-  background: var(--accent-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.3);
+.btn-secondary {
+  @apply inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500;
+}
+
+.input-primary {
+  @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm;
 }
 
 @layer base {
   body {
     @apply text-white antialiased;
+  }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
   }
 }
 

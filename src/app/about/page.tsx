@@ -1,7 +1,11 @@
-'use client';
-
+import { Metadata } from 'next';
 import Image from 'next/image';
 import { FiUsers, FiAward, FiTrendingUp, FiHeart } from 'react-icons/fi';
+
+export const metadata: Metadata = {
+  title: 'About Us - PitchDeck',
+  description: 'Learn about our mission to help startups create better pitch decks and secure funding faster.',
+};
 
 const stats = [
   {
