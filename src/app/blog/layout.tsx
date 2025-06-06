@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { FiSearch, FiMenu, FiX } from 'react-icons/fi';
 import { useState } from 'react';
@@ -73,12 +72,7 @@ export default function BlogLayout({
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-black/50 backdrop-blur-lg border-b border-gray-800"
-          >
+          <div className="md:hidden bg-black/50 backdrop-blur-lg border-b border-gray-800">
             <div className="px-4 py-4 space-y-4">
               <div className="relative">
                 <input
@@ -101,7 +95,7 @@ export default function BlogLayout({
                 ))}
               </nav>
             </div>
-          </motion.div>
+          </div>
         )}
       </header>
 

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -114,32 +113,18 @@ function SearchContent() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-4xl font-bold tracking-tight sm:text-5xl"
-          >
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
             Search Results
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="mt-4 text-xl text-gray-400"
-          >
+          </h1>
+          <p className="mt-4 text-xl text-gray-400">
             {searchQuery
               ? `Showing results for "${searchQuery}"`
               : 'Search for articles, guides, and more'}
-          </motion.p>
+          </p>
         </div>
 
         {/* Search */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="mt-12 max-w-2xl mx-auto"
-        >
+        <div className="mt-12 max-w-2xl mx-auto">
           <div className="relative">
             <input
               type="text"
@@ -150,28 +135,20 @@ function SearchContent() {
             />
             <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           </div>
-        </motion.div>
+        </div>
 
         {/* Results Count */}
         {searchQuery && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="mt-8 text-center text-gray-400"
-          >
+          <div className="mt-8 text-center text-gray-400">
             Found {filteredPosts.length} {filteredPosts.length === 1 ? 'result' : 'results'}
-          </motion.div>
+          </div>
         )}
 
         {/* Blog Posts Grid */}
         <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredPosts.map((post, index) => (
-            <motion.article
+            <article
               key={post.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 + index * 0.1 }}
               className="rounded-2xl bg-white/5 backdrop-blur-lg overflow-hidden"
             >
               <Link href={`/blog/${post.id}`}>
@@ -217,36 +194,28 @@ function SearchContent() {
                   </div>
                 </div>
               </Link>
-            </motion.article>
+            </article>
           ))}
         </div>
 
         {/* No Results */}
         {searchQuery && filteredPosts.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mt-12"
-          >
+          <div className="text-center mt-12">
             <h3 className="text-xl font-semibold text-white">No results found</h3>
             <p className="mt-2 text-gray-400">
               Try adjusting your search terms or browse our categories
             </p>
-          </motion.div>
+          </div>
         )}
 
         {/* Empty State */}
         {!searchQuery && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mt-12"
-          >
+          <div className="text-center mt-12">
             <h3 className="text-xl font-semibold text-white">Start your search</h3>
             <p className="mt-2 text-gray-400">
               Enter keywords to find articles, guides, and more
             </p>
-          </motion.div>
+          </div>
         )}
       </div>
     </div>

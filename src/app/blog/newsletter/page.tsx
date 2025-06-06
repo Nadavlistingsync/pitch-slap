@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { FiMail, FiCheck, FiAlertCircle } from 'react-icons/fi';
 
 interface NewsletterOption {
@@ -60,30 +59,17 @@ export default function NewsletterPage() {
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="text-center">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-4xl font-bold tracking-tight sm:text-5xl"
-          >
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
             Subscribe to Our Newsletter
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="mt-4 text-xl text-gray-400"
-          >
+          </h1>
+          <p className="mt-4 text-xl text-gray-400">
             Stay updated with the latest insights, tips, and guides for creating winning pitch decks
-          </motion.p>
+          </p>
         </div>
 
         {/* Success Message */}
         {isSuccess && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-8 p-6 rounded-2xl bg-green-500/10 border border-green-500/20"
-          >
+          <div className="mt-8 p-6 rounded-2xl bg-green-500/10 border border-green-500/20">
             <div className="flex items-center gap-3">
               <FiCheck className="w-6 h-6 text-green-500" />
               <div>
@@ -93,15 +79,12 @@ export default function NewsletterPage() {
                 </p>
               </div>
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* Subscription Form */}
         {!isSuccess && (
-          <motion.form
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
+          <form
             onSubmit={handleSubmit}
             className="mt-12 space-y-8"
           >
@@ -131,11 +114,8 @@ export default function NewsletterPage() {
               </label>
               <div className="space-y-4">
                 {newsletterOptions.map((option) => (
-                  <motion.div
+                  <div
                     key={option.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
                     className={`relative rounded-lg border p-4 cursor-pointer transition-colors ${
                       selectedOption === option.id
                         ? 'bg-pink-500/10 border-pink-500/20'
@@ -173,30 +153,23 @@ export default function NewsletterPage() {
                         </span>
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </div>
 
             {/* Error Message */}
             {error && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="p-4 rounded-lg bg-red-500/10 border border-red-500/20"
-              >
+              <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
                 <div className="flex items-center gap-3">
                   <FiAlertCircle className="w-5 h-5 text-red-500" />
                   <p className="text-red-500">{error}</p>
                 </div>
-              </motion.div>
+              </div>
             )}
 
             {/* Submit Button */}
-            <motion.button
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
+            <button
               type="submit"
               disabled={isSubmitting}
               className="w-full rounded-lg bg-pink-500 px-6 py-3 text-white font-medium hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -209,7 +182,7 @@ export default function NewsletterPage() {
               ) : (
                 'Subscribe to Newsletter'
               )}
-            </motion.button>
+            </button>
 
             {/* Privacy Notice */}
             <p className="text-center text-sm text-gray-500">
@@ -223,7 +196,7 @@ export default function NewsletterPage() {
               </a>
               . You can unsubscribe at any time.
             </p>
-          </motion.form>
+          </form>
         )}
       </div>
     </div>

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FiSearch, FiClock, FiUser, FiTag, FiCalendar } from 'react-icons/fi';
@@ -158,30 +157,16 @@ export default function ArchivePage() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-4xl font-bold tracking-tight sm:text-5xl"
-          >
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
             Blog Archive
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="mt-4 text-xl text-gray-400"
-          >
+          </h1>
+          <p className="mt-4 text-xl text-gray-400">
             Browse all articles by date
-          </motion.p>
+          </p>
         </div>
 
         {/* Search and Filters */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="mt-12 max-w-2xl mx-auto"
-        >
+        <div className="mt-12 max-w-2xl mx-auto">
           <div className="relative mb-6">
             <input
               type="text"
@@ -225,35 +210,26 @@ export default function ArchivePage() {
               </select>
             )}
           </div>
-        </motion.div>
+        </div>
 
         {/* Archive Content */}
         <div className="mt-12">
           {groupedPosts.map((group, groupIndex) => (
-            <motion.div
+            <div
               key={group.year}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 + groupIndex * 0.1 }}
               className="mb-12"
             >
               <h2 className="text-3xl font-bold mb-6">{group.year}</h2>
               {group.months.map((monthGroup, monthIndex) => (
-                <motion.div
+                <div
                   key={monthGroup.month}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 + groupIndex * 0.1 + monthIndex * 0.1 }}
                   className="mb-8"
                 >
                   <h3 className="text-2xl font-semibold mb-4">{monthGroup.month}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {monthGroup.posts.map((post, postIndex) => (
-                      <motion.article
+                      <article
                         key={post.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.5 + groupIndex * 0.1 + monthIndex * 0.1 + postIndex * 0.1 }}
                         className="rounded-2xl bg-white/5 backdrop-blur-lg overflow-hidden"
                       >
                         <Link href={`/blog/${post.id}`}>
@@ -299,27 +275,25 @@ export default function ArchivePage() {
                             </div>
                           </div>
                         </Link>
-                      </motion.article>
+                      </article>
                     ))}
                   </div>
-                </motion.div>
+                </div>
               ))}
-            </motion.div>
+            </div>
           ))}
         </div>
 
         {/* No Results */}
         {filteredPosts.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+          <div
             className="text-center mt-12"
           >
             <h3 className="text-xl font-semibold text-white">No articles found</h3>
             <p className="mt-2 text-gray-400">
               Try adjusting your search or filters
             </p>
-          </motion.div>
+          </div>
         )}
       </div>
     </div>
