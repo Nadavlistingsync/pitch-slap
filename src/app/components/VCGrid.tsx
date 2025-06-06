@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import Image from 'next/image';
 
 interface VC {
@@ -61,12 +60,8 @@ export default function VCGrid() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {vcs.map((vc, index) => (
-          <motion.div
+          <div
             key={vc.name}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: index * 0.1 }}
             className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-colors"
           >
             <div className="flex items-start gap-4">
@@ -94,7 +89,7 @@ export default function VCGrid() {
                 <p className="text-gray-300 text-sm">{vc.description}</p>
               </div>
             </div>
-          </motion.div>
+          </div>
         ))}
       </div>
     </div>
