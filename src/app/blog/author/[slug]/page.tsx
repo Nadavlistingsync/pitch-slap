@@ -45,7 +45,7 @@ const authors: { [key: string]: Author } = {
     name: 'Sarah Chen',
     role: 'Pitch Deck Expert',
     bio: 'Sarah is a seasoned pitch deck expert with over 10 years of experience helping startups raise funding. She has worked with hundreds of founders to create compelling pitch decks that have helped them secure millions in funding.',
-    avatar: '/team/sarah.jpg',
+    avatar: 'https://placehold.co/400x400',
     social: {
       twitter: 'https://twitter.com/sarahchen',
       linkedin: 'https://linkedin.com/in/sarahchen',
@@ -61,7 +61,7 @@ const authors: { [key: string]: Author } = {
     name: 'Michael Rodriguez',
     role: 'Startup Advisor',
     bio: 'Michael is a startup advisor and former VC who has helped numerous startups refine their pitch decks and secure funding. He brings a unique perspective from both the founder and investor sides.',
-    avatar: '/team/michael.jpg',
+    avatar: 'https://placehold.co/400x400',
     social: {
       twitter: 'https://twitter.com/michaelrodriguez',
       linkedin: 'https://linkedin.com/in/michaelrodriguez',
@@ -83,12 +83,12 @@ const posts: BlogPost[] = [
     excerpt: 'Learn about the most common mistakes founders make in their pitch decks and how to avoid them to increase your chances of securing funding.',
     author: {
       name: 'Sarah Chen',
-      avatar: '/team/sarah.jpg',
+      avatar: 'https://placehold.co/400x400',
     },
     date: '2024-03-15',
     readTime: '5 min read',
     category: 'Pitch Deck Tips',
-    image: '/blog/pitch-deck-mistakes.jpg',
+    image: 'https://placehold.co/800x600',
   },
   {
     id: '2',
@@ -96,12 +96,12 @@ const posts: BlogPost[] = [
     excerpt: 'A comprehensive guide that walks you through the process of creating a pitch deck that will impress investors and help you raise your next round.',
     author: {
       name: 'Michael Rodriguez',
-      avatar: '/team/michael.jpg',
+      avatar: 'https://placehold.co/400x400',
     },
     date: '2024-03-10',
     readTime: '8 min read',
     category: 'Guides',
-    image: '/blog/winning-pitch-deck.jpg',
+    image: 'https://placehold.co/800x600',
   },
   {
     id: '3',
@@ -109,12 +109,12 @@ const posts: BlogPost[] = [
     excerpt: 'Master the art of presenting your pitch deck with these proven techniques and tips from successful founders and investors.',
     author: {
       name: 'Sarah Chen',
-      avatar: '/team/sarah.jpg',
+      avatar: 'https://placehold.co/400x400',
     },
     date: '2024-03-05',
     readTime: '6 min read',
     category: 'Presentation Skills',
-    image: '/blog/present-like-pro.jpg',
+    image: 'https://placehold.co/800x600',
   },
   {
     id: '4',
@@ -122,12 +122,12 @@ const posts: BlogPost[] = [
     excerpt: 'Understand how investors think and make decisions, and learn how to tailor your pitch deck to appeal to their psychology.',
     author: {
       name: 'Michael Rodriguez',
-      avatar: '/team/michael.jpg',
+      avatar: 'https://placehold.co/400x400',
     },
     date: '2024-02-28',
     readTime: '7 min read',
     category: 'Investor Insights',
-    image: '/blog/investor-psychology.jpg',
+    image: 'https://placehold.co/800x600',
   },
 ];
 
@@ -188,6 +188,7 @@ export default function AuthorPage({ params }: { params: { slug: string } }) {
               alt={author.name}
               fill
               className="rounded-full object-cover"
+              unoptimized
             />
           </div>
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl mb-4">
