@@ -1,10 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
-import { FiClock, FiUser, FiTag, FiShare2, FiBookmark, FiMessageSquare } from 'react-icons/fi';
+import { FiClock, FiUser, FiTag, FiArrowLeft } from 'react-icons/fi';
 
 interface BlogPost {
   id: string;
@@ -13,104 +11,129 @@ interface BlogPost {
   author: {
     name: string;
     avatar: string;
-    role: string;
   };
   date: string;
   readTime: string;
   category: string;
   image: string;
-  tags: string[];
-  relatedPosts: {
-    id: string;
-    title: string;
-    image: string;
-  }[];
 }
 
-// Simulated blog post data
-const blogPost: BlogPost = {
-  id: '1',
-  title: '10 Common Pitch Deck Mistakes That Turn Off Investors',
-  content: `
-    <p>Creating a compelling pitch deck is crucial for securing investment, but many founders make common mistakes that can turn off potential investors. In this article, we'll explore the top 10 mistakes to avoid and how to fix them.</p>
+// Static blog posts data
+const posts: { [key: string]: BlogPost } = {
+  '1': {
+    id: '1',
+    title: '10 Common Pitch Deck Mistakes That Turn Off Investors',
+    content: `
+      Creating a compelling pitch deck is crucial for securing funding, but many founders make common mistakes that can turn off potential investors. Here are 10 mistakes to avoid:
 
-    <h2>1. Too Much Text</h2>
-    <p>One of the most common mistakes is overcrowding slides with text. Investors want to see clear, concise information that they can quickly understand. Instead of paragraphs of text, use bullet points, charts, and visuals to convey your message.</p>
+      1. Too Much Text
+      Investors want to quickly understand your business. Avoid walls of text and use visuals to convey your message.
 
-    <h2>2. Unclear Value Proposition</h2>
-    <p>Your value proposition should be crystal clear within the first few slides. If investors can't quickly understand what problem you're solving and why your solution is unique, they'll lose interest.</p>
+      2. Unclear Value Proposition
+      Your value proposition should be crystal clear within the first few slides. Investors need to understand what problem you're solving and why your solution is unique.
 
-    <h2>3. Weak Market Analysis</h2>
-    <p>Many founders fail to properly research and present their market opportunity. Include specific data about market size, growth potential, and your target audience to show you understand your market.</p>
+      3. Missing Market Size
+      Always include your total addressable market (TAM) and explain how you'll capture a portion of it.
 
-    <h2>4. Unrealistic Financial Projections</h2>
-    <p>Overly optimistic financial projections can damage your credibility. Be realistic and back up your numbers with solid assumptions and market research.</p>
+      4. Unrealistic Financial Projections
+      Be conservative with your financial projections and be ready to explain your assumptions.
 
-    <h2>5. Missing Competitive Analysis</h2>
-    <p>Investors want to know how you stack up against competitors. Include a clear competitive analysis that shows your unique advantages and market positioning.</p>
+      5. Weak Competitive Analysis
+      Show that you understand your competition and explain your competitive advantages.
 
-    <h2>6. Poor Design and Branding</h2>
-    <p>Your pitch deck should reflect your brand's professionalism. Use consistent branding, high-quality visuals, and a clean design that's easy to read.</p>
+      6. No Clear Use of Funds
+      Specify how you'll use the investment and what milestones you'll achieve.
 
-    <h2>7. Lack of Clear Ask</h2>
-    <p>Be specific about how much funding you're seeking and how you'll use it. Investors need to know exactly what you're asking for and why.</p>
+      7. Poor Design
+      A professional-looking pitch deck shows that you take your business seriously.
 
-    <h2>8. Ignoring the Team Slide</h2>
-    <p>Your team is crucial to your success. Highlight key team members' relevant experience and achievements to build credibility.</p>
+      8. Too Many Slides
+      Keep your pitch deck concise, ideally under 15 slides.
 
-    <h2>9. Too Many Slides</h2>
-    <p>Keep your pitch deck concise and focused. Aim for 10-15 slides that cover the essential information without overwhelming investors.</p>
+      9. Missing Team Slide
+      Investors invest in people as much as ideas. Highlight your team's relevant experience.
 
-    <h2>10. No Clear Call to Action</h2>
-    <p>End your pitch with a clear next step. Whether it's scheduling a follow-up meeting or providing additional materials, make it easy for investors to take action.</p>
+      10. No Clear Call to Action
+      End with a clear next step for investors.
 
-    <p>By avoiding these common mistakes, you'll create a more compelling pitch deck that better engages potential investors and increases your chances of securing funding.</p>
-  `,
-  author: {
-    name: 'Sarah Chen',
-    avatar: '/team/sarah.jpg',
-    role: 'Pitch Deck Expert',
+      Remember, your pitch deck is often the first impression investors have of your company. Make it count!
+    `,
+    author: {
+      name: 'Sarah Chen',
+      avatar: 'https://placehold.co/400x400',
+    },
+    date: '2024-03-15',
+    readTime: '5 min read',
+    category: 'Pitch Deck Tips',
+    image: 'https://placehold.co/800x600',
   },
-  date: '2024-03-15',
-  readTime: '5 min read',
-  category: 'Pitch Deck Tips',
-  image: '/blog/pitch-deck-mistakes.jpg',
-  tags: ['Pitch Deck', 'Investor Relations', 'Startup Funding', 'Presentation Skills'],
-  relatedPosts: [
-    {
-      id: '2',
-      title: 'The Ultimate Guide to Creating a Winning Pitch Deck',
-      image: '/blog/winning-pitch-deck.jpg',
+  '2': {
+    id: '2',
+    title: 'The Ultimate Guide to Creating a Winning Pitch Deck',
+    content: `
+      A winning pitch deck is more than just a presentation—it's a story that captures your vision and convinces investors to join your journey. Here's how to create one:
+
+      1. Start with a Hook
+      Your first slide should grab attention and make investors want to learn more.
+
+      2. Tell a Story
+      Structure your pitch deck as a narrative that flows logically from problem to solution.
+
+      3. Focus on the Problem
+      Clearly articulate the problem you're solving and why it matters.
+
+      4. Present Your Solution
+      Show how your product or service solves the problem in a unique way.
+
+      5. Demonstrate Market Opportunity
+      Use data to show the size of your market and your potential for growth.
+
+      6. Show Your Business Model
+      Explain how you'll make money and achieve profitability.
+
+      7. Highlight Your Team
+      Showcase your team's expertise and why they're the right people to execute.
+
+      8. Include Traction
+      Share your key metrics and achievements to date.
+
+      9. Be Clear About Funding
+      State how much you're raising and how you'll use the funds.
+
+      10. End with a Strong Call to Action
+      Make it easy for investors to take the next step.
+
+      Remember, a great pitch deck is just the beginning. Be prepared to answer questions and provide more detail during your pitch.
+    `,
+    author: {
+      name: 'Michael Rodriguez',
+      avatar: 'https://placehold.co/400x400',
     },
-    {
-      id: '3',
-      title: 'How to Present Your Pitch Deck Like a Pro',
-      image: '/blog/present-like-pro.jpg',
-    },
-    {
-      id: '4',
-      title: 'The Psychology of Investor Decision Making',
-      image: '/blog/investor-psychology.jpg',
-    },
-  ],
+    date: '2024-03-10',
+    readTime: '8 min read',
+    category: 'Guides',
+    image: 'https://placehold.co/800x600',
+  },
 };
 
 export default function BlogPostPage({ params }: { params: { id: string } }) {
-  const [isLoading, setIsLoading] = useState(true);
+  const post = posts[params.id];
 
-  useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (isLoading) {
+  if (!post) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500"></div>
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-white">Post not found</h1>
+          <p className="mt-2 text-gray-400">
+            The blog post you're looking for doesn't exist or has been removed.
+          </p>
+          <Link
+            href="/blog"
+            className="mt-4 inline-block px-6 py-2 rounded-lg bg-pink-500 text-white hover:bg-pink-600 transition-colors"
+          >
+            Back to Blog
+          </Link>
+        </div>
       </div>
     );
   }
@@ -118,139 +141,60 @@ export default function BlogPostPage({ params }: { params: { id: string } }) {
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
+        <Link
+          href="/blog"
+          className="inline-flex items-center text-pink-500 hover:text-pink-400 mb-8"
         >
-          <div className="flex items-center justify-center gap-2 text-sm text-gray-400 mb-4">
-            <FiTag className="w-4 h-4" />
-            <span>{blogPost.category}</span>
+          <FiArrowLeft className="mr-2" />
+          Back to Blog
+        </Link>
+
+        <article>
+          <div className="relative h-96 mb-8 rounded-2xl overflow-hidden">
+            <Image
+              src={post.image}
+              alt={post.title}
+              fill
+              className="object-cover"
+              unoptimized
+            />
           </div>
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl mb-6">
-            {blogPost.title}
-          </h1>
-          <div className="flex items-center justify-center gap-6 text-sm text-gray-400">
-            <div className="flex items-center gap-2">
-              <div className="relative w-8 h-8 rounded-full overflow-hidden">
-                <Image
-                  src={blogPost.author.avatar}
-                  alt={blogPost.author.name}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div>
-                <div className="text-white">{blogPost.author.name}</div>
-                <div>{blogPost.author.role}</div>
-              </div>
+
+          <div className="flex items-center gap-4 mb-8">
+            <div className="relative w-12 h-12">
+              <Image
+                src={post.author.avatar}
+                alt={post.author.name}
+                fill
+                className="rounded-full object-cover"
+                unoptimized
+              />
             </div>
-            <div className="flex items-center gap-1">
-              <FiClock className="w-4 h-4" />
-              <span>{blogPost.readTime}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <FiUser className="w-4 h-4" />
-              <span>{new Date(blogPost.date).toLocaleDateString()}</span>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Featured Image */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="relative h-[400px] rounded-2xl overflow-hidden mb-12"
-        >
-          <Image
-            src={blogPost.image}
-            alt={blogPost.title}
-            fill
-            className="object-cover"
-          />
-        </motion.div>
-
-        {/* Content */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="prose prose-invert prose-lg max-w-none"
-          dangerouslySetInnerHTML={{ __html: blogPost.content }}
-        />
-
-        {/* Tags */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="mt-12 flex flex-wrap gap-2"
-        >
-          {blogPost.tags.map((tag) => (
-            <span
-              key={tag}
-              className="px-4 py-2 rounded-full bg-white/5 text-sm text-gray-300"
-            >
-              #{tag}
-            </span>
-          ))}
-        </motion.div>
-
-        {/* Share and Bookmark */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="mt-12 flex items-center justify-between border-t border-gray-800 pt-8"
-        >
-          <div className="flex items-center gap-4">
-            <button className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
-              <FiShare2 className="w-5 h-5" />
-              <span>Share</span>
-            </button>
-            <button className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
-              <FiBookmark className="w-5 h-5" />
-              <span>Bookmark</span>
-            </button>
-          </div>
-          <button className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
-            <FiMessageSquare className="w-5 h-5" />
-            <span>Comment</span>
-          </button>
-        </motion.div>
-
-        {/* Related Posts */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="mt-24"
-        >
-          <h2 className="text-2xl font-bold mb-8">Related Posts</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {blogPost.relatedPosts.map((post) => (
-              <Link
-                key={post.id}
-                href={`/blog/${post.id}`}
-                className="group"
-              >
-                <div className="relative h-48 rounded-lg overflow-hidden mb-4">
-                  <Image
-                    src={post.image}
-                    alt={post.title}
-                    fill
-                    className="object-cover transition-transform group-hover:scale-105"
-                  />
+            <div>
+              <p className="font-medium">{post.author.name}</p>
+              <div className="flex items-center gap-4 text-sm text-gray-400">
+                <div className="flex items-center gap-1">
+                  <FiClock className="w-4 h-4" />
+                  <span>{post.readTime}</span>
                 </div>
-                <h3 className="text-lg font-semibold group-hover:text-pink-500 transition-colors">
-                  {post.title}
-                </h3>
-              </Link>
+                <div className="flex items-center gap-1">
+                  <FiTag className="w-4 h-4" />
+                  <span>{post.category}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h1 className="text-4xl font-bold mb-8">{post.title}</h1>
+
+          <div className="prose prose-invert max-w-none">
+            {post.content.split('\n').map((paragraph, index) => (
+              <p key={index} className="mb-4">
+                {paragraph.trim()}
+              </p>
             ))}
           </div>
-        </motion.div>
+        </article>
       </div>
     </div>
   );
