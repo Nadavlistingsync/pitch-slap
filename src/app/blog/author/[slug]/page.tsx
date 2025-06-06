@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FiClock, FiUser, FiTag, FiTwitter, FiLinkedin, FiGithub } from 'react-icons/fi';
@@ -177,11 +176,7 @@ export default function AuthorPage({ params }: { params: { slug: string } }) {
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Author Profile */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-16"
-        >
+        <div className="text-center mb-16">
           <div className="relative w-32 h-32 mx-auto mb-6">
             <Image
               src={author.avatar}
@@ -246,18 +241,15 @@ export default function AuthorPage({ params }: { params: { slug: string } }) {
               <div className="text-sm text-gray-400">Following</div>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Author's Posts */}
         <div>
           <h2 className="text-2xl font-bold mb-8">Articles by {author.name}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {authorPosts.map((post, index) => (
-              <motion.article
+              <div
                 key={post.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 + index * 0.1 }}
                 className="rounded-2xl bg-white/5 backdrop-blur-lg overflow-hidden"
               >
                 <Link href={`/blog/${post.id}`}>
@@ -303,7 +295,7 @@ export default function AuthorPage({ params }: { params: { slug: string } }) {
                     </div>
                   </div>
                 </Link>
-              </motion.article>
+              </div>
             ))}
           </div>
         </div>
