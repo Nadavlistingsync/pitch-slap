@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { FiUsers, FiAward, FiTrendingUp, FiHeart } from 'react-icons/fi';
 
@@ -60,31 +59,17 @@ export default function AboutPage() {
       <div className="max-w-7xl mx-auto">
         {/* Hero Section */}
         <div className="text-center">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-4xl font-bold tracking-tight sm:text-5xl"
-          >
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
             Our Mission
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="mt-4 text-xl text-gray-400 max-w-3xl mx-auto"
-          >
+          </h1>
+          <p className="mt-4 text-xl text-gray-400 max-w-3xl mx-auto">
             We're on a mission to help startups create better pitch decks and secure funding faster.
             Our platform connects founders with experienced VCs who provide honest, actionable feedback.
-          </motion.p>
+          </p>
         </div>
 
         {/* Stats Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="mt-16 grid grid-cols-2 gap-8 sm:grid-cols-4"
-        >
+        <div className="mt-16 grid grid-cols-2 gap-8 sm:grid-cols-4">
           {stats.map((stat) => (
             <div
               key={stat.label}
@@ -95,15 +80,10 @@ export default function AboutPage() {
               <p className="mt-1 text-sm text-gray-400">{stat.label}</p>
             </div>
           ))}
-        </motion.div>
+        </div>
 
         {/* Story Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="mt-24"
-        >
+        <div className="mt-24">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl font-bold">Our Story</h2>
@@ -132,15 +112,10 @@ export default function AboutPage() {
               />
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Team Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="mt-24"
-        >
+        <div className="mt-24">
           <h2 className="text-3xl font-bold text-center">Meet Our Team</h2>
           <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {team.map((member) => (
@@ -163,15 +138,10 @@ export default function AboutPage() {
               </div>
             ))}
           </div>
-        </motion.div>
+        </div>
 
         {/* Values Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="mt-24"
-        >
+        <div className="mt-24">
           <h2 className="text-3xl font-bold text-center">Our Values</h2>
           <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="rounded-lg bg-white/5 backdrop-blur-lg p-6">
@@ -196,7 +166,7 @@ export default function AboutPage() {
               </p>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );
