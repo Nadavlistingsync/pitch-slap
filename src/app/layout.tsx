@@ -6,7 +6,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { ToastProvider } from './components/ToastContext';
 import { UIProvider } from '../lib/UIContext';
-import ErrorBoundary from '../components/ErrorBoundary';
+import ErrorBoundary from './components/ErrorBoundary';
 import { Providers } from './providers';
 
 const inter = Inter({

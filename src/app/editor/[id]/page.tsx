@@ -5,20 +5,49 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '../../providers'
 import { PlusIcon, TrashIcon, ArrowUpIcon, ArrowDownIcon } from '@heroicons/react/24/outline'
 
-interface Slide {
-  id: string
-  type: 'title' | 'text' | 'image' | 'chart'
-  content: {
-    title?: string
-    subtitle?: string
-    [key: string]: unknown
-  }
+interface BaseSlide {
+  id: string;
+  type: 'title' | 'text' | 'image' | 'chart';
 }
 
+interface TitleSlide extends BaseSlide {
+  type: 'title';
+  content: {
+    title: string;
+    subtitle: string;
+  };
+}
+
+interface TextSlide extends BaseSlide {
+  type: 'text';
+  content: {
+    text: string;
+  };
+}
+
+interface ImageSlide extends BaseSlide {
+  type: 'image';
+  content: {
+    imageUrl: string;
+    caption?: string;
+  };
+}
+
+interface ChartSlide extends BaseSlide {
+  type: 'chart';
+  content: {
+    chartType: 'bar' | 'line' | 'pie';
+    data: Record<string, number>;
+    title?: string;
+  };
+}
+
+type Slide = TitleSlide | TextSlide | ImageSlide | ChartSlide;
+
 interface PitchDeck {
-  id: string
-  title: string
-  slides: Slide[]
+  id: string;
+  title: string;
+  slides: Slide[];
 }
 
 export default function Editor({ params }: { params: { id: string } }) {
@@ -72,23 +101,58 @@ export default function Editor({ params }: { params: { id: string } }) {
   }, [params.id])
 
   const handleAddSlide = (type: Slide['type']) => {
-    if (!pitchDeck) return
+    if (!pitchDeck) return;
 
-    const newSlide: Slide = {
-      id: Date.now().toString(),
-      type,
-      content: {
-        title: 'New Slide',
-        subtitle: 'Add your content here',
-      },
+    let newSlide: Slide;
+    switch (type) {
+      case 'title':
+        newSlide = {
+          id: Date.now().toString(),
+          type: 'title',
+          content: {
+            title: 'New Slide',
+            subtitle: 'Add your subtitle here',
+          },
+        };
+        break;
+      case 'text':
+        newSlide = {
+          id: Date.now().toString(),
+          type: 'text',
+          content: {
+            text: 'Add your text here',
+          },
+        };
+        break;
+      case 'image':
+        newSlide = {
+          id: Date.now().toString(),
+          type: 'image',
+          content: {
+            imageUrl: '',
+            caption: 'Add your caption here',
+          },
+        };
+        break;
+      case 'chart':
+        newSlide = {
+          id: Date.now().toString(),
+          type: 'chart',
+          content: {
+            chartType: 'bar',
+            data: {},
+            title: 'New Chart',
+          },
+        };
+        break;
     }
 
     setPitchDeck({
       ...pitchDeck,
       slides: [...pitchDeck.slides, newSlide],
-    })
-    setSelectedSlide(newSlide.id)
-  }
+    });
+    setSelectedSlide(newSlide.id);
+  };
 
   const handleDeleteSlide = (slideId: string) => {
     if (!pitchDeck) return
@@ -122,16 +186,64 @@ export default function Editor({ params }: { params: { id: string } }) {
     })
   }
 
-  const handleUpdateSlide = (slideId: string, content: Record<string, unknown>) => {
-    if (!pitchDeck) return
+  const handleUpdateSlide = (slideId: string, content: Partial<TitleSlide['content']> | Partial<TextSlide['content']> | Partial<ImageSlide['content']> | Partial<ChartSlide['content']>) => {
+    if (!pitchDeck) return;
 
     setPitchDeck({
       ...pitchDeck,
-      slides: pitchDeck.slides.map(slide =>
-        slide.id === slideId ? { ...slide, content } : slide
-      ),
-    })
-  }
+      slides: pitchDeck.slides.map(slide => {
+        if (slide.id !== slideId) return slide;
+        switch (slide.type) {
+          case 'title': {
+            const prev = slide.content as TitleSlide['content'];
+            const c = content as Partial<TitleSlide['content']>;
+            return {
+              ...slide,
+              content: {
+                title: c.title ?? prev.title,
+                subtitle: c.subtitle ?? prev.subtitle,
+              },
+            };
+          }
+          case 'text': {
+            const prev = slide.content as TextSlide['content'];
+            const c = content as Partial<TextSlide['content']>;
+            return {
+              ...slide,
+              content: {
+                text: c.text ?? prev.text,
+              },
+            };
+          }
+          case 'image': {
+            const prev = slide.content as ImageSlide['content'];
+            const c = content as Partial<ImageSlide['content']>;
+            return {
+              ...slide,
+              content: {
+                imageUrl: c.imageUrl ?? prev.imageUrl,
+                caption: c.caption ?? prev.caption,
+              },
+            };
+          }
+          case 'chart': {
+            const prev = slide.content as ChartSlide['content'];
+            const c = content as Partial<ChartSlide['content']>;
+            return {
+              ...slide,
+              content: {
+                chartType: c.chartType ?? prev.chartType,
+                data: c.data ?? prev.data,
+                title: c.title ?? prev.title,
+              },
+            };
+          }
+          default:
+            return slide;
+        }
+      }),
+    });
+  };
 
   if (loading || isLoading) {
     return (
@@ -244,9 +356,8 @@ export default function Editor({ params }: { params: { id: string } }) {
                 <div className="space-y-4">
                   <input
                     type="text"
-                    value={pitchDeck.slides.find(slide => slide.id === selectedSlide)?.content.title || ''}
+                    value={(pitchDeck.slides.find(slide => slide.id === selectedSlide)?.content as TitleSlide['content']).title || ''}
                     onChange={(e) => handleUpdateSlide(selectedSlide, {
-                      ...pitchDeck.slides.find(slide => slide.id === selectedSlide)?.content,
                       title: e.target.value,
                     })}
                     className="w-full text-4xl font-bold px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -254,9 +365,8 @@ export default function Editor({ params }: { params: { id: string } }) {
                   />
                   <input
                     type="text"
-                    value={pitchDeck.slides.find(slide => slide.id === selectedSlide)?.content.subtitle || ''}
+                    value={(pitchDeck.slides.find(slide => slide.id === selectedSlide)?.content as TitleSlide['content']).subtitle || ''}
                     onChange={(e) => handleUpdateSlide(selectedSlide, {
-                      ...pitchDeck.slides.find(slide => slide.id === selectedSlide)?.content,
                       subtitle: e.target.value,
                     })}
                     className="w-full text-xl px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"

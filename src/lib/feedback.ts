@@ -1,5 +1,19 @@
+interface FeedbackContent {
+  feedbackId: string;
+  vcName: string;
+  timestamp: string;
+  content: string;
+  score: number;
+  categories: {
+    [key: string]: {
+      score: number;
+      feedback: string;
+    };
+  };
+}
+
 // Store feedback in localStorage for persistence
-export function storeFeedback(id: string, feedback: unknown) {
+export function storeFeedback(id: string, feedback: FeedbackContent) {
   try {
     // Get existing feedback
     const existingFeedback = localStorage.getItem('feedbackStore');
@@ -20,21 +34,21 @@ export function storeFeedback(id: string, feedback: unknown) {
   }
 }
 
-export async function getFeedback(id: string): Promise<unknown> {
+export async function getFeedback(id: string): Promise<FeedbackContent | null> {
   try {
     // Try to get from localStorage first
     const existingFeedback = localStorage.getItem('feedbackStore');
     if (existingFeedback) {
       const feedbackStore = JSON.parse(existingFeedback);
       if (feedbackStore[id]) {
-        return feedbackStore[id];
+        return feedbackStore[id] as FeedbackContent;
       }
     }
     
     // Fallback to sessionStorage
     const currentFeedback = sessionStorage.getItem('currentFeedback');
     if (currentFeedback) {
-      const feedback = JSON.parse(currentFeedback);
+      const feedback = JSON.parse(currentFeedback) as FeedbackContent;
       if (feedback.feedbackId === id) {
         return feedback;
       }
