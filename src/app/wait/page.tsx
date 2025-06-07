@@ -1,7 +1,4 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { FaSpinner } from 'react-icons/fa';
 
 export default function WaitPage() {
   return (

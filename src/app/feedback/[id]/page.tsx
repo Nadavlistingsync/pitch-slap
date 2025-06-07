@@ -1,24 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { FaLinkedin, FaTwitter } from 'react-icons/fa';
-import { FiStar, FiTrash2, FiArchive, FiMail, FiCheck, FiClock, FiArrowLeft } from 'react-icons/fi';
-
-const buckets = [
-  { key: 'hook', label: 'Hook / Traction' },
-  { key: 'pain', label: 'Pain Clarity' },
-  { key: 'numbers', label: 'Numbers / Proof Points' },
-  { key: 'solution', label: 'Solution Clarity' },
-  { key: 'visual', label: 'Product Tease / Visual Excitement' },
-  { key: 'ease', label: 'Ease of Use' },
-  { key: 'demo', label: 'Demo / Visual Clarity' },
-  { key: 'team', label: 'Team Credibility' },
-  { key: 'story', label: 'Personal Story / Founder Narrative' },
-  { key: 'icp', label: 'ICP Clarity' },
-  { key: 'whynow', label: 'Why Now' },
-  { key: 'competition', label: 'Competitive Landscape' },
-  { key: 'bizmodel', label: 'Business Model' },
-];
+import { FiStar, FiTrash2, FiArchive, FiCheck, FiArrowLeft } from 'react-icons/fi';
+import Image from 'next/image';
 
 interface FeedbackDetail {
   id: string;
@@ -99,7 +83,7 @@ export default function FeedbackDetailPage({ params }: { params: { id: string } 
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-4">Feedback not found</h2>
-          <p className="text-gray-400">The feedback you're looking for doesn't exist.</p>
+          <p className="text-gray-600">It&apos;s not you, it&apos;s us. We couldn&apos;t find the feedback you&apos;re looking for.</p>
         </div>
       </div>
     );
@@ -107,18 +91,6 @@ export default function FeedbackDetailPage({ params }: { params: { id: string } 
 
   // Determine the email body (feedback)
   const emailBody = feedback.content;
-
-  const handleShareLinkedIn = () => {
-    const text = `🔥 Check out this absolutely SAVAGE pitch deck feedback from ${feedback.vcName} on PitchDeck Roaster! No holds barred, just pure unfiltered truth:`;
-    const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}&summary=${encodeURIComponent(text)}`;
-    window.open(linkedInUrl, '_blank');
-  };
-
-  const handleShareTwitter = () => {
-    const text = `🔥 This pitch deck just got absolutely MURDERED by ${feedback.vcName} on @PitchDeckRoaster! No mercy, just brutal honesty. Check it out:`;
-    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.href)}`;
-    window.open(twitterUrl, '_blank');
-  };
 
   return (
     <main className="min-h-screen bg-white">
@@ -155,10 +127,12 @@ export default function FeedbackDetailPage({ params }: { params: { id: string } 
           <div className="bg-white rounded-lg shadow-lg p-8">
             {/* Feedback Header */}
             <div className="flex items-start gap-4 mb-8">
-              <img 
+              <Image 
                 src={feedback.vcAvatar} 
                 alt={feedback.vcName}
                 className="w-12 h-12 rounded-full"
+                width={48}
+                height={48}
               />
               <div className="flex-1">
                 <div className="flex items-center justify-between">
@@ -189,7 +163,7 @@ export default function FeedbackDetailPage({ params }: { params: { id: string } 
 
               {/* Sections */}
               <div className="space-y-8">
-                {feedback.sections.map((section, index) => (
+                {feedback.sections.map((section) => (
                   <div
                     key={section.title}
                     className="bg-gray-50 rounded-lg p-6"

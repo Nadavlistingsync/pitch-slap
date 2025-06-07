@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 const vcs = [
   {
@@ -169,9 +170,11 @@ export default function RoastPage({ params }: { params: { id: string } }) {
         <div className="bg-gray-800 rounded-lg p-8 mb-8">
           <div className="flex items-center gap-6 mb-6">
             <div className="w-24 h-24 bg-gray-700 rounded-lg overflow-hidden">
-              <img
+              <Image
                 src={selectedVC.image}
                 alt={selectedVC.name}
+                width={96}
+                height={96}
                 className="w-full h-full object-cover"
               />
             </div>

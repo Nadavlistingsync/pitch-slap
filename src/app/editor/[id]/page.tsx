@@ -8,7 +8,11 @@ import { PlusIcon, TrashIcon, ArrowUpIcon, ArrowDownIcon } from '@heroicons/reac
 interface Slide {
   id: string
   type: 'title' | 'text' | 'image' | 'chart'
-  content: any
+  content: {
+    title?: string
+    subtitle?: string
+    [key: string]: unknown
+  }
 }
 
 interface PitchDeck {
@@ -118,7 +122,7 @@ export default function Editor({ params }: { params: { id: string } }) {
     })
   }
 
-  const handleUpdateSlide = (slideId: string, content: any) => {
+  const handleUpdateSlide = (slideId: string, content: Record<string, unknown>) => {
     if (!pitchDeck) return
 
     setPitchDeck({
@@ -240,7 +244,7 @@ export default function Editor({ params }: { params: { id: string } }) {
                 <div className="space-y-4">
                   <input
                     type="text"
-                    value={pitchDeck.slides.find(slide => slide.id === selectedSlide)?.content.title}
+                    value={pitchDeck.slides.find(slide => slide.id === selectedSlide)?.content.title || ''}
                     onChange={(e) => handleUpdateSlide(selectedSlide, {
                       ...pitchDeck.slides.find(slide => slide.id === selectedSlide)?.content,
                       title: e.target.value,
@@ -250,7 +254,7 @@ export default function Editor({ params }: { params: { id: string } }) {
                   />
                   <input
                     type="text"
-                    value={pitchDeck.slides.find(slide => slide.id === selectedSlide)?.content.subtitle}
+                    value={pitchDeck.slides.find(slide => slide.id === selectedSlide)?.content.subtitle || ''}
                     onChange={(e) => handleUpdateSlide(selectedSlide, {
                       ...pitchDeck.slides.find(slide => slide.id === selectedSlide)?.content,
                       subtitle: e.target.value,

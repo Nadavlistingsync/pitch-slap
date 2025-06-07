@@ -49,7 +49,7 @@ export default function TrustBar() {
     <div className="w-full">
       {/* Trust Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
-        {trustItems.map((item, index) => (
+        {trustItems.map((item) => (
           <div
             key={item.title}
             className="text-center"
@@ -67,7 +67,7 @@ export default function TrustBar() {
           Featured In
         </h3>
         <div className="flex flex-wrap justify-center items-center gap-8">
-          {logos.map((logo, index) => (
+          {logos.map((logo) => (
             <div
               key={logo.name}
               className="relative h-10 w-32 grayscale hover:grayscale-0 transition-all"

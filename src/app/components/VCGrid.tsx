@@ -59,7 +59,7 @@ export default function VCGrid() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {vcs.map((vc, index) => (
+        {vcs.map((vc) => (
           <div
             key={vc.name}
             className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-colors"

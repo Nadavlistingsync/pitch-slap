@@ -9,8 +9,8 @@ export default function ContactPage() {
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
             Get in Touch
           </h1>
-          <p className="mt-4 text-xl text-gray-400">
-            Have questions? We'd love to hear from you.
+          <p className="text-gray-600 mb-8">
+            We&apos;d love to hear from you. Send us a message and we&apos;ll get back to you as soon as possible.
           </p>
         </div>
 
@@ -141,7 +141,7 @@ export default function ContactPage() {
                 <div>
                   <h3 className="text-lg font-medium">Can I schedule a demo?</h3>
                   <p className="text-gray-400">
-                    Absolutely! We'd be happy to show you how our platform works. Just let us know
+                    Absolutely! We&apos;d be happy to show you how our platform works. Just let us know
                     your preferred time.
                   </p>
                 </div>

@@ -1,6 +1,7 @@
 import React, { useCallback, useState, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { FiUpload, FiX, FiCheck, FiAlertCircle } from 'react-icons/fi';
+import Image from 'next/image';
 
 interface FileUploadProps {
   onFileSelect: (file: File) => void;
@@ -122,9 +123,11 @@ const FileUpload: React.FC<FileUploadProps> = ({
             >
               <div className="flex items-center space-x-3">
                 {file.preview ? (
-                  <img
+                  <Image
                     src={file.preview}
                     alt={file.file.name}
+                    width={128}
+                    height={128}
                     className="w-12 h-12 object-cover rounded"
                   />
                 ) : (

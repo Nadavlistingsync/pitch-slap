@@ -23,8 +23,8 @@ export default function Login() {
     try {
       await signIn(formData.email, formData.password)
       router.push('/dashboard')
-    } catch (err) {
-      setError('Invalid email or password')
+    } catch {
+      setError('Login failed. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -92,11 +92,13 @@ export default function Login() {
         </form>
 
         <p className="mt-10 text-center text-sm text-gray-500">
-          Don't have an account?{' '}
+          Don&apos;t have an account?{' '}
           <Link href="/signup" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
             Sign up
           </Link>
         </p>
+
+        <p className="text-red-500 text-sm mt-2">We couldn&apos;t find your account.</p>
       </div>
     </div>
   )

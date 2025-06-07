@@ -95,7 +95,7 @@ export default function PricingPage() {
               </div>
               <div className="pt-6 pb-8 px-6">
                 <h3 className="text-xs font-medium text-gray-300 tracking-wide uppercase">
-                  What's included
+                  What&apos;s included
                 </h3>
                 <ul className="mt-6 space-y-4">
                   {tier.features.map((feature) => (
@@ -121,6 +121,8 @@ export default function PricingPage() {
             </div>
           ))}
         </div>
+
+        <p className="text-gray-600">You won&apos;t be charged until you confirm your plan.</p>
       </div>
     </div>
   );

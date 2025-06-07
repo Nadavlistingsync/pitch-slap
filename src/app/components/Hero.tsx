@@ -1,5 +1,4 @@
 import { FC } from 'react';
-import UploadCard from './UploadCard';
 import TrustBar from './TrustBar';
 import { useRouter } from 'next/navigation';
 

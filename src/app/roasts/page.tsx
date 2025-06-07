@@ -1,25 +1,5 @@
 import React from 'react';
-import { RoastLevel } from '@/components/RoastLevelSelector';
-
-interface VC {
-  id: string;
-  name: string;
-  firm: string;
-  image: string;
-  specialties: string[];
-  description: string;
-}
-
-interface Roast {
-  id: string;
-  title: string;
-  content: string;
-  roastLevel: RoastLevel;
-  vc: VC;
-  createdAt: string;
-  likes: number;
-  comments: number;
-}
+import Image from 'next/image';
 
 export default function RoastsPage() {
   return (
@@ -37,10 +17,12 @@ export default function RoastsPage() {
           <div className="card hover-glow">
             <div className="flex items-center gap-4 mb-4">
               <div className="relative w-12 h-12 rounded-full overflow-hidden">
-                <img
+                <Image
                   src="/placeholder-vc.jpg"
                   alt="VC Name"
                   className="object-cover"
+                  width={48}
+                  height={48}
                 />
               </div>
               <div>

@@ -146,7 +146,7 @@ function SearchContent() {
 
         {/* Blog Posts Grid */}
         <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredPosts.map((post, index) => (
+          {filteredPosts.map((post) => (
             <article
               key={post.id}
               className="rounded-2xl bg-white/5 backdrop-blur-lg overflow-hidden"

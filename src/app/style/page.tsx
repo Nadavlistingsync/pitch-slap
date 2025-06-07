@@ -37,7 +37,6 @@ const styleOptions = [
 export default function StylePage() {
   const router = useRouter();
   const [selectedStyle, setSelectedStyle] = useState<string | null>(null);
-  const [hoveredStyle, setHoveredStyle] = useState<string | null>(null);
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12">
@@ -46,20 +45,18 @@ export default function StylePage() {
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-[#2e2e2e] mb-4">Choose Your Style</h1>
             <p className="text-xl text-gray-600">
-              Select a design style that matches your brand's personality
+              Select a design style that matches your brand&apos;s personality
             </p>
           </div>
 
           {/* Style Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-            {styleOptions.map((style, index) => (
+            {styleOptions.map((style) => (
               <div
                 key={style.id}
               >
                 <button
                   onClick={() => setSelectedStyle(style.id)}
-                  onMouseEnter={() => setHoveredStyle(style.id)}
-                  onMouseLeave={() => setHoveredStyle(null)}
                   className={`w-full p-6 rounded-2xl border-2 transition-all duration-200 ${
                     selectedStyle === style.id
                       ? 'border-[#ff4154] bg-[#ff4154]/5 shadow-lg'
@@ -80,7 +77,7 @@ export default function StylePage() {
                         {style.description}
                       </p>
                       <div className="flex gap-2">
-                        {style.colors.map((color, colorIndex) => (
+                        {style.colors.map((color) => (
                           <div
                             key={color}
                             className="w-6 h-6 rounded-full"

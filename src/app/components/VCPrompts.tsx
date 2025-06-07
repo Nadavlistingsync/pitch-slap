@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { Search, MapPin, Building2, Award, Users, MessageSquare } from 'lucide-react';
-import { realVCPersonalities } from '../../types/realVCPersonalities';
 import { useRouter } from 'next/navigation';
 
 interface VC {
@@ -170,24 +169,6 @@ const vcs: VC[] = [
       "Managing Partner Andrea Hippeau on 20VC",
       "Lerer Hippeau YouTube channel"
     ]
-  }
-];
-
-const vcData = [
-  {
-    name: 'VC Name 1',
-    comment: "This is a brutally good idea. Nobody else is doing it this raw. I'm in.",
-    logo: 'https://via.placeholder.com/80x40?text=Logo+1'
-  },
-  {
-    name: 'VC Name 2',
-    comment: 'Finally, someone who tells it like it is. This is exactly what founders need.',
-    logo: 'https://via.placeholder.com/80x40?text=Logo+2'
-  },
-  {
-    name: 'VC Name 3',
-    comment: 'The feedback is harsh but fair. It\'s what makes this platform unique.',
-    logo: 'https://via.placeholder.com/80x40?text=Logo+3'
   }
 ];
 

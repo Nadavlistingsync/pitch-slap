@@ -41,7 +41,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
     try {
       // TODO: Implement sign in
       setLoading(true)
-      // Mock user for now
+      // Mock user for now - validate password length
+      if (password.length < 6) {
+        throw new Error('Password must be at least 6 characters')
+      }
       setUser({
         id: '1',
         email,

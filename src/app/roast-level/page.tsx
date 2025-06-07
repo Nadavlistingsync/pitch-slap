@@ -1,32 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FiCoffee, FiZap } from "react-icons/fi";
-import { FaFire } from "react-icons/fa";
-import { realVCPersonalities } from "../../types/realVCPersonalities";
 import { RoastLevelSelector, RoastLevel } from "@/components/RoastLevelSelector";
 import type { RealVCPersonality } from '@/types/realVCPersonalities';
-
-const roastLevels: { level: RoastLevel; label: string; description: string; icon: React.ReactNode }[] = [
-  {
-    level: "gentle",
-    label: "Gentle",
-    description: "Constructive feedback with a soft touch",
-    icon: <FiCoffee className="w-6 h-6" />
-  },
-  {
-    level: "balanced",
-    label: "Balanced",
-    description: "Mix of tough love and helpful advice",
-    icon: <FiZap className="w-6 h-6" />
-  },
-  {
-    level: "brutal",
-    label: "Brutal",
-    description: "No holds barred, prepare for impact",
-    icon: <FaFire className="w-6 h-6" />
-  }
-];
 
 export default function RoastLevelPage() {
   const router = useRouter();

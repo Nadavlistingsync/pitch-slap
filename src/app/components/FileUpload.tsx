@@ -17,7 +17,6 @@ export default function FileUpload({
 }: FileUploadProps) {
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setError(null);
@@ -65,8 +64,6 @@ export default function FileUpload({
             ? 'border-pink-500 bg-pink-500/10' 
             : 'border-gray-700 hover:border-pink-500/50'
         }`}
-        onDragOver={() => setIsDragging(true)}
-        onDragLeave={() => setIsDragging(false)}
       >
         <input {...getInputProps()} />
         

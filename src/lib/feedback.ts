@@ -1,5 +1,5 @@
 // Store feedback in localStorage for persistence
-export function storeFeedback(id: string, feedback: any) {
+export function storeFeedback(id: string, feedback: unknown) {
   try {
     // Get existing feedback
     const existingFeedback = localStorage.getItem('feedbackStore');
@@ -20,7 +20,7 @@ export function storeFeedback(id: string, feedback: any) {
   }
 }
 
-export function getFeedback(id: string) {
+export async function getFeedback(id: string): Promise<unknown> {
   try {
     // Try to get from localStorage first
     const existingFeedback = localStorage.getItem('feedbackStore');

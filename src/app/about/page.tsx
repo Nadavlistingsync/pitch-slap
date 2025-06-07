@@ -67,7 +67,7 @@ export default function AboutPage() {
             Our Mission
           </h1>
           <p className="mt-4 text-xl text-gray-400 max-w-3xl mx-auto">
-            We're on a mission to help startups create better pitch decks and secure funding faster.
+            We&apos;re on a mission to help startups create better pitch decks and secure funding faster.
             Our platform connects founders with experienced VCs who provide honest, actionable feedback.
           </p>
         </div>
@@ -93,7 +93,7 @@ export default function AboutPage() {
               <h2 className="text-3xl font-bold">Our Story</h2>
               <p className="mt-4 text-gray-400">
                 PitchDeck was born out of a simple observation: too many great startups were failing
-                to secure funding because their pitch decks weren't effectively communicating their
+                to secure funding because their pitch decks weren&apos;t effectively communicating their
                 vision and potential.
               </p>
               <p className="mt-4 text-gray-400">
@@ -102,7 +102,7 @@ export default function AboutPage() {
                 significantly improve their chances of success.
               </p>
               <p className="mt-4 text-gray-400">
-                Today, we're proud to have helped hundreds of startups refine their pitch decks and
+                Today, we&apos;re proud to have helped hundreds of startups refine their pitch decks and
                 secure the funding they need to grow and succeed.
               </p>
             </div>
@@ -165,7 +165,7 @@ export default function AboutPage() {
             <div className="rounded-lg bg-white/5 backdrop-blur-lg p-6">
               <h3 className="text-xl font-semibold">Excellence</h3>
               <p className="mt-2 text-gray-400">
-                We're committed to excellence in everything we do, from the quality of our feedback
+                We&apos;re committed to excellence in everything we do, from the quality of our feedback
                 to the tools we build.
               </p>
             </div>

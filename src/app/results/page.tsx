@@ -3,6 +3,14 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaLinkedin, FaTwitter } from 'react-icons/fa';
 
+interface FeedbackResult {
+  id: string;
+  content: string;
+  vcName: string;
+  timestamp: string;
+  score: number;
+}
+
 const buckets = [
   { key: 'hook', label: 'Hook / Traction' },
   { key: 'pain', label: 'Pain Clarity' },
@@ -21,113 +29,112 @@ const buckets = [
 
 export default function ResultsPage() {
   const router = useRouter();
-  const [feedback, setFeedback] = useState<any>({});
-  const [rawFeedback, setRawFeedback] = useState<string | null>(null);
-  const [feedbackId, setFeedbackId] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<FeedbackResult | null>(null);
+  const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
-  const [shareUrl, setShareUrl] = useState<string | null>(null);
-  const [vcName, setVcName] = useState<string>('');
-  const [timestamp, setTimestamp] = useState<string>('');
 
   useEffect(() => {
-    // Read feedback from sessionStorage
-    const stored = sessionStorage.getItem('feedbackResult');
-    if (stored) {
+    const fetchFeedback = async () => {
       try {
-        const result = JSON.parse(stored);
-        if (typeof result.feedback === 'object') {
-          setFeedback(result.feedback);
-        } else if (typeof result.feedback === 'string') {
-          setRawFeedback(result.feedback);
+        const storedFeedback = localStorage.getItem('feedback');
+        if (storedFeedback) {
+          setFeedback(JSON.parse(storedFeedback));
         }
-        if (result.personality) {
-          setVcName(result.personality);
-        }
-        if (result.timestamp) {
-          setTimestamp(new Date(result.timestamp).toLocaleString());
-        }
-      } catch (error) {
-        console.error('Error parsing feedback:', error);
-        router.push('/');
+        setLoading(false);
+      } catch {
+        setLoading(false);
       }
-    } else {
-      // No feedback found, redirect to home
-      router.push('/');
-    }
-  }, [router]);
+    };
+
+    fetchFeedback();
+  }, []);
 
   const handleExport = () => {
-    const text = `From: ${vcName}\nDate: ${timestamp}\n\n${buckets.map(b => `${b.label}\n${feedback[b.key]?.roast || ''}\n\n${feedback[b.key]?.constructive || ''}\n\n`).join('')}`;
+    const text = `From: ${feedback?.vcName}\nDate: ${feedback?.timestamp ? new Date(feedback.timestamp).toLocaleString() : 'N/A'}\n\n${buckets.map(b => `${b.label}\n${feedback?.content?.split('\n').find(c => c.startsWith(b.key))?.split(': ')[1] || ''}\n\n`).join('')}`;
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleShare = async () => {
-    if (shareUrl) {
-      try {
-        await navigator.share({
-          title: 'My Pitch Deck Feedback',
-          text: 'Check out the feedback I got on my pitch deck!',
-          url: shareUrl,
-        });
-      } catch (err) {
-        // Fallback to copying URL
-        navigator.clipboard.writeText(shareUrl);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      }
-    }
-  };
-
   const handleShareLinkedIn = () => {
-    if (shareUrl) {
-      const text = `🔥 Just got my pitch deck absolutely ROASTED by ${vcName} on PitchDeck Roaster! No sugar coating, just brutal honesty. Check out this savage feedback:`;
-      const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}&summary=${encodeURIComponent(text)}`;
+    if (feedback) {
+      const text = `🔥 Just got my pitch deck absolutely ROASTED by ${feedback.vcName} on PitchDeck Roaster! No sugar coating, just brutal honesty. Check out this savage feedback:`;
+      const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(feedback.id)}&summary=${encodeURIComponent(text)}`;
       window.open(linkedInUrl, '_blank');
     }
   };
 
   const handleShareTwitter = () => {
-    if (shareUrl) {
-      const text = `🔥 My pitch deck just got absolutely DESTROYED by ${vcName} on @PitchDeckRoaster! No mercy, just pure unfiltered truth. Check out this brutal feedback:`;
-      const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl)}`;
+    if (feedback) {
+      const text = `🔥 My pitch deck just got absolutely DESTROYED by ${feedback.vcName} on @PitchDeckRoaster! No mercy, just pure unfiltered truth. Check out this brutal feedback:`;
+      const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(feedback.id)}`;
       window.open(twitterUrl, '_blank');
     }
   };
 
-  if (!feedback && !rawFeedback) {
+  if (loading) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-purple-900 to-indigo-950 py-12 flex flex-col items-center justify-center">
-        <div className="text-white text-xl">Loading feedback...</div>
-      </main>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500"></div>
+      </div>
     );
   }
 
-  // Determine the email body (feedback)
-  const emailBody = typeof rawFeedback === 'string' 
-    ? rawFeedback 
-    : typeof feedback?.email === 'string'
-      ? feedback.email
-      : typeof feedback === 'string'
-        ? feedback
-        : JSON.stringify(feedback, null, 2);
+  if (!feedback) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">No feedback found</h2>
+          <p className="text-gray-400">Please try submitting your pitch deck again.</p>
+          <button
+            onClick={() => router.push('/')}
+            className="mt-4 px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors"
+          >
+            Go Home
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-purple-900 to-indigo-950 py-12 flex flex-col items-center">
-      <div className="max-w-3xl w-full mx-auto bg-white/10 rounded-2xl p-8 shadow-xl">
-        <div className="bg-white rounded-xl p-8 shadow-lg">
-          <div className="border-b border-gray-200 pb-4 mb-6">
-            <div className="flex justify-between items-center mb-2">
-              <h2 className="text-2xl font-bold text-gray-800">Re: Your Pitch Deck</h2>
-              <span className="text-gray-500 text-sm">{timestamp}</span>
+    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto">
+        <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-8">
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-3xl font-bold">Feedback Results</h1>
+            <button
+              onClick={() => router.push('/')}
+              className="px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors"
+            >
+              New Analysis
+            </button>
+          </div>
+
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-xl font-semibold mb-2">VC Feedback</h2>
+              <p className="text-gray-400">{feedback.content}</p>
             </div>
-            <div className="text-gray-600">
-              <p>From: {vcName}</p>
-              <p>To: You</p>
+
+            <div>
+              <h2 className="text-xl font-semibold mb-2">Details</h2>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-gray-400">VC Name</p>
+                  <p className="text-white">{feedback.vcName}</p>
+                </div>
+                <div>
+                  <p className="text-gray-400">Date</p>
+                  <p className="text-white">{new Date(feedback.timestamp).toLocaleDateString()}</p>
+                </div>
+                <div>
+                  <p className="text-gray-400">Score</p>
+                  <p className="text-white">{feedback.score}/100</p>
+                </div>
+              </div>
             </div>
           </div>
-          <div className="text-gray-700 whitespace-pre-line">{emailBody}</div>
         </div>
 
         <div className="mt-8 flex gap-4 justify-center">
@@ -137,7 +144,7 @@ export default function ResultsPage() {
           >
             {copied ? 'Copied!' : 'Copy Email'}
           </button>
-          {shareUrl && (
+          {feedback && (
             <>
               <button
                 className="px-6 py-3 rounded-full font-bold text-lg bg-[#0077B5] text-white hover:bg-[#006399] shadow-lg transition-all flex items-center gap-2"
@@ -155,14 +162,8 @@ export default function ResultsPage() {
               </button>
             </>
           )}
-          <button
-            className="px-6 py-3 rounded-full font-bold text-lg bg-purple-500 text-white hover:bg-purple-600 shadow-lg transition-all"
-            onClick={() => router.push('/')}
-          >
-            New Feedback
-          </button>
         </div>
       </div>
-    </main>
+    </div>
   );
 } 

@@ -1,6 +1,6 @@
 'use client';
 
-import { FC, useState } from 'react';
+import { useState } from 'react';
 import { realVCPersonalities } from '../../types/realVCPersonalities';
 
 interface VCSelectorProps {

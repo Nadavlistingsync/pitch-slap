@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 
 interface Comment {
   id: string;
@@ -15,7 +14,6 @@ export default function EgoDump() {
   const [newComment, setNewComment] = useState('');
   const [author, setAuthor] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
 
   useEffect(() => {
     // Simulate fetching comments with mock data

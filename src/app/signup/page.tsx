@@ -31,8 +31,8 @@ export default function SignUp() {
     try {
       await signUp(formData.email, formData.password, formData.name)
       router.push('/dashboard')
-    } catch (err) {
-      setError('Failed to create account. Please try again.')
+    } catch {
+      setError('Signup failed. Please try again.')
     } finally {
       setLoading(false)
     }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { RealVCPersonality, realVCPersonalities } from '../types/realVCPersonalities';
+import { realVCPersonalities } from '../types/realVCPersonalities';
 
 interface VCPersonalitySelectorProps {
   selectedPersonality: string | null;
