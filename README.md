@@ -1,5 +1,7 @@
 # PitchDeck - Create Beautiful Presentations
 
+[![CI/CD Pipeline](https://github.com/Nadavlistingsync/pitch-slap/actions/workflows/ci.yml/badge.svg)](https://github.com/Nadavlistingsync/pitch-slap/actions/workflows/ci.yml)
+
 PitchDeck is a modern web application that helps you create, collaborate, and present beautiful pitch decks with ease. Built with Next.js, TypeScript, and Tailwind CSS.
 
 ## Features
@@ -16,8 +18,8 @@ PitchDeck is a modern web application that helps you create, collaborate, and pr
 
 ### Prerequisites
 
-- Node.js 18.0.0 or later
-- npm 9.0.0 or later
+- Node.js 20.0.0 or later
+- npm 10.0.0 or later
 
 ### Installation
 
