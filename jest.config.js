@@ -7,7 +7,7 @@ module.exports = {
     '\\.(jpg|jpeg|png|gif|webp|svg)$': '<rootDir>/src/app/__tests__/__mocks__/fileMock.js'
   },
   transform: {
-    '^.+\\.(ts|tsx)$': 'babel-jest'
+    '^.+\\.(ts|tsx)$': ['@swc/jest']
   },
   transformIgnorePatterns: [
     '/node_modules/(?!(@headlessui|@heroicons)/)'
