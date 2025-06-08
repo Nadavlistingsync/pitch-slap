@@ -14,14 +14,16 @@ jobs:
       - uses: actions/checkout@v3
       
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '20.11.1'
           cache: 'npm'
+          check-latest: true
           
       - name: Install dependencies
         run: |
-          npm install -g npm@10.2.4
+          corepack enable
+          corepack prepare npm@10.2.4 --activate
           npm ci
         
       - name: Setup Vercel
