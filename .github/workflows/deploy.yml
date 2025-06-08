@@ -10,11 +10,23 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    container:
-      image: node:20.11.1
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       
+      - name: Configure Git
+        run: |
+          git config --global --add safe.directory /__w/pitch-slap/pitch-slap
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.11.1'
+          cache: 'npm'
+          
       - name: Install dependencies
         run: |
           npm install -g npm@10.2.4
