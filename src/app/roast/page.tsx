@@ -1,13 +1,14 @@
 'use client';
 
-import React from 'react';
-import { RoastLevelSelector, RoastLevel } from '@/components/RoastLevelSelector';
+import React, { useState, FormEvent } from 'react';
+import type { RoastLevel } from '@/components/RoastLevelSelector';
+import { RoastLevelSelector } from '@/components/RoastLevelSelector';
 
 export default function RoastPage() {
-  const [selectedLevel, setSelectedLevel] = React.useState<RoastLevel>('balanced');
-  const [roastContent, setRoastContent] = React.useState('');
+  const [selectedLevel, setSelectedLevel] = useState<RoastLevel>('balanced');
+  const [roastContent, setRoastContent] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     // TODO: Implement roast submission
