@@ -30,7 +30,8 @@ jobs:
       - name: Install dependencies
         run: |
           npm install -g npm@10.2.4
-          npm ci --no-audit --no-fund
+          npm config set engine-strict false
+          npm ci --no-audit --no-fund --ignore-scripts
         
       - name: Setup Vercel
         run: |
