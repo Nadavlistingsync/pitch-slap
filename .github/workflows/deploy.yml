@@ -56,11 +56,10 @@ jobs:
         
       - name: Setup Vercel
         run: |
-          chmod +x scripts/setup-vercel.sh
-          ./scripts/setup-vercel.sh
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          rm -rf .vercel
+          mkdir -p .vercel
+          echo '{"orgId":"${{ secrets.VERCEL_ORG_ID }}","projectId":"${{ secrets.VERCEL_PROJECT_ID }}"}' > .vercel/project.json
+          echo '{"version":2,"buildCommand":"npm run build","devCommand":"npm run dev","installCommand":"npm install","framework":"nextjs","outputDirectory":".next"}' > .vercel/project.json
           
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v25
