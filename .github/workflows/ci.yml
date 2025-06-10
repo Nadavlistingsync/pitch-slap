@@ -61,10 +61,9 @@ jobs:
       run: |
         rm -rf .vercel
         mkdir -p .vercel
-        echo '{
-  "orgId": "${{ secrets.VERCEL_ORG_ID }}",
-  "projectId": "${{ secrets.VERCEL_PROJECT_ID }}"
-}' > .vercel/project.json
+        echo "{\n  \"orgId\": \"${{ secrets.VERCEL_ORG_ID }}\",\n  \"projectId\": \"${{ secrets.VERCEL_PROJECT_ID }}\"\n}" > .vercel/project.json
+    - name: Debug Vercel project config
+      run: cat .vercel/project.json
     
     - name: Deploy to Vercel
       uses: amondnet/vercel-action@v25
