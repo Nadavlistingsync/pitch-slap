@@ -1,0 +1,147 @@
+"use client";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
+
+const vcs = [
+  { id: "jean-de-la-rochebrochard", name: "Jean de La Rochebrochard" },
+  { id: "pauline-roux", name: "Pauline Roux" },
+  { id: "roxanne-varza", name: "Roxanne Varza" },
+  { id: "guillaume-moubeche", name: "Guillaume Moubeche" },
+  { id: "partech", name: "Partech" },
+  { id: "y-combinator", name: "Y Combinator" },
+  { id: "andreessen-horowitz", name: "Andreessen Horowitz (a16z)" },
+  { id: "boxgroup", name: "BoxGroup (David Tisch, Nimi Katragadda)" },
+  { id: "lerer-hippeau", name: "Lerer Hippeau" },
+];
+
+const intensities = [
+  { value: "gentle", label: "Gentle" },
+  { value: "balanced", label: "Balanced" },
+  { value: "brutal", label: "Brutal" },
+];
+
+export default function UploadPage() {
+  const router = useRouter();
+  const params = useSearchParams();
+  const vcId = params.get("vc");
+  const vc = vcs.find((v) => v.id === vcId);
+
+  const [file, setFile] = useState<File | null>(null);
+  const [text, setText] = useState("");
+  const [intensity, setIntensity] = useState("balanced");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  if (!vc) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white">
+        <div>
+          <h2 className="text-2xl font-bold mb-4">No VC selected</h2>
+          <button className="bg-pink-500 px-4 py-2 rounded" onClick={() => router.push("/")}>Go Home</button>
+        </div>
+      </div>
+    );
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFile(e.target.files[0]);
+      setText("");
+    }
+  };
+
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setText(e.target.value);
+    setFile(null);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    let pitchDeckText = text;
+    if (file) {
+      try {
+        const reader = new FileReader();
+        reader.readAsText(file);
+        await new Promise((resolve, reject) => {
+          reader.onload = () => {
+            pitchDeckText = reader.result as string;
+            resolve(null);
+          };
+          reader.onerror = reject;
+        });
+      } catch {
+        setError("Failed to read file");
+        setLoading(false);
+        return;
+      }
+    }
+    try {
+      const res = await fetch("/api/roast", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pitchDeck: pitchDeckText, vc, intensity }),
+      });
+      const data = await res.json();
+      if (data.roast) {
+        // Store roast in sessionStorage for results page
+        sessionStorage.setItem("roastResult", JSON.stringify({ roast: data.roast, vc, intensity, pitchDeck: pitchDeckText }));
+        router.push("/results");
+      } else {
+        setError(data.error || "No feedback generated");
+      }
+    } catch (err) {
+      setError("Failed to get feedback");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <main className="min-h-screen bg-gray-900 text-white p-8">
+      <div className="max-w-xl mx-auto">
+        <h1 className="text-3xl font-bold mb-4">Upload Your Pitch Deck</h1>
+        <h2 className="mb-2">Roaster: <span className="text-pink-400 font-semibold">{vc.name}</span></h2>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="block mb-2">Upload PDF or paste text:</label>
+            <input type="file" accept=".pdf,.txt" onChange={handleFileChange} className="mb-2" />
+            <textarea
+              className="w-full p-2 rounded bg-gray-800 text-white"
+              rows={6}
+              placeholder="Or paste your pitch deck text here..."
+              value={text}
+              onChange={handleTextChange}
+            />
+          </div>
+          <div>
+            <label className="block mb-2">Roast Intensity:</label>
+            <div className="flex gap-4">
+              {intensities.map((i) => (
+                <label key={i.value} className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="intensity"
+                    value={i.value}
+                    checked={intensity === i.value}
+                    onChange={() => setIntensity(i.value)}
+                  />
+                  {i.label}
+                </label>
+              ))}
+            </div>
+          </div>
+          {error && <div className="text-red-500">{error}</div>}
+          <button
+            type="submit"
+            className="bg-pink-500 px-6 py-2 rounded text-white font-bold disabled:opacity-50"
+            disabled={loading || (!file && !text)}
+          >
+            {loading ? "Roasting..." : "Get Roasted"}
+          </button>
+        </form>
+      </div>
+    </main>
+  );
+} 

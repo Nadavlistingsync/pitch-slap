@@ -1,129 +1,104 @@
-'use client';
-
-import { useState, useEffect } from 'react';
+"use client";
+import { useEffect, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 
 interface Comment {
-  id: string;
   text: string;
-  timestamp: string;
   author: string;
+  timestamp: string;
 }
 
 export default function EgoDump() {
+  const params = useSearchParams();
+  const router = useRouter();
+  const vcId = params.get("vc");
   const [comments, setComments] = useState<Comment[]>([]);
-  const [newComment, setNewComment] = useState('');
-  const [author, setAuthor] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [newComment, setNewComment] = useState("");
+  const [author, setAuthor] = useState("");
+  const [roast, setRoast] = useState<string>("");
+  const [vc, setVc] = useState<any>(null);
 
+  // In-memory comments per VC (demo only)
   useEffect(() => {
-    // Simulate fetching comments with mock data
-    setTimeout(() => {
-      setComments([
-        {
-          id: '1',
-          text: 'This is a great platform! Love the feedback.',
-          timestamp: new Date().toISOString(),
-          author: 'Alice',
-        },
-        {
-          id: '2',
-          text: 'Can you add more VC personalities?',
-          timestamp: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
-          author: 'Bob',
-        },
-      ]);
-    }, 500);
-  }, []);
+    if (vcId) {
+      const stored = localStorage.getItem(`ego-comments-${vcId}`);
+      setComments(stored ? JSON.parse(stored) : []);
+    }
+    // Show last roast result if available
+    const data = sessionStorage.getItem("roastResult");
+    if (data) {
+      const parsed = JSON.parse(data);
+      setRoast(parsed.roast);
+      setVc(parsed.vc);
+    }
+  }, [vcId]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newComment.trim() || !author.trim()) return;
-
-    setIsLoading(true);
-    try {
-      // Simulate posting comment
-      await new Promise(resolve => setTimeout(resolve, 500));
-      const comment: Comment = {
-        id: Math.random().toString(36).substr(2, 9),
-        text: newComment,
-        timestamp: new Date().toISOString(),
-        author,
-      };
-      setComments([comment, ...comments]);
-      setNewComment('');
-      setAuthor('');
-    } catch (error) {
-      console.error('Failed to post comment:', error);
-    } finally {
-      setIsLoading(false);
-    }
+    const comment: Comment = {
+      text: newComment,
+      author,
+      timestamp: new Date().toISOString(),
+    };
+    const updated = [comment, ...comments];
+    setComments(updated);
+    setNewComment("");
+    setAuthor("");
+    if (vcId) localStorage.setItem(`ego-comments-${vcId}`, JSON.stringify(updated));
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Ego Dump</h1>
-          <p className="text-gray-400">Dump your thoughts, feedback, or anything else on your mind.</p>
-        </div>
-
-        <div className="bg-gray-800 rounded-lg p-6 mb-8">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="author" className="block text-sm font-medium text-gray-300 mb-2">
-                Your Name
-              </label>
-              <input
-                type="text"
-                id="author"
-                value={author}
-                onChange={(e) => setAuthor(e.target.value)}
-                className="w-full px-4 py-2 bg-gray-700 rounded-md text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                required
-                disabled={isLoading}
-              />
-            </div>
-            <div>
-              <label htmlFor="comment" className="block text-sm font-medium text-gray-300 mb-2">
-                Your Comment
-              </label>
-              <textarea
-                id="comment"
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                rows={4}
-                className="w-full px-4 py-2 bg-gray-700 rounded-md text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                required
-                disabled={isLoading}
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Posting...' : 'Post Comment'}
-            </button>
-          </form>
-        </div>
-
+    <main className="min-h-screen bg-gray-900 text-white p-8">
+      <div className="max-w-2xl mx-auto">
+        <h1 className="text-3xl font-bold mb-4">Ego Dump</h1>
+        {vc && (
+          <div className="mb-4">
+            <h2 className="text-xl font-semibold">Roaster: <span className="text-pink-400">{vc.name}</span></h2>
+            <div className="bg-gray-800 rounded-lg p-4 my-2 whitespace-pre-line">{roast}</div>
+          </div>
+        )}
+        <form onSubmit={handleSubmit} className="bg-gray-800 rounded-lg p-4 mb-6">
+          <div className="mb-2">
+            <input
+              type="text"
+              placeholder="Your name"
+              className="w-full px-3 py-2 rounded bg-gray-700 text-white mb-2"
+              value={author}
+              onChange={(e) => setAuthor(e.target.value)}
+              required
+            />
+            <textarea
+              placeholder="Your comment..."
+              className="w-full px-3 py-2 rounded bg-gray-700 text-white"
+              rows={3}
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            className="bg-pink-500 px-4 py-2 rounded text-white font-bold mt-2"
+            disabled={!newComment.trim() || !author.trim()}
+          >
+            Post Comment
+          </button>
+        </form>
         <div className="space-y-4">
-          {comments.map((comment) => (
-            <div
-              key={comment.id}
-              className="bg-gray-800 rounded-lg p-6"
-            >
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="text-lg font-medium text-blue-400">{comment.author}</h3>
-                <span className="text-sm text-gray-400">
-                  {new Date(comment.timestamp).toLocaleString()}
-                </span>
+          {comments.length === 0 && <div className="text-gray-400">No comments yet. Be the first!</div>}
+          {comments.map((c, i) => (
+            <div key={i} className="bg-gray-800 rounded-lg p-4">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-pink-400 font-semibold">{c.author}</span>
+                <span className="text-xs text-gray-400">{new Date(c.timestamp).toLocaleString()}</span>
               </div>
-              <p className="text-gray-300 whitespace-pre-wrap">{comment.text}</p>
+              <div className="text-gray-200 whitespace-pre-line">{c.text}</div>
             </div>
           ))}
         </div>
+        <button className="mt-8 bg-gray-700 px-4 py-2 rounded text-white" onClick={() => router.push("/")}>Back to Home</button>
       </div>
-    </div>
+    </main>
   );
 } 

@@ -60,17 +60,17 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} font-sans min-h-screen bg-gradient-to-br from-[#18181b] via-[#23272f] to-[#1a1a1a] text-white`}>
         <ErrorBoundary>
-          <UIProvider>
-            <ToastProvider>
-              <div className="min-h-screen flex flex-col">
-                <Navbar />
-                <main className="flex-grow">
-                  {children}
-                </main>
-                <Footer />
-              </div>
-            </ToastProvider>
-          </UIProvider>
+            <UIProvider>
+              <ToastProvider>
+                <div className="min-h-screen flex flex-col">
+                  <Navbar />
+                  <main className="flex-grow">
+                    {children}
+                  </main>
+                  <Footer />
+                </div>
+              </ToastProvider>
+            </UIProvider>
         </ErrorBoundary>
         <script dangerouslySetInnerHTML={{
           __html: `
