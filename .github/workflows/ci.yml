@@ -58,10 +58,13 @@ jobs:
       run: npm ci
     
     - name: Setup Vercel project config
+      env:
+        VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
       run: |
         rm -rf .vercel
         mkdir -p .vercel
-        echo "{\n  \"orgId\": \"${{ secrets.VERCEL_ORG_ID }}\",\n  \"projectId\": \"${{ secrets.VERCEL_PROJECT_ID }}\"\n}" > .vercel/project.json
+        echo "{\n  \"orgId\": \"${VERCEL_ORG_ID}\",\n  \"projectId\": \"${VERCEL_PROJECT_ID}\"\n}" > .vercel/project.json
     - name: Debug Vercel project config
       run: cat .vercel/project.json
     
