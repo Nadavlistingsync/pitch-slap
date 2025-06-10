@@ -163,6 +163,14 @@ export default function ResultsPage() {
             </>
           )}
         </div>
+        <div className="mt-8 flex justify-center">
+          <button
+            className="px-8 py-3 rounded-full font-bold text-lg bg-purple-600 text-white hover:bg-purple-700 shadow-lg transition-all"
+            onClick={() => router.push('/ego-dump')}
+          >
+            Post to Ego Dump
+          </button>
+        </div>
       </div>
     </div>
   );

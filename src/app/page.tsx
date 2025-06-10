@@ -1,11 +1,8 @@
 'use client';
 
-import { useAuth } from './providers'
 import Link from 'next/link'
 
 export default function Home() {
-  const { user } = useAuth()
-
   return (
     <div className="relative isolate">
       {/* Background gradient */}
@@ -23,26 +20,12 @@ export default function Home() {
             Design, collaborate, and present your ideas with our intuitive pitch deck builder. Perfect for startups, entrepreneurs, and professionals.
           </p>
           <div className="mt-10 flex items-center justify-center gap-x-6">
-            {user ? (
-              <Link
-                href="/dashboard"
-                className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-              >
-                Go to Dashboard
-              </Link>
-            ) : (
-              <>
-                <Link
-                  href="/signup"
-                  className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                >
-                  Get started
-                </Link>
-                <Link href="/login" className="text-sm font-semibold leading-6 text-gray-900">
-                  Sign in <span aria-hidden="true">→</span>
-                </Link>
-              </>
-            )}
+            <Link
+              href="/dashboard"
+              className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            >
+              Get started
+            </Link>
           </div>
         </div>
       </div>

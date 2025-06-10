@@ -7,7 +7,6 @@ import Footer from '../components/Footer';
 import { ToastProvider } from './components/ToastContext';
 import { UIProvider } from '../lib/UIContext';
 import ErrorBoundary from './components/ErrorBoundary';
-import { Providers } from './providers';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -61,19 +60,17 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} font-sans min-h-screen bg-gradient-to-br from-[#18181b] via-[#23272f] to-[#1a1a1a] text-white`}>
         <ErrorBoundary>
-          <Providers>
-            <UIProvider>
-              <ToastProvider>
-                <div className="min-h-screen flex flex-col">
-                  <Navbar />
-                  <main className="flex-grow">
-                    {children}
-                  </main>
-                  <Footer />
-                </div>
-              </ToastProvider>
-            </UIProvider>
-          </Providers>
+          <UIProvider>
+            <ToastProvider>
+              <div className="min-h-screen flex flex-col">
+                <Navbar />
+                <main className="flex-grow">
+                  {children}
+                </main>
+                <Footer />
+              </div>
+            </ToastProvider>
+          </UIProvider>
         </ErrorBoundary>
         <script dangerouslySetInnerHTML={{
           __html: `

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '../../providers'
 import { PlusIcon, TrashIcon, ArrowUpIcon, ArrowDownIcon } from '@heroicons/react/24/outline'
 
 interface BaseSlide {
@@ -52,16 +51,9 @@ interface PitchDeck {
 
 export default function Editor({ params }: { params: { id: string } }) {
   const router = useRouter()
-  const { user, loading } = useAuth()
   const [pitchDeck, setPitchDeck] = useState<PitchDeck | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [selectedSlide, setSelectedSlide] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push('/login')
-    }
-  }, [loading, user, router])
 
   useEffect(() => {
     // TODO: Fetch pitch deck from API
@@ -245,7 +237,7 @@ export default function Editor({ params }: { params: { id: string } }) {
     });
   };
 
-  if (loading || isLoading) {
+  if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
