@@ -190,7 +190,7 @@ export async function POST(req: NextRequest) {
     };
     
     // Log the result before serialization
-    console.log('Result object:', result);
+    console.log('Result object:', JSON.stringify(result, null, 2));
     
     // Ensure proper serialization with no circular references
     const serializedResult = JSON.stringify(result, (_key, value) => {
@@ -200,6 +200,7 @@ export async function POST(req: NextRequest) {
           JSON.stringify(value);
           return value;
         } catch (e) {
+          console.error('Circular reference detected:', e);
           return '[Circular]';
         }
       }
@@ -237,7 +238,7 @@ export async function POST(req: NextRequest) {
     };
     
     // Log the error response
-    console.log('Error response:', errorResponse);
+    console.log('Error response:', JSON.stringify(errorResponse, null, 2));
     
     // Ensure proper serialization of error response
     const serializedError = JSON.stringify(errorResponse, null, 2);

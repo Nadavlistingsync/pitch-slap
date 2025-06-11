@@ -170,7 +170,7 @@ function UploadContent() {
         
         try {
           data = JSON.parse(text);
-          console.log('Parsed response data:', data);
+          console.log('Parsed response data:', JSON.stringify(data, null, 2));
         } catch (parseError) {
           console.error('Failed to parse JSON:', parseError);
           console.error('Raw text that failed to parse:', text);
@@ -178,12 +178,12 @@ function UploadContent() {
         }
 
         if (!response.ok) {
-          console.error('API error:', data);
+          console.error('API error:', JSON.stringify(data, null, 2));
           throw new Error(data.error || 'Failed to get feedback');
         }
 
         if (!data.roast) {
-          console.error('Unexpected response format:', data);
+          console.error('Unexpected response format:', JSON.stringify(data, null, 2));
           throw new Error('Invalid response format from server');
         }
 
@@ -200,7 +200,7 @@ function UploadContent() {
           timestamp: data.timestamp
         };
 
-        console.log('Storing result:', result);
+        console.log('Storing result:', JSON.stringify(result, null, 2));
         
         // Ensure proper serialization before storing
         const serializedResult = JSON.stringify(result, null, 2);
