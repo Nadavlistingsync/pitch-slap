@@ -8,34 +8,68 @@ export async function POST(req: NextRequest) {
     let pitchDeck, vc, intensity;
     try {
       const body = await req.json();
+      console.log('Received request body:', { 
+        hasPitchDeck: !!body.pitchDeck,
+        hasVc: !!body.vc,
+        intensity: body.intensity
+      });
       pitchDeck = body.pitchDeck;
       vc = body.vc;
       intensity = body.intensity;
     } catch (parseError) {
       console.error('Failed to parse request body:', parseError);
-      return NextResponse.json({ 
-        error: 'Invalid request format',
-        details: 'Request body must be valid JSON'
-      }, { status: 400 });
+      return new NextResponse(
+        JSON.stringify({ 
+          error: 'Invalid request format',
+          details: 'Request body must be valid JSON'
+        }), 
+        { 
+          status: 400,
+          headers: { 
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-store'
+          }
+        }
+      );
     }
 
     const apiKey = process.env.OPENAI_API_KEY;
 
     if (!apiKey) {
       console.error('OpenAI API key is not set in environment variables');
-      return NextResponse.json({ error: 'OpenAI API key not set' }, { status: 500 });
+      return new NextResponse(
+        JSON.stringify({ 
+          error: 'OpenAI API key not set' 
+        }), 
+        { 
+          status: 500,
+          headers: { 
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-store'
+          }
+        }
+      );
     }
 
     if (!pitchDeck || !vc || !intensity) {
       console.error('Missing required parameters:', { pitchDeck: !!pitchDeck, vc: !!vc, intensity });
-      return NextResponse.json({ 
-        error: 'Missing required parameters',
-        details: {
-          pitchDeck: !pitchDeck ? 'Pitch deck text is required' : null,
-          vc: !vc ? 'VC information is required' : null,
-          intensity: !intensity ? 'Intensity level is required' : null
+      return new NextResponse(
+        JSON.stringify({ 
+          error: 'Missing required parameters',
+          details: {
+            pitchDeck: !pitchDeck ? 'Pitch deck text is required' : null,
+            vc: !vc ? 'VC information is required' : null,
+            intensity: !intensity ? 'Intensity level is required' : null
+          }
+        }), 
+        { 
+          status: 400,
+          headers: { 
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-store'
+          }
         }
-      }, { status: 400 });
+      );
     }
 
     // Build the prompt based on VC persona and intensity
@@ -62,10 +96,19 @@ export async function POST(req: NextRequest) {
       });
     } catch (fetchError) {
       console.error('Failed to make request to OpenAI API:', fetchError);
-      return NextResponse.json({ 
-        error: 'Failed to connect to OpenAI API',
-        details: fetchError instanceof Error ? fetchError.message : 'Network error'
-      }, { status: 500 });
+      return new NextResponse(
+        JSON.stringify({ 
+          error: 'Failed to connect to OpenAI API',
+          details: fetchError instanceof Error ? fetchError.message : 'Network error'
+        }), 
+        { 
+          status: 500,
+          headers: { 
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-store'
+          }
+        }
+      );
     }
 
     console.log('OpenAI API response status:', response.status);
@@ -73,12 +116,22 @@ export async function POST(req: NextRequest) {
     let responseData;
     try {
       responseData = await response.json();
+      console.log('API response data:', responseData);
     } catch (jsonError) {
       console.error('Failed to parse OpenAI API response:', jsonError);
-      return NextResponse.json({ 
-        error: 'Invalid response from OpenAI API',
-        details: 'Could not parse API response'
-      }, { status: 500 });
+      return new NextResponse(
+        JSON.stringify({ 
+          error: 'Invalid response from OpenAI API',
+          details: 'Could not parse API response'
+        }), 
+        { 
+          status: 500,
+          headers: { 
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-store'
+          }
+        }
+      );
     }
     
     if (!response.ok) {
@@ -88,23 +141,59 @@ export async function POST(req: NextRequest) {
         error: responseData,
         headers: Object.fromEntries(response.headers.entries())
       });
-      return NextResponse.json({ 
-        error: `OpenAI API error: ${responseData.error?.message || 'Unknown error'}`,
-        details: responseData
-      }, { status: response.status });
+      return new NextResponse(
+        JSON.stringify({ 
+          error: `OpenAI API error: ${responseData.error?.message || 'Unknown error'}`,
+          details: responseData
+        }), 
+        { 
+          status: response.status,
+          headers: { 
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-store'
+          }
+        }
+      );
     }
     
     if (!responseData.choices?.[0]?.message?.content) {
       console.error('Unexpected API response format:', responseData);
-      return NextResponse.json({ 
-        error: 'Unexpected response format from OpenAI',
-        details: 'Response missing required fields'
-      }, { status: 500 });
+      return new NextResponse(
+        JSON.stringify({ 
+          error: 'Unexpected response format from OpenAI',
+          details: 'Response missing required fields'
+        }), 
+        { 
+          status: 500,
+          headers: { 
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-store'
+          }
+        }
+      );
     }
 
     const roast = responseData.choices[0].message.content;
     console.log('Successfully generated roast');
-    return NextResponse.json({ roast });
+    
+    // Store the result in session storage
+    const result = {
+      roast,
+      vc,
+      intensity,
+      timestamp: new Date().toISOString()
+    };
+    
+    return new NextResponse(
+      JSON.stringify(result), 
+      { 
+        status: 200,
+        headers: { 
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store'
+        }
+      }
+    );
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     const errorName = error instanceof Error ? error.name : 'Error';
@@ -116,9 +205,18 @@ export async function POST(req: NextRequest) {
       stack: errorStack
     });
     
-    return NextResponse.json({ 
-      error: 'Failed to get feedback from OpenAI',
-      details: errorMessage
-    }, { status: 500 });
+    return new NextResponse(
+      JSON.stringify({ 
+        error: 'Failed to get feedback from OpenAI',
+        details: errorMessage
+      }), 
+      { 
+        status: 500,
+        headers: { 
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store'
+        }
+      }
+    );
   }
 } 

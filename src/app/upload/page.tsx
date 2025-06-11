@@ -104,6 +104,7 @@ function UploadContent() {
   const [intensity, setIntensity] = useState("balanced");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [roast, setRoast] = useState<string | null>(null);
 
   if (!vc) {
     return (
@@ -130,57 +131,70 @@ function UploadContent() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    if (!file || !vc) return;
+
     setLoading(true);
-    let pitchDeckText = text;
-    if (file) {
-      try {
-        const reader = new FileReader();
-        reader.readAsText(file);
-        await new Promise((resolve, reject) => {
-          reader.onload = () => {
-            pitchDeckText = reader.result as string;
-            resolve(null);
-          };
-          reader.onerror = reject;
-        });
-      } catch {
-        setError("Failed to read file");
-        setLoading(false);
-        return;
-      }
-    }
+    setError(null);
+    setRoast(null);
+
     try {
-      const res = await fetch("/api/roast", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pitchDeck: pitchDeckText, vc, intensity }),
-      });
+      const text = await file.text();
+      console.log('File content length:', text.length);
       
+      const response = await fetch('/api/roast', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          pitchDeck: text,
+          vc: vc,
+          intensity: 'high',
+        }),
+      });
+
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Invalid response content type');
+      }
+
       let data;
       try {
-        data = await res.json();
-      } catch (jsonError) {
-        console.error('Failed to parse API response:', jsonError);
+        const text = await response.text();
+        console.log('Raw response:', text);
+        data = JSON.parse(text);
+        console.log('Parsed response data:', data);
+      } catch (parseError) {
+        console.error('Failed to parse response:', parseError);
         throw new Error('Failed to parse server response');
       }
 
-      if (!res.ok) {
-        const errorMessage = data.error || 'Failed to get feedback';
-        const errorDetails = data.details ? `\nDetails: ${typeof data.details === 'string' ? data.details : JSON.stringify(data.details)}` : '';
-        throw new Error(`${errorMessage}${errorDetails}`);
+      if (!response.ok) {
+        console.error('API error:', data);
+        throw new Error(data.error || 'Failed to get feedback');
       }
 
-      if (data.roast) {
-        // Store roast in sessionStorage for results page
-        sessionStorage.setItem("roastResult", JSON.stringify({ roast: data.roast, vc, intensity, pitchDeck: pitchDeckText }));
-        router.push("/results");
-      } else {
-        throw new Error(data.error || data.details || "No feedback generated");
+      if (!data.roast) {
+        console.error('Unexpected response format:', data);
+        throw new Error('Invalid response format from server');
       }
-    } catch (err) {
-      console.error('Error:', err);
-      setError(err instanceof Error ? err.message : "Failed to get feedback");
+
+      // Store the result in session storage
+      sessionStorage.setItem('roastResult', JSON.stringify({
+        roast: data.roast,
+        vc: data.vc,
+        intensity: data.intensity,
+        timestamp: data.timestamp
+      }));
+
+      setRoast(data.roast);
+      router.push(`/results?roast=${encodeURIComponent(data.roast)}`);
+    } catch (error) {
+      console.error('Error submitting pitch deck:', error);
+      setError(error instanceof Error ? error.message : 'Failed to get feedback');
     } finally {
       setLoading(false);
     }
