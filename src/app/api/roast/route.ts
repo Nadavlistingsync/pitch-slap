@@ -31,9 +31,14 @@ export async function POST(req: NextRequest) {
       }),
     });
     const data = await response.json();
+    if (!response.ok) {
+      console.error('OpenAI API error:', data);
+      return NextResponse.json({ error: `OpenAI API error: ${data.error?.message || 'Unknown error'}` }, { status: response.status });
+    }
     const roast = data.choices?.[0]?.message?.content || 'No feedback generated.';
     return NextResponse.json({ roast });
   } catch (error) {
+    console.error('Error fetching from OpenAI:', error);
     return NextResponse.json({ error: 'Failed to get feedback from OpenAI.' }, { status: 500 });
   }
 } 
