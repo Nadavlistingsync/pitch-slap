@@ -93,45 +93,49 @@ const intensities = [
   { value: "brutal", label: "Brutal" },
 ];
 
+// Helper function to create a clean VC object
+function createCleanVcObject(vc: any) {
+  return {
+    id: String(vc?.id || ''),
+    name: String(vc?.name || ''),
+    knownFor: String(vc?.knownFor || ''),
+    vibe: String(vc?.vibe || '')
+  };
+}
+
 // Helper function to safely stringify objects
 function safeStringify(obj: any): string {
-  console.log('🔍 Upload Serialization: Starting object serialization', {
-    type: typeof obj,
-    isObject: obj instanceof Object,
-    keys: Object.keys(obj || {}),
-    hasToString: obj?.toString !== undefined
-  });
-
   try {
     // If it's already a string, return it
     if (typeof obj === 'string') {
-      console.log('🔍 Upload Serialization: Object is already a string');
       return obj;
     }
 
-    // Create a clean copy of the object without any prototype methods
-    const cleanObj = Object.keys(obj || {}).reduce((acc, key) => {
-      if (typeof obj[key] !== 'function') {
-        acc[key] = obj[key];
+    // If it's null or undefined, return empty object
+    if (obj == null) {
+      return '{}';
+    }
+
+    // If it's a VC object, use the clean VC object creator
+    if (obj.id !== undefined || obj.name !== undefined) {
+      const cleanVc = createCleanVcObject(obj);
+      return JSON.stringify(cleanVc);
+    }
+
+    // For other objects, create a clean copy
+    const cleanObj = Object.entries(obj).reduce((acc, [key, value]) => {
+      // Skip functions and undefined values
+      if (typeof value !== 'function' && value !== undefined) {
+        // Convert values to strings if they're not objects
+        acc[key] = typeof value === 'object' ? value : String(value);
       }
       return acc;
     }, {} as Record<string, any>);
 
-    // Stringify the clean object
-    const str = JSON.stringify(cleanObj);
-    console.log('🔍 Upload Serialization: Clean object stringify result:', {
-      result: str,
-      length: str?.length
-    });
-
-    return str;
+    return JSON.stringify(cleanObj);
   } catch (e) {
-    console.error('❌ Upload Serialization: Error during stringification:', {
-      error: e,
-      message: e instanceof Error ? e.message : 'Unknown error',
-      stack: e instanceof Error ? e.stack : undefined
-    });
-    return JSON.stringify({ error: 'Failed to stringify object' });
+    console.error('❌ Upload Serialization: Error during stringification:', e);
+    return '{}';
   }
 }
 
@@ -178,18 +182,8 @@ function UploadContent() {
     }
 
     // Create a clean VC object
-    const cleanVc = {
-      id: vc.id || '',
-      name: vc.name || '',
-      knownFor: vc.knownFor || '',
-      vibe: vc.vibe || ''
-    };
-
-    console.log('🔵 Upload: Starting submission process', {
-      fileName: file.name,
-      fileSize: file.size,
-      vc: safeStringify(cleanVc)
-    });
+    const cleanVc = createCleanVcObject(vc);
+    console.log('🔵 Upload: Clean VC object created:', safeStringify(cleanVc));
 
     setLoading(true);
     setError(null);
@@ -269,13 +263,8 @@ function UploadContent() {
 
       console.log('🔵 Upload: Creating result object');
       const result = {
-        roast: data.roast,
-        vc: {
-          id: data.vc.id || '',
-          name: data.vc.name || '',
-          knownFor: data.vc.knownFor || '',
-          vibe: data.vc.vibe || ''
-        }
+        roast: String(data.roast),
+        vc: createCleanVcObject(data.vc)
       };
       console.log('🔵 Upload: Result object created:', {
         roastLength: result.roast.length,
@@ -293,7 +282,7 @@ function UploadContent() {
       console.log('🔵 Upload: Result stored successfully');
 
       console.log('🔵 Upload: Preparing redirect');
-      const encodedRoast = encodeURIComponent(data.roast);
+      const encodedRoast = encodeURIComponent(String(data.roast));
       console.log('🔵 Upload: Redirecting to results page');
       router.push(`/results?roast=${encodedRoast}`);
     } catch (error) {

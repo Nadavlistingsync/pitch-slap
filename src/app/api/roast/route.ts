@@ -2,45 +2,49 @@ import { NextRequest } from 'next/server';
 
 export const runtime = 'edge';
 
+// Helper function to create a clean VC object
+function createCleanVcObject(vc: any) {
+  return {
+    id: String(vc?.id || ''),
+    name: String(vc?.name || ''),
+    knownFor: String(vc?.knownFor || ''),
+    vibe: String(vc?.vibe || '')
+  };
+}
+
 // Helper function to safely stringify objects
 function safeStringify(obj: any): string {
-  console.log('🔍 Serialization: Starting object serialization', {
-    type: typeof obj,
-    isObject: obj instanceof Object,
-    keys: Object.keys(obj || {}),
-    hasToString: obj?.toString !== undefined
-  });
-
   try {
     // If it's already a string, return it
     if (typeof obj === 'string') {
-      console.log('🔍 Serialization: Object is already a string');
       return obj;
     }
 
-    // Create a clean copy of the object without any prototype methods
-    const cleanObj = Object.keys(obj || {}).reduce((acc, key) => {
-      if (typeof obj[key] !== 'function') {
-        acc[key] = obj[key];
+    // If it's null or undefined, return empty object
+    if (obj == null) {
+      return '{}';
+    }
+
+    // If it's a VC object, use the clean VC object creator
+    if (obj.id !== undefined || obj.name !== undefined) {
+      const cleanVc = createCleanVcObject(obj);
+      return JSON.stringify(cleanVc);
+    }
+
+    // For other objects, create a clean copy
+    const cleanObj = Object.entries(obj).reduce((acc, [key, value]) => {
+      // Skip functions and undefined values
+      if (typeof value !== 'function' && value !== undefined) {
+        // Convert values to strings if they're not objects
+        acc[key] = typeof value === 'object' ? value : String(value);
       }
       return acc;
     }, {} as Record<string, any>);
 
-    // Stringify the clean object
-    const str = JSON.stringify(cleanObj);
-    console.log('🔍 Serialization: Clean object stringify result:', {
-      result: str,
-      length: str?.length
-    });
-
-    return str;
+    return JSON.stringify(cleanObj);
   } catch (e) {
-    console.error('❌ Serialization: Error during stringification:', {
-      error: e,
-      message: e instanceof Error ? e.message : 'Unknown error',
-      stack: e instanceof Error ? e.stack : undefined
-    });
-    return JSON.stringify({ error: 'Failed to stringify object' });
+    console.error('❌ Serialization: Error during stringification:', e);
+    return '{}';
   }
 }
 
@@ -81,14 +85,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Create a clean VC object
-    const cleanVc = {
-      id: body.vc.id || '',
-      name: body.vc.name || '',
-      knownFor: body.vc.knownFor || '',
-      vibe: body.vc.vibe || ''
-    };
+    const cleanVc = createCleanVcObject(body.vc);
+    console.log('🔵 API: Clean VC object created:', safeStringify(cleanVc));
 
-    console.log('🔵 API: Creating VC-specific prompt with clean VC object:', safeStringify(cleanVc));
     const prompt = `You are ${cleanVc.name}, ${cleanVc.knownFor}. ${cleanVc.vibe}. Review this pitch deck and provide feedback: ${body.pitchDeck}`;
     console.log('🔵 API: Prompt created:', { promptLength: prompt.length });
 
@@ -126,9 +125,9 @@ export async function POST(req: NextRequest) {
     const roast = data.choices[0].message.content.trim();
     console.log('🔵 API: Roast generated:', { roastLength: roast.length });
 
-    // Create a clean result object
+    // Create the final result object
     const result = {
-      roast,
+      roast: String(roast),
       vc: cleanVc
     };
 
