@@ -141,7 +141,8 @@ function UploadContent() {
       const response = await fetch('/api/roast', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
         body: JSON.stringify({
           pitchDeck: text,
@@ -149,21 +150,30 @@ function UploadContent() {
         }),
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        const text = await response.text();
+        data = JSON.parse(text);
+      } catch (parseError) {
+        console.error('Failed to parse response:', parseError);
+        throw new Error('Invalid response from server');
+      }
 
       if (!response.ok) {
         throw new Error(data.error || 'Failed to get feedback');
       }
 
-      if (!data.roast) {
+      if (!data.roast || !data.vc) {
         throw new Error('Invalid response format');
       }
 
       // Store the result
-      sessionStorage.setItem('roastResult', JSON.stringify({
+      const result = {
         roast: data.roast,
         vc: data.vc
-      }));
+      };
+
+      sessionStorage.setItem('roastResult', JSON.stringify(result));
 
       // Redirect to results page
       router.push(`/results?roast=${encodeURIComponent(data.roast)}`);

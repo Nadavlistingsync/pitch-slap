@@ -13,7 +13,10 @@ export async function POST(req: NextRequest) {
         JSON.stringify({ error: 'Missing pitch deck or VC information' }),
         { 
           status: 400,
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-store'
+          }
         }
       );
     }
@@ -24,7 +27,10 @@ export async function POST(req: NextRequest) {
         JSON.stringify({ error: 'API key not configured' }),
         { 
           status: 500,
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-store'
+          }
         }
       );
     }
@@ -51,41 +57,67 @@ export async function POST(req: NextRequest) {
       }),
     });
 
-    const data = await response.json();
-    
     if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Failed to get AI response' }));
       return new Response(
-        JSON.stringify({ error: 'Failed to get AI response' }),
+        JSON.stringify({ error: errorData.error || 'Failed to get AI response' }),
         { 
           status: 500,
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-store'
+          }
+        }
+      );
+    }
+
+    const data = await response.json();
+    
+    if (!data.choices?.[0]?.message?.content) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid response from AI' }),
+        { 
+          status: 500,
+          headers: { 
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-store'
+          }
         }
       );
     }
 
     // Return just the AI's response
+    const result = {
+      roast: data.choices[0].message.content.trim(),
+      vc: {
+        id: vc.id,
+        name: vc.name,
+        knownFor: vc.knownFor,
+        vibe: vc.vibe
+      }
+    };
+
     return new Response(
-      JSON.stringify({ 
-        roast: data.choices[0].message.content.trim(),
-        vc: {
-          id: vc.id,
-          name: vc.name,
-          knownFor: vc.knownFor,
-          vibe: vc.vibe
-        }
-      }),
+      JSON.stringify(result),
       { 
         status: 200,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store'
+        }
       }
     );
 
   } catch (error) {
+    console.error('Error in roast API:', error);
     return new Response(
       JSON.stringify({ error: 'Internal server error' }),
       { 
         status: 500,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store'
+        }
       }
     );
   }
