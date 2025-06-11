@@ -24,123 +24,124 @@ function safeStringify(obj: any): string {
 }
 
 export async function POST(req: NextRequest) {
+  console.log('🔵 API: Starting roast request processing');
+  
   try {
-    // Parse request body
     const body = await req.json();
-    const { pitchDeck, vc } = body;
+    console.log('🔵 API: Request body received:', {
+      hasPitchDeck: !!body.pitchDeck,
+      pitchDeckLength: body.pitchDeck?.length,
+      vc: body.vc
+    });
 
-    if (!pitchDeck || !vc) {
+    if (!body.pitchDeck) {
+      console.error('❌ API: Missing pitch deck in request');
       return new Response(
-        safeStringify({ error: 'Missing pitch deck or VC information' }),
-        { 
-          status: 400,
-          headers: { 
-            'Content-Type': 'application/json',
-            'Cache-Control': 'no-store'
-          }
-        }
+        safeStringify({ error: 'Pitch deck is required' }),
+        { status: 400 }
+      );
+    }
+
+    if (!body.vc) {
+      console.error('❌ API: Missing VC in request');
+      return new Response(
+        safeStringify({ error: 'VC is required' }),
+        { status: 400 }
       );
     }
 
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
+      console.error('❌ API: OpenAI API key not configured');
       return new Response(
-        safeStringify({ error: 'API key not configured' }),
-        { 
-          status: 500,
-          headers: { 
-            'Content-Type': 'application/json',
-            'Cache-Control': 'no-store'
-          }
-        }
+        safeStringify({ error: 'OpenAI API key not configured' }),
+        { status: 500 }
       );
     }
 
-    // Create VC-specific prompt
-    const prompt = `You are ${vc.name}, a VC known for: ${vc.knownFor}. Your style: ${vc.vibe}. 
-    Review this pitch deck and provide your honest feedback:\n\n${pitchDeck}`;
+    console.log('🔵 API: Creating VC-specific prompt');
+    const prompt = `You are ${body.vc.name}, ${body.vc.knownFor}. ${body.vc.vibe}. Review this pitch deck and provide feedback: ${body.pitchDeck}`;
+    console.log('🔵 API: Prompt created:', { promptLength: prompt.length });
 
-    // Call OpenAI API
+    console.log('🔵 API: Calling OpenAI API');
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
+        'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
         model: 'gpt-4',
-        messages: [
-          { role: 'system', content: 'You are a brutally honest VC giving feedback.' },
-          { role: 'user', content: prompt },
-        ],
-        max_tokens: 600,
-        temperature: 0.8,
-      }),
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.7,
+        max_tokens: 1000
+      })
+    });
+
+    console.log('🔵 API: OpenAI response status:', response.status);
+    const data = await response.json();
+    console.log('🔵 API: OpenAI response data:', {
+      hasChoices: !!data.choices,
+      firstChoiceLength: data.choices?.[0]?.message?.content?.length,
+      error: data.error
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: 'Failed to get AI response' }));
+      console.error('❌ API: OpenAI API error:', data);
       return new Response(
-        safeStringify({ error: errorData.error || 'Failed to get AI response' }),
-        { 
-          status: 500,
-          headers: { 
-            'Content-Type': 'application/json',
-            'Cache-Control': 'no-store'
-          }
-        }
+        safeStringify({ error: 'Failed to get AI feedback' }),
+        { status: 500 }
       );
     }
 
-    const data = await response.json();
-    
-    if (!data.choices?.[0]?.message?.content) {
-      return new Response(
-        safeStringify({ error: 'Invalid response from AI' }),
-        { 
-          status: 500,
-          headers: { 
-            'Content-Type': 'application/json',
-            'Cache-Control': 'no-store'
-          }
-        }
-      );
-    }
+    const roast = data.choices[0].message.content.trim();
+    console.log('🔵 API: Roast generated:', { roastLength: roast.length });
 
-    // Create a clean result object
     const result = {
-      roast: data.choices[0].message.content.trim(),
+      roast,
       vc: {
-        id: vc.id || '',
-        name: vc.name || '',
-        knownFor: vc.knownFor || '',
-        vibe: vc.vibe || ''
+        id: body.vc.id,
+        name: body.vc.name,
+        knownFor: body.vc.knownFor,
+        vibe: body.vc.vibe
       }
     };
 
-    // Ensure the result is properly serialized
-    return new Response(
-      safeStringify(result),
-      { 
-        status: 200,
-        headers: { 
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-store'
-        }
+    console.log('🔵 API: Final result object:', {
+      roastLength: result.roast.length,
+      vc: result.vc
+    });
+
+    const serializedResult = safeStringify(result);
+    console.log('🔵 API: Serialized result:', {
+      length: serializedResult.length,
+      preview: serializedResult.substring(0, 100) + '...'
+    });
+
+    return new Response(serializedResult, {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store, no-cache, must-revalidate'
       }
-    );
+    });
 
   } catch (error) {
-    console.error('Error in roast API:', error);
+    console.error('❌ API: Error processing request:', {
+      error,
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    });
+
+    const errorResponse = {
+      error: 'Internal server error',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    };
+
+    console.log('🔵 API: Sending error response:', errorResponse);
     return new Response(
-      safeStringify({ error: 'Internal server error' }),
-      { 
-        status: 500,
-        headers: { 
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-store'
-        }
-      }
+      safeStringify(errorResponse),
+      { status: 500 }
     );
   }
 } 
