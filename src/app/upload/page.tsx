@@ -249,44 +249,52 @@ function UploadContent() {
         <h2 className="mb-2">Roaster: <span className="text-pink-400 font-semibold">{vc.name}</span></h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block mb-2">Upload PDF or paste text:</label>
-            <input type="file" accept=".pdf,.txt" onChange={handleFileChange} className="mb-2" />
-            <textarea
-              className="w-full p-2 rounded bg-gray-800 text-white"
-              rows={6}
-              placeholder="Or paste your pitch deck text here..."
-              value={text}
-              onChange={handleTextChange}
+            <label className="block mb-2">Upload a PDF or text file:</label>
+            <input
+              type="file"
+              accept=".pdf,.txt"
+              onChange={handleFileChange}
+              className="w-full p-2 border border-gray-600 rounded bg-gray-800"
             />
           </div>
           <div>
-            <label className="block mb-2">Roast Intensity:</label>
-            <div className="flex gap-4">
+            <label className="block mb-2">Or paste your pitch deck text:</label>
+            <textarea
+              value={text}
+              onChange={handleTextChange}
+              className="w-full h-32 p-2 border border-gray-600 rounded bg-gray-800"
+              placeholder="Paste your pitch deck content here..."
+            />
+          </div>
+          <div>
+            <label className="block mb-2">Feedback Intensity:</label>
+            <select
+              value={intensity}
+              onChange={(e) => setIntensity(e.target.value)}
+              className="w-full p-2 border border-gray-600 rounded bg-gray-800"
+            >
               {intensities.map((i) => (
-                <label key={i.value} className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="intensity"
-                    value={i.value}
-                    checked={intensity === i.value}
-                    onChange={() => setIntensity(i.value)}
-                  />
+                <option key={i.value} value={i.value}>
                   {i.label}
-                </label>
+                </option>
               ))}
-            </div>
+            </select>
           </div>
           {error && (
-            <div className="text-red-500 bg-red-500/10 p-4 rounded-lg">
+            <div className="text-red-500">
               {error}
             </div>
           )}
           <button
             type="submit"
-            className="bg-pink-500 px-6 py-2 rounded text-white font-bold disabled:opacity-50"
             disabled={loading || (!file && !text)}
+            className={`w-full py-2 px-4 rounded ${
+              loading || (!file && !text)
+                ? 'bg-gray-600 cursor-not-allowed'
+                : 'bg-pink-500 hover:bg-pink-600'
+            }`}
           >
-            {loading ? "Roasting..." : "Get Roasted"}
+            {loading ? 'Processing...' : 'Get Feedback'}
           </button>
         </form>
       </div>
@@ -296,7 +304,7 @@ function UploadContent() {
 
 export default function UploadPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-white">Loading...</div>}>
+    <Suspense fallback={<div>Loading...</div>}>
       <UploadContent />
     </Suspense>
   );
