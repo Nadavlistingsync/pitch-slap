@@ -291,7 +291,13 @@ function UploadContent() {
         message: error instanceof Error ? error.message : 'Unknown error',
         stack: error instanceof Error ? error.stack : undefined
       });
-      setError(error instanceof Error ? error.message : 'Failed to get feedback');
+      setError(
+        error instanceof Error 
+          ? error.message 
+          : typeof error === 'string' 
+            ? error 
+            : 'Failed to get feedback. Please try again.'
+      );
     } finally {
       setLoading(false);
       console.log('🔵 Upload: Submission process completed');
@@ -332,7 +338,11 @@ function UploadContent() {
               ))}
             </div>
           </div>
-          {error && <div className="text-red-500">{error}</div>}
+          {error && (
+            <div className="text-red-500 bg-red-500/10 p-4 rounded-lg">
+              {typeof error === 'string' ? error : 'An error occurred. Please try again.'}
+            </div>
+          )}
           <button
             type="submit"
             className="bg-pink-500 px-6 py-2 rounded text-white font-bold disabled:opacity-50"
