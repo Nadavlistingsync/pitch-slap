@@ -184,19 +184,10 @@ function UploadContent() {
         throw new Error('Invalid response format from server');
       }
 
-      // Parse the serialized VC object
-      let parsedVc;
-      try {
-        parsedVc = JSON.parse(data.vc);
-      } catch (parseError) {
-        console.error('Failed to parse VC data:', parseError);
-        throw new Error('Invalid VC data format');
-      }
-
       // Store the result in session storage
       sessionStorage.setItem('roastResult', JSON.stringify({
         roast: data.roast,
-        vc: parsedVc,
+        vc: data.vc,
         intensity: data.intensity,
         timestamp: data.timestamp
       }));

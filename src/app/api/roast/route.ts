@@ -179,7 +179,12 @@ export async function POST(req: NextRequest) {
     // Store the result in session storage
     const result = {
       roast,
-      vc: JSON.stringify(vc),
+      vc: {
+        id: vc.id,
+        name: vc.name,
+        knownFor: vc.knownFor,
+        vibe: vc.vibe
+      },
       intensity,
       timestamp: new Date().toISOString()
     };
