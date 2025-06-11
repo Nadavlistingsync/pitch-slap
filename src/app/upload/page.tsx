@@ -104,7 +104,6 @@ function UploadContent() {
   const [intensity, setIntensity] = useState("balanced");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [roast, setRoast] = useState<string | null>(null);
 
   if (!vc) {
     return (
@@ -135,7 +134,6 @@ function UploadContent() {
 
     setLoading(true);
     setError(null);
-    setRoast(null);
 
     try {
       const text = await file.text();
@@ -190,7 +188,6 @@ function UploadContent() {
         timestamp: data.timestamp
       }));
 
-      setRoast(data.roast);
       router.push(`/results?roast=${encodeURIComponent(data.roast)}`);
     } catch (error) {
       console.error('Error submitting pitch deck:', error);
