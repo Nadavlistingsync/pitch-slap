@@ -103,7 +103,7 @@ function UploadContent() {
   const [text, setText] = useState("");
   const [intensity, setIntensity] = useState("balanced");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   if (!vc) {
     return (
