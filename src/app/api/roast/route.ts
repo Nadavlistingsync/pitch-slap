@@ -176,9 +176,9 @@ export async function POST(req: NextRequest) {
     const roast = responseData.choices[0].message.content;
     console.log('Successfully generated roast');
     
-    // Store the result in session storage
+    // Create a clean result object with only the necessary data
     const result = {
-      roast,
+      roast: roast.trim(),
       vc: {
         id: vc.id,
         name: vc.name,
@@ -189,12 +189,16 @@ export async function POST(req: NextRequest) {
       timestamp: new Date().toISOString()
     };
     
-    // Ensure proper serialization of the response
-    const serializedResult = JSON.stringify(result);
+    // Log the result before serialization
+    console.log('Result object:', result);
+    
+    // Ensure proper serialization
+    const serializedResult = JSON.stringify(result, null, 2);
     console.log('Serialized response:', serializedResult);
     
+    // Return the response with proper headers
     return new Response(
-      serializedResult, 
+      serializedResult,
       { 
         status: 200,
         headers: { 
@@ -214,11 +218,17 @@ export async function POST(req: NextRequest) {
       stack: errorStack
     });
     
+    // Create a clean error response
+    const errorResponse = {
+      error: 'Failed to get feedback from OpenAI',
+      details: errorMessage
+    };
+    
+    // Log the error response
+    console.log('Error response:', errorResponse);
+    
     return new Response(
-      JSON.stringify({ 
-        error: 'Failed to get feedback from OpenAI',
-        details: errorMessage
-      }), 
+      JSON.stringify(errorResponse, null, 2),
       { 
         status: 500,
         headers: { 

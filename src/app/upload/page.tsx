@@ -167,15 +167,27 @@ function UploadContent() {
       try {
         const text = await response.text();
         console.log('Raw response:', text);
-        data = JSON.parse(text);
-        console.log('Parsed response data:', data);
+        
+        try {
+          data = JSON.parse(text);
+          console.log('Parsed response data:', data);
+        } catch (parseError) {
+          console.error('Failed to parse JSON:', parseError);
+          console.error('Raw text that failed to parse:', text);
+          throw new Error('Failed to parse server response as JSON');
+        }
+
+        if (!response.ok) {
+          console.error('API error:', data);
+          throw new Error(data.error || 'Failed to get feedback');
+        }
 
         if (!data.roast) {
           console.error('Unexpected response format:', data);
           throw new Error('Invalid response format from server');
         }
 
-        // Store the result in session storage
+        // Create a clean result object
         const result = {
           roast: data.roast,
           vc: data.vc,
@@ -187,9 +199,9 @@ function UploadContent() {
         sessionStorage.setItem('roastResult', JSON.stringify(result));
 
         router.push(`/results?roast=${encodeURIComponent(data.roast)}`);
-      } catch (parseError) {
-        console.error('Failed to parse response:', parseError);
-        throw new Error('Failed to parse server response');
+      } catch (error) {
+        console.error('Error handling response:', error);
+        throw error;
       }
     } catch (error) {
       console.error('Error submitting pitch deck:', error);
