@@ -93,6 +93,27 @@ const intensities = [
   { value: "brutal", label: "Brutal" },
 ];
 
+// Helper function to safely stringify objects
+function safeStringify(obj: any): string {
+  try {
+    // First try to stringify the object
+    const str = JSON.stringify(obj);
+    // If it's already a string, return it
+    if (typeof obj === 'string') return obj;
+    // If it's an object that stringifies to [object Object], handle it specially
+    if (str === '[object Object]') {
+      return JSON.stringify({
+        ...obj,
+        toString: undefined // Remove toString to prevent recursion
+      });
+    }
+    return str;
+  } catch (e) {
+    console.error('Error stringifying object:', e);
+    return JSON.stringify({ error: 'Failed to stringify object' });
+  }
+}
+
 function UploadContent() {
   const router = useRouter();
   const params = useSearchParams();
@@ -144,7 +165,7 @@ function UploadContent() {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: JSON.stringify({
+        body: safeStringify({
           pitchDeck: text,
           vc: vc
         }),
@@ -167,13 +188,19 @@ function UploadContent() {
         throw new Error('Invalid response format');
       }
 
-      // Store the result
+      // Create a clean result object
       const result = {
         roast: data.roast,
-        vc: data.vc
+        vc: {
+          id: data.vc.id || '',
+          name: data.vc.name || '',
+          knownFor: data.vc.knownFor || '',
+          vibe: data.vc.vibe || ''
+        }
       };
 
-      sessionStorage.setItem('roastResult', JSON.stringify(result));
+      // Store the result with safe serialization
+      sessionStorage.setItem('roastResult', safeStringify(result));
 
       // Redirect to results page
       router.push(`/results?roast=${encodeURIComponent(data.roast)}`);

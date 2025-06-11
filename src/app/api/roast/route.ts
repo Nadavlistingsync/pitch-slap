@@ -2,6 +2,27 @@ import { NextRequest } from 'next/server';
 
 export const runtime = 'edge';
 
+// Helper function to safely stringify objects
+function safeStringify(obj: any): string {
+  try {
+    // First try to stringify the object
+    const str = JSON.stringify(obj);
+    // If it's already a string, return it
+    if (typeof obj === 'string') return obj;
+    // If it's an object that stringifies to [object Object], handle it specially
+    if (str === '[object Object]') {
+      return JSON.stringify({
+        ...obj,
+        toString: undefined // Remove toString to prevent recursion
+      });
+    }
+    return str;
+  } catch (e) {
+    console.error('Error stringifying object:', e);
+    return JSON.stringify({ error: 'Failed to stringify object' });
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     // Parse request body
@@ -10,7 +31,7 @@ export async function POST(req: NextRequest) {
 
     if (!pitchDeck || !vc) {
       return new Response(
-        JSON.stringify({ error: 'Missing pitch deck or VC information' }),
+        safeStringify({ error: 'Missing pitch deck or VC information' }),
         { 
           status: 400,
           headers: { 
@@ -24,7 +45,7 @@ export async function POST(req: NextRequest) {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
       return new Response(
-        JSON.stringify({ error: 'API key not configured' }),
+        safeStringify({ error: 'API key not configured' }),
         { 
           status: 500,
           headers: { 
@@ -60,7 +81,7 @@ export async function POST(req: NextRequest) {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ error: 'Failed to get AI response' }));
       return new Response(
-        JSON.stringify({ error: errorData.error || 'Failed to get AI response' }),
+        safeStringify({ error: errorData.error || 'Failed to get AI response' }),
         { 
           status: 500,
           headers: { 
@@ -75,7 +96,7 @@ export async function POST(req: NextRequest) {
     
     if (!data.choices?.[0]?.message?.content) {
       return new Response(
-        JSON.stringify({ error: 'Invalid response from AI' }),
+        safeStringify({ error: 'Invalid response from AI' }),
         { 
           status: 500,
           headers: { 
@@ -86,19 +107,20 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Return just the AI's response
+    // Create a clean result object
     const result = {
       roast: data.choices[0].message.content.trim(),
       vc: {
-        id: vc.id,
-        name: vc.name,
-        knownFor: vc.knownFor,
-        vibe: vc.vibe
+        id: vc.id || '',
+        name: vc.name || '',
+        knownFor: vc.knownFor || '',
+        vibe: vc.vibe || ''
       }
     };
 
+    // Ensure the result is properly serialized
     return new Response(
-      JSON.stringify(result),
+      safeStringify(result),
       { 
         status: 200,
         headers: { 
@@ -111,7 +133,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('Error in roast API:', error);
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
+      safeStringify({ error: 'Internal server error' }),
       { 
         status: 500,
         headers: { 
