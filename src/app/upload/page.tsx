@@ -233,7 +233,9 @@ function UploadContent() {
       } else if (typeof error === 'string') {
         errorMessage = error;
       } else if (error && typeof error === 'object') {
-        errorMessage = error.message || error.error || 'An unexpected error occurred';
+        // Type guard for error object
+        const errorObj = error as { message?: string; error?: string };
+        errorMessage = errorObj.message || errorObj.error || 'An unexpected error occurred';
       }
       
       setError(errorMessage);
