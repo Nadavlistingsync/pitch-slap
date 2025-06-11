@@ -144,7 +144,7 @@ export async function POST(req: NextRequest) {
       return new Response(
         JSON.stringify({ 
           error: `OpenAI API error: ${responseData.error?.message || 'Unknown error'}`,
-          details: responseData
+          details: JSON.stringify(responseData)
         }), 
         { 
           status: response.status,
@@ -161,7 +161,7 @@ export async function POST(req: NextRequest) {
       return new Response(
         JSON.stringify({ 
           error: 'Unexpected response format from OpenAI',
-          details: 'Response missing required fields'
+          details: JSON.stringify(responseData)
         }), 
         { 
           status: 500,
@@ -179,7 +179,7 @@ export async function POST(req: NextRequest) {
     // Store the result in session storage
     const result = {
       roast,
-      vc,
+      vc: JSON.stringify(vc),
       intensity,
       timestamp: new Date().toISOString()
     };
