@@ -189,8 +189,12 @@ export async function POST(req: NextRequest) {
       timestamp: new Date().toISOString()
     };
     
+    // Ensure proper serialization of the response
+    const serializedResult = JSON.stringify(result);
+    console.log('Serialized response:', serializedResult);
+    
     return new Response(
-      JSON.stringify(result), 
+      serializedResult, 
       { 
         status: 200,
         headers: { 

@@ -169,30 +169,28 @@ function UploadContent() {
         console.log('Raw response:', text);
         data = JSON.parse(text);
         console.log('Parsed response data:', data);
+
+        if (!data.roast) {
+          console.error('Unexpected response format:', data);
+          throw new Error('Invalid response format from server');
+        }
+
+        // Store the result in session storage
+        const result = {
+          roast: data.roast,
+          vc: data.vc,
+          intensity: data.intensity,
+          timestamp: data.timestamp
+        };
+
+        console.log('Storing result:', result);
+        sessionStorage.setItem('roastResult', JSON.stringify(result));
+
+        router.push(`/results?roast=${encodeURIComponent(data.roast)}`);
       } catch (parseError) {
         console.error('Failed to parse response:', parseError);
         throw new Error('Failed to parse server response');
       }
-
-      if (!response.ok) {
-        console.error('API error:', data);
-        throw new Error(data.error || 'Failed to get feedback');
-      }
-
-      if (!data.roast) {
-        console.error('Unexpected response format:', data);
-        throw new Error('Invalid response format from server');
-      }
-
-      // Store the result in session storage
-      sessionStorage.setItem('roastResult', JSON.stringify({
-        roast: data.roast,
-        vc: data.vc,
-        intensity: data.intensity,
-        timestamp: data.timestamp
-      }));
-
-      router.push(`/results?roast=${encodeURIComponent(data.roast)}`);
     } catch (error) {
       console.error('Error submitting pitch deck:', error);
       setError(error instanceof Error ? error.message : 'Failed to get feedback');
