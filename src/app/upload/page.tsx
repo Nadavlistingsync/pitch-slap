@@ -187,18 +187,30 @@ function UploadContent() {
           throw new Error('Invalid response format from server');
         }
 
-        // Create a clean result object
+        // Create a clean result object with only the necessary data
         const result = {
           roast: data.roast,
-          vc: data.vc,
+          vc: {
+            id: data.vc.id,
+            name: data.vc.name,
+            knownFor: data.vc.knownFor,
+            vibe: data.vc.vibe
+          },
           intensity: data.intensity,
           timestamp: data.timestamp
         };
 
         console.log('Storing result:', result);
-        sessionStorage.setItem('roastResult', JSON.stringify(result));
+        
+        // Ensure proper serialization before storing
+        const serializedResult = JSON.stringify(result, null, 2);
+        sessionStorage.setItem('roastResult', serializedResult);
 
-        router.push(`/results?roast=${encodeURIComponent(data.roast)}`);
+        // Ensure proper encoding of the roast for the URL
+        const encodedRoast = encodeURIComponent(data.roast);
+        console.log('Encoded roast for URL:', encodedRoast);
+        
+        router.push(`/results?roast=${encodedRoast}`);
       } catch (error) {
         console.error('Error handling response:', error);
         throw error;

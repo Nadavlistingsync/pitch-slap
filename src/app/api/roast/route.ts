@@ -192,8 +192,20 @@ export async function POST(req: NextRequest) {
     // Log the result before serialization
     console.log('Result object:', result);
     
-    // Ensure proper serialization
-    const serializedResult = JSON.stringify(result, null, 2);
+    // Ensure proper serialization with no circular references
+    const serializedResult = JSON.stringify(result, (key, value) => {
+      if (typeof value === 'object' && value !== null) {
+        // Handle any potential circular references
+        try {
+          JSON.stringify(value);
+          return value;
+        } catch (e) {
+          return '[Circular]';
+        }
+      }
+      return value;
+    }, 2);
+    
     console.log('Serialized response:', serializedResult);
     
     // Return the response with proper headers
@@ -227,8 +239,11 @@ export async function POST(req: NextRequest) {
     // Log the error response
     console.log('Error response:', errorResponse);
     
+    // Ensure proper serialization of error response
+    const serializedError = JSON.stringify(errorResponse, null, 2);
+    
     return new Response(
-      JSON.stringify(errorResponse, null, 2),
+      serializedError,
       { 
         status: 500,
         headers: { 
