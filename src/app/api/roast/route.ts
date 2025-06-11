@@ -64,15 +64,20 @@ export async function POST(req: NextRequest) {
     const roast = data.choices[0].message.content;
     console.log('Successfully generated roast');
     return NextResponse.json({ roast });
-  } catch (error) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    const errorName = error instanceof Error ? error.name : 'Error';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    
     console.error('Error in roast API route:', {
-      name: error.name,
-      message: error.message,
-      stack: error.stack
+      name: errorName,
+      message: errorMessage,
+      stack: errorStack
     });
+    
     return NextResponse.json({ 
       error: 'Failed to get feedback from OpenAI.',
-      details: error.message
+      details: errorMessage
     }, { status: 500 });
   }
 } 
