@@ -193,7 +193,7 @@ export async function POST(req: NextRequest) {
     console.log('Result object:', result);
     
     // Ensure proper serialization with no circular references
-    const serializedResult = JSON.stringify(result, (key, value) => {
+    const serializedResult = JSON.stringify(result, (_key, value) => {
       if (typeof value === 'object' && value !== null) {
         // Handle any potential circular references
         try {
