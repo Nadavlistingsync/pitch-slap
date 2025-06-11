@@ -137,101 +137,38 @@ function UploadContent() {
 
     try {
       const text = await file.text();
-      console.log('File content length:', text.length);
       
       const response = await fetch('/api/roast', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           pitchDeck: text,
-          vc: vc,
-          intensity: 'high',
+          vc: vc
         }),
       });
 
-      console.log('Response status:', response.status);
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+      const data = await response.json();
 
-      const contentType = response.headers.get('content-type');
-      console.log('Response content type:', contentType);
-      
-      if (!contentType || !contentType.includes('application/json')) {
-        console.error('Invalid content type:', contentType);
-        throw new Error('Invalid response content type');
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to get feedback');
       }
 
-      let data;
-      try {
-        const text = await response.text();
-        console.log('Raw response:', text);
-        
-        try {
-          data = JSON.parse(text);
-          console.log('Parsed response data:', JSON.stringify(data, null, 2));
-        } catch (parseError) {
-          console.error('Failed to parse JSON:', parseError);
-          console.error('Raw text that failed to parse:', text);
-          throw new Error('Failed to parse server response as JSON');
-        }
-
-        if (!response.ok) {
-          console.error('API error:', JSON.stringify(data, null, 2));
-          throw new Error(data.error || 'Failed to get feedback');
-        }
-
-        if (!data.roast) {
-          console.error('Unexpected response format:', JSON.stringify(data, null, 2));
-          throw new Error('Invalid response format from server');
-        }
-
-        // Create a clean result object with only the necessary data
-        const result = {
-          roast: typeof data.roast === 'string' ? data.roast : JSON.stringify(data.roast),
-          vc: {
-            id: data.vc?.id || '',
-            name: data.vc?.name || '',
-            knownFor: data.vc?.knownFor || '',
-            vibe: data.vc?.vibe || ''
-          },
-          intensity: data.intensity || 'balanced',
-          timestamp: data.timestamp || new Date().toISOString()
-        };
-
-        console.log('Storing result:', JSON.stringify(result, null, 2));
-        
-        // Ensure proper serialization before storing
-        const serializedResult = JSON.stringify(result, (_key, value) => {
-          if (typeof value === 'object' && value !== null) {
-            try {
-              if (value.toString() === '[object Object]') {
-                return JSON.parse(JSON.stringify(value));
-              }
-              JSON.stringify(value);
-              return value;
-            } catch (e) {
-              console.error('Error serializing result:', e);
-              return '[Circular]';
-            }
-          }
-          return value;
-        }, 2);
-
-        sessionStorage.setItem('roastResult', serializedResult);
-
-        // Ensure proper encoding of the roast for the URL
-        const encodedRoast = encodeURIComponent(result.roast);
-        console.log('Encoded roast for URL:', encodedRoast);
-        
-        router.push(`/results?roast=${encodedRoast}`);
-      } catch (error) {
-        console.error('Error handling response:', error);
-        throw error;
+      if (!data.roast) {
+        throw new Error('Invalid response format');
       }
+
+      // Store the result
+      sessionStorage.setItem('roastResult', JSON.stringify({
+        roast: data.roast,
+        vc: data.vc
+      }));
+
+      // Redirect to results page
+      router.push(`/results?roast=${encodeURIComponent(data.roast)}`);
     } catch (error) {
-      console.error('Error submitting pitch deck:', error);
+      console.error('Error:', error);
       setError(error instanceof Error ? error.message : 'Failed to get feedback');
     } finally {
       setLoading(false);
