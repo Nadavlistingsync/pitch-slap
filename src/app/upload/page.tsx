@@ -177,37 +177,54 @@ function UploadContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file || !vc) {
-      console.log('❌ Upload: Missing file or VC selection');
+      setError('Please select a file and VC');
       return;
     }
-
-    // Create a clean VC object
-    const cleanVc = createCleanVcObject(vc);
-    console.log('🔵 Upload: Clean VC object created:', safeStringify(cleanVc));
 
     setLoading(true);
     setError(null);
 
     try {
-      console.log('🔵 Upload: Reading file contents');
-      const text = await file.text();
-      console.log('🔵 Upload: File contents read', {
-        length: text.length,
-        preview: text.substring(0, 100) + '...'
-      });
+      console.log('🔵 Upload: Starting file processing for:', file.name);
+      let pitchDeckContent = '';
       
-      console.log('🔵 Upload: Preparing API request');
-      const requestBody = safeStringify({
-        pitchDeck: text,
+      try {
+        if (file.type === 'application/pdf') {
+          console.log('🔵 Upload: Processing PDF file');
+          const arrayBuffer = await file.arrayBuffer();
+          pitchDeckContent = new TextDecoder().decode(arrayBuffer);
+          console.log('🔵 Upload: PDF content length:', pitchDeckContent.length);
+        } else {
+          console.log('🔵 Upload: Processing text file');
+          pitchDeckContent = await file.text();
+          console.log('🔵 Upload: Text content length:', pitchDeckContent.length);
+        }
+
+        if (!pitchDeckContent || pitchDeckContent.trim().length === 0) {
+          throw new Error('The file appears to be empty or could not be read properly');
+        }
+
+        console.log('🔵 Upload: Content preview:', pitchDeckContent.substring(0, 200) + '...');
+      } catch (readError) {
+        console.error('❌ Upload: File reading error:', readError);
+        throw new Error('Failed to read the file. Please make sure it\'s a valid PDF or text file.');
+      }
+
+      // Create a clean VC object
+      const cleanVc = {
+        name: vc.name,
+        firm: vc.firm,
+        knownFor: vc.knownFor,
+        vibe: vc.vibe
+      };
+
+      console.log('🔵 Upload: Preparing API request with VC:', cleanVc);
+      const requestBody = JSON.stringify({
+        pitchDeck: pitchDeckContent,
         vc: cleanVc
       });
-      console.log('🔵 Upload: Request body prepared', {
-        length: requestBody.length,
-        preview: requestBody.substring(0, 100) + '...',
-        fullBody: requestBody
-      });
 
-      console.log('🔵 Upload: Sending API request');
+      console.log('🔵 Upload: Sending API request with content length:', requestBody.length);
       const response = await fetch('/api/roast', {
         method: 'POST',
         headers: {
@@ -217,90 +234,57 @@ function UploadContent() {
         body: requestBody,
       });
 
-      console.log('🔵 Upload: Received API response', {
-        status: response.status,
-        statusText: response.statusText,
-        headers: Object.fromEntries(response.headers.entries())
-      });
-
+      console.log('🔵 Upload: Received API response status:', response.status);
       let data;
       try {
-        console.log('🔵 Upload: Reading response text');
-        const text = await response.text();
-        console.log('🔵 Upload: Response text received', {
-          length: text.length,
-          preview: text.substring(0, 100) + '...'
-        });
-
-        console.log('🔵 Upload: Parsing response JSON');
-        data = JSON.parse(text);
-        console.log('🔵 Upload: Response parsed successfully', {
-          hasRoast: !!data.roast,
-          hasVc: !!data.vc,
-          error: data.error
-        });
+        const responseText = await response.text();
+        console.log('🔵 Upload: Raw API response:', responseText.substring(0, 200) + '...');
+        data = JSON.parse(responseText);
       } catch (parseError) {
-        console.error('❌ Upload: Failed to parse response:', {
-          error: parseError,
-          message: parseError instanceof Error ? parseError.message : 'Unknown error',
-          stack: parseError instanceof Error ? parseError.stack : undefined
-        });
-        throw new Error('Invalid response from server');
+        console.error('❌ Upload: Failed to parse response:', parseError);
+        throw new Error('Invalid response from server. Please try again.');
       }
 
       if (!response.ok) {
-        console.error('❌ Upload: API request failed:', {
-          status: response.status,
-          error: data.error
-        });
+        console.error('❌ Upload: API error:', data.error);
         throw new Error(data.error || 'Failed to get feedback');
       }
 
-      if (!data.roast || !data.vc) {
-        console.error('❌ Upload: Invalid response format:', data);
-        throw new Error('Invalid response format');
+      if (!data.roast || typeof data.roast !== 'string') {
+        console.error('❌ Upload: Invalid feedback format:', data);
+        throw new Error('Invalid feedback format received');
       }
 
-      console.log('🔵 Upload: Creating result object');
+      console.log('🔵 Upload: Successfully received feedback, length:', data.roast.length);
+
+      // Store the result
       const result = {
-        roast: String(data.roast),
-        vc: createCleanVcObject(data.vc)
+        roast: data.roast,
+        vc: cleanVc
       };
-      console.log('🔵 Upload: Result object created:', {
-        roastLength: result.roast.length,
-        vc: safeStringify(result.vc)
-      });
 
-      console.log('🔵 Upload: Storing result in session storage');
-      const serializedResult = safeStringify(result);
-      console.log('🔵 Upload: Serialized result:', {
-        length: serializedResult.length,
-        preview: serializedResult.substring(0, 100) + '...',
-        fullResult: serializedResult
-      });
-      sessionStorage.setItem('roastResult', serializedResult);
-      console.log('🔵 Upload: Result stored successfully');
+      sessionStorage.setItem('roastResult', JSON.stringify(result));
+      sessionStorage.setItem('selectedVC', JSON.stringify(cleanVc));
 
-      console.log('🔵 Upload: Preparing redirect');
-      const encodedRoast = encodeURIComponent(String(data.roast));
-      console.log('🔵 Upload: Redirecting to results page');
+      // Redirect to results page
+      const encodedRoast = encodeURIComponent(data.roast);
       router.push(`/results?roast=${encodedRoast}`);
     } catch (error) {
-      console.error('❌ Upload: Error in submission process:', {
-        error,
-        message: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined
-      });
-      setError(
-        error instanceof Error 
-          ? error.message 
-          : typeof error === 'string' 
-            ? error 
-            : 'Failed to get feedback. Please try again.'
-      );
+      console.error('❌ Upload: Error in submission process:', error);
+      
+      let errorMessage = 'Failed to process your pitch deck. Please try again.';
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
+      } else if (error && typeof error === 'object') {
+        errorMessage = error.message || error.error || 'An unexpected error occurred';
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
-      console.log('🔵 Upload: Submission process completed');
     }
   };
 
@@ -340,7 +324,7 @@ function UploadContent() {
           </div>
           {error && (
             <div className="text-red-500 bg-red-500/10 p-4 rounded-lg">
-              {typeof error === 'string' ? error : 'An error occurred. Please try again.'}
+              {error}
             </div>
           )}
           <button
