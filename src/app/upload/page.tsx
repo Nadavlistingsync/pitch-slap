@@ -143,6 +143,7 @@ function UploadContent() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
         body: JSON.stringify({
           pitchDeck: text,
@@ -155,7 +156,10 @@ function UploadContent() {
       console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
       const contentType = response.headers.get('content-type');
+      console.log('Response content type:', contentType);
+      
       if (!contentType || !contentType.includes('application/json')) {
+        console.error('Invalid content type:', contentType);
         throw new Error('Invalid response content type');
       }
 
