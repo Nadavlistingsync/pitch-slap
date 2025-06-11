@@ -1,5 +1,3 @@
-import { NextRequest } from 'next/server';
-
 export const runtime = 'edge';
 
 // Helper function to create a clean VC object
