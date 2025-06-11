@@ -4,21 +4,50 @@ export const runtime = 'edge';
 
 // Helper function to safely stringify objects
 function safeStringify(obj: any): string {
+  console.log('🔍 Serialization: Starting object serialization', {
+    type: typeof obj,
+    isObject: obj instanceof Object,
+    keys: Object.keys(obj || {}),
+    hasToString: obj?.toString !== undefined
+  });
+
   try {
     // First try to stringify the object
     const str = JSON.stringify(obj);
+    console.log('🔍 Serialization: Initial stringify result:', {
+      result: str,
+      length: str?.length
+    });
+
     // If it's already a string, return it
-    if (typeof obj === 'string') return obj;
+    if (typeof obj === 'string') {
+      console.log('🔍 Serialization: Object is already a string');
+      return obj;
+    }
+
     // If it's an object that stringifies to [object Object], handle it specially
     if (str === '[object Object]') {
-      return JSON.stringify({
+      console.log('🔍 Serialization: Detected [object Object], applying special handling');
+      const cleanedObj = {
         ...obj,
         toString: undefined // Remove toString to prevent recursion
+      };
+      const result = JSON.stringify(cleanedObj);
+      console.log('🔍 Serialization: Special handling result:', {
+        result,
+        length: result?.length
       });
+      return result;
     }
+
+    console.log('🔍 Serialization: Standard stringify successful');
     return str;
   } catch (e) {
-    console.error('Error stringifying object:', e);
+    console.error('❌ Serialization: Error during stringification:', {
+      error: e,
+      message: e instanceof Error ? e.message : 'Unknown error',
+      stack: e instanceof Error ? e.stack : undefined
+    });
     return JSON.stringify({ error: 'Failed to stringify object' });
   }
 }
@@ -31,7 +60,7 @@ export async function POST(req: NextRequest) {
     console.log('🔵 API: Request body received:', {
       hasPitchDeck: !!body.pitchDeck,
       pitchDeckLength: body.pitchDeck?.length,
-      vc: body.vc
+      vc: safeStringify(body.vc) // Safely stringify VC object
     });
 
     if (!body.pitchDeck) {
@@ -109,13 +138,14 @@ export async function POST(req: NextRequest) {
 
     console.log('🔵 API: Final result object:', {
       roastLength: result.roast.length,
-      vc: result.vc
+      vc: safeStringify(result.vc) // Safely stringify VC object
     });
 
     const serializedResult = safeStringify(result);
     console.log('🔵 API: Serialized result:', {
       length: serializedResult.length,
-      preview: serializedResult.substring(0, 100) + '...'
+      preview: serializedResult.substring(0, 100) + '...',
+      fullResult: serializedResult // Log the full result for debugging
     });
 
     return new Response(serializedResult, {
@@ -138,7 +168,7 @@ export async function POST(req: NextRequest) {
       details: error instanceof Error ? error.message : 'Unknown error'
     };
 
-    console.log('🔵 API: Sending error response:', errorResponse);
+    console.log('🔵 API: Sending error response:', safeStringify(errorResponse));
     return new Response(
       safeStringify(errorResponse),
       { status: 500 }

@@ -95,21 +95,50 @@ const intensities = [
 
 // Helper function to safely stringify objects
 function safeStringify(obj: any): string {
+  console.log('🔍 Upload Serialization: Starting object serialization', {
+    type: typeof obj,
+    isObject: obj instanceof Object,
+    keys: Object.keys(obj || {}),
+    hasToString: obj?.toString !== undefined
+  });
+
   try {
     // First try to stringify the object
     const str = JSON.stringify(obj);
+    console.log('🔍 Upload Serialization: Initial stringify result:', {
+      result: str,
+      length: str?.length
+    });
+
     // If it's already a string, return it
-    if (typeof obj === 'string') return obj;
+    if (typeof obj === 'string') {
+      console.log('🔍 Upload Serialization: Object is already a string');
+      return obj;
+    }
+
     // If it's an object that stringifies to [object Object], handle it specially
     if (str === '[object Object]') {
-      return JSON.stringify({
+      console.log('🔍 Upload Serialization: Detected [object Object], applying special handling');
+      const cleanedObj = {
         ...obj,
         toString: undefined // Remove toString to prevent recursion
+      };
+      const result = JSON.stringify(cleanedObj);
+      console.log('🔍 Upload Serialization: Special handling result:', {
+        result,
+        length: result?.length
       });
+      return result;
     }
+
+    console.log('🔍 Upload Serialization: Standard stringify successful');
     return str;
   } catch (e) {
-    console.error('Error stringifying object:', e);
+    console.error('❌ Upload Serialization: Error during stringification:', {
+      error: e,
+      message: e instanceof Error ? e.message : 'Unknown error',
+      stack: e instanceof Error ? e.stack : undefined
+    });
     return JSON.stringify({ error: 'Failed to stringify object' });
   }
 }
@@ -159,7 +188,7 @@ function UploadContent() {
     console.log('🔵 Upload: Starting submission process', {
       fileName: file.name,
       fileSize: file.size,
-      vc: vc
+      vc: safeStringify(vc) // Safely stringify VC object
     });
 
     setLoading(true);
@@ -180,7 +209,8 @@ function UploadContent() {
       });
       console.log('🔵 Upload: Request body prepared', {
         length: requestBody.length,
-        preview: requestBody.substring(0, 100) + '...'
+        preview: requestBody.substring(0, 100) + '...',
+        fullBody: requestBody // Log the full body for debugging
       });
 
       console.log('🔵 Upload: Sending API request');
@@ -249,11 +279,16 @@ function UploadContent() {
       };
       console.log('🔵 Upload: Result object created:', {
         roastLength: result.roast.length,
-        vc: result.vc
+        vc: safeStringify(result.vc) // Safely stringify VC object
       });
 
       console.log('🔵 Upload: Storing result in session storage');
       const serializedResult = safeStringify(result);
+      console.log('🔵 Upload: Serialized result:', {
+        length: serializedResult.length,
+        preview: serializedResult.substring(0, 100) + '...',
+        fullResult: serializedResult // Log the full result for debugging
+      });
       sessionStorage.setItem('roastResult', serializedResult);
       console.log('🔵 Upload: Result stored successfully');
 
