@@ -189,25 +189,40 @@ function UploadContent() {
 
         // Create a clean result object with only the necessary data
         const result = {
-          roast: data.roast,
+          roast: typeof data.roast === 'string' ? data.roast : JSON.stringify(data.roast),
           vc: {
-            id: data.vc.id,
-            name: data.vc.name,
-            knownFor: data.vc.knownFor,
-            vibe: data.vc.vibe
+            id: data.vc?.id || '',
+            name: data.vc?.name || '',
+            knownFor: data.vc?.knownFor || '',
+            vibe: data.vc?.vibe || ''
           },
-          intensity: data.intensity,
-          timestamp: data.timestamp
+          intensity: data.intensity || 'balanced',
+          timestamp: data.timestamp || new Date().toISOString()
         };
 
         console.log('Storing result:', JSON.stringify(result, null, 2));
         
         // Ensure proper serialization before storing
-        const serializedResult = JSON.stringify(result, null, 2);
+        const serializedResult = JSON.stringify(result, (_key, value) => {
+          if (typeof value === 'object' && value !== null) {
+            try {
+              if (value.toString() === '[object Object]') {
+                return JSON.parse(JSON.stringify(value));
+              }
+              JSON.stringify(value);
+              return value;
+            } catch (e) {
+              console.error('Error serializing result:', e);
+              return '[Circular]';
+            }
+          }
+          return value;
+        }, 2);
+
         sessionStorage.setItem('roastResult', serializedResult);
 
         // Ensure proper encoding of the roast for the URL
-        const encodedRoast = encodeURIComponent(data.roast);
+        const encodedRoast = encodeURIComponent(result.roast);
         console.log('Encoded roast for URL:', encodedRoast);
         
         router.push(`/results?roast=${encodedRoast}`);

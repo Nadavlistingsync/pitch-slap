@@ -192,15 +192,19 @@ export async function POST(req: NextRequest) {
     // Log the result before serialization
     console.log('Result object:', JSON.stringify(result, null, 2));
     
-    // Ensure proper serialization with no circular references
+    // Ensure proper serialization with no circular references and handle any potential [object Object] issues
     const serializedResult = JSON.stringify(result, (_key, value) => {
       if (typeof value === 'object' && value !== null) {
         // Handle any potential circular references
         try {
+          // If the object has a toString method that returns [object Object], use JSON.stringify
+          if (value.toString() === '[object Object]') {
+            return JSON.parse(JSON.stringify(value));
+          }
           JSON.stringify(value);
           return value;
         } catch (e) {
-          console.error('Circular reference detected:', e);
+          console.error('Circular reference or serialization error:', e);
           return '[Circular]';
         }
       }
@@ -240,8 +244,22 @@ export async function POST(req: NextRequest) {
     // Log the error response
     console.log('Error response:', JSON.stringify(errorResponse, null, 2));
     
-    // Ensure proper serialization of error response
-    const serializedError = JSON.stringify(errorResponse, null, 2);
+    // Ensure proper serialization of error response with the same object handling
+    const serializedError = JSON.stringify(errorResponse, (_key, value) => {
+      if (typeof value === 'object' && value !== null) {
+        try {
+          if (value.toString() === '[object Object]') {
+            return JSON.parse(JSON.stringify(value));
+          }
+          JSON.stringify(value);
+          return value;
+        } catch (e) {
+          console.error('Error serializing error response:', e);
+          return '[Circular]';
+        }
+      }
+      return value;
+    }, 2);
     
     return new Response(
       serializedError,
