@@ -157,22 +157,29 @@ function UploadContent() {
         body: JSON.stringify({ pitchDeck: pitchDeckText, vc, intensity }),
       });
       
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({ error: 'Failed to parse error response' }));
-        throw new Error(errorData.error || errorData.details || 'Failed to get feedback');
+      let data;
+      try {
+        data = await res.json();
+      } catch (jsonError) {
+        console.error('Failed to parse API response:', jsonError);
+        throw new Error('Failed to parse server response');
       }
 
-      const data = await res.json();
+      if (!res.ok) {
+        const errorMessage = data.error || 'Failed to get feedback';
+        const errorDetails = data.details ? `\nDetails: ${typeof data.details === 'string' ? data.details : JSON.stringify(data.details)}` : '';
+        throw new Error(`${errorMessage}${errorDetails}`);
+      }
+
       if (data.roast) {
         // Store roast in sessionStorage for results page
         sessionStorage.setItem("roastResult", JSON.stringify({ roast: data.roast, vc, intensity, pitchDeck: pitchDeckText }));
         router.push("/results");
       } else {
-        setError(data.error || data.details || "No feedback generated");
-        console.error('API Error:', data);
+        throw new Error(data.error || data.details || "No feedback generated");
       }
     } catch (err) {
-      console.error('Fetch Error:', err);
+      console.error('Error:', err);
       setError(err instanceof Error ? err.message : "Failed to get feedback");
     } finally {
       setLoading(false);
