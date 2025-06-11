@@ -1,51 +1,5 @@
 export const runtime = 'edge';
 
-// Helper function to create a clean VC object
-function createCleanVcObject(vc: any) {
-  return {
-    id: String(vc?.id || ''),
-    name: String(vc?.name || ''),
-    knownFor: String(vc?.knownFor || ''),
-    vibe: String(vc?.vibe || '')
-  };
-}
-
-// Helper function to safely stringify objects
-function safeStringify(obj: any): string {
-  try {
-    // If it's already a string, return it
-    if (typeof obj === 'string') {
-      return obj;
-    }
-
-    // If it's null or undefined, return empty object
-    if (obj == null) {
-      return '{}';
-    }
-
-    // If it's a VC object, use the clean VC object creator
-    if (obj.id !== undefined || obj.name !== undefined) {
-      const cleanVc = createCleanVcObject(obj);
-      return JSON.stringify(cleanVc);
-    }
-
-    // For other objects, create a clean copy
-    const cleanObj = Object.entries(obj).reduce((acc, [key, value]) => {
-      // Skip functions and undefined values
-      if (typeof value !== 'function' && value !== undefined) {
-        // Convert values to strings if they're not objects
-        acc[key] = typeof value === 'object' ? value : String(value);
-      }
-      return acc;
-    }, {} as Record<string, any>);
-
-    return JSON.stringify(cleanObj);
-  } catch (e) {
-    console.error('❌ Serialization: Error during stringification:', e);
-    return '{}';
-  }
-}
-
 export async function POST(request: Request) {
   try {
     console.log('🔵 API: Starting roast request processing');
