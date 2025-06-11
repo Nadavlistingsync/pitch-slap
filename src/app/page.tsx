@@ -105,7 +105,7 @@ export default function Home() {
               }`}
               onClick={() => {
                 setSelected(vc.id);
-                setTimeout(() => router.push(`/upload?vc=${vc.id}`), 300);
+                router.push(`/upload?vc=${vc.id}`);
               }}
             >
               <h2 className="text-2xl font-semibold mb-2">{vc.name}</h2>
