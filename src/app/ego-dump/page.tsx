@@ -1,4 +1,5 @@
 "use client";
+import { Suspense } from "react";
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
@@ -8,7 +9,7 @@ interface Comment {
   timestamp: string;
 }
 
-export default function EgoDump() {
+function EgoDumpContent() {
   const params = useSearchParams();
   const router = useRouter();
   const vcId = params.get("vc");
@@ -100,5 +101,13 @@ export default function EgoDump() {
         <button className="mt-8 bg-gray-700 px-4 py-2 rounded text-white" onClick={() => router.push("/")}>Back to Home</button>
       </div>
     </main>
+  );
+}
+
+export default function EgoDump() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-white">Loading...</div>}>
+      <EgoDumpContent />
+    </Suspense>
   );
 } 

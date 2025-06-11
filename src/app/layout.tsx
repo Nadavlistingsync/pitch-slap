@@ -7,6 +7,7 @@ import Footer from '../components/Footer';
 import { ToastProvider } from './components/ToastContext';
 import { UIProvider } from '../lib/UIContext';
 import ErrorBoundary from './components/ErrorBoundary';
+import { Suspense } from 'react';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -60,6 +61,7 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} font-sans min-h-screen bg-gradient-to-br from-[#18181b] via-[#23272f] to-[#1a1a1a] text-white`}>
         <ErrorBoundary>
+          <Suspense fallback={<div>Loading...</div>}>
             <UIProvider>
               <ToastProvider>
                 <div className="min-h-screen flex flex-col">
@@ -71,6 +73,7 @@ export default function RootLayout({
                 </div>
               </ToastProvider>
             </UIProvider>
+          </Suspense>
         </ErrorBoundary>
         <script dangerouslySetInnerHTML={{
           __html: `

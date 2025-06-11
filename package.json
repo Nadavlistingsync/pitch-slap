@@ -17,7 +17,7 @@
     "push": "bash scripts/push-to-github.sh",
     "deploy": "bash scripts/deploy-to-vercel.sh",
     "check": "bash scripts/check-code.sh",
-    "export": "next build && next start",
+    "export": "next build && next export",
     "postinstall": "next telemetry disable"
   },
   "dependencies": {

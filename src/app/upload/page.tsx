@@ -1,4 +1,5 @@
 "use client";
+import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
@@ -20,7 +21,7 @@ const intensities = [
   { value: "brutal", label: "Brutal" },
 ];
 
-export default function UploadPage() {
+function UploadContent() {
   const router = useRouter();
   const params = useSearchParams();
   const vcId = params.get("vc");
@@ -143,5 +144,13 @@ export default function UploadPage() {
         </form>
       </div>
     </main>
+  );
+}
+
+export default function UploadPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-white">Loading...</div>}>
+      <UploadContent />
+    </Suspense>
   );
 } 

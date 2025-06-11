@@ -7,7 +7,6 @@ export default function ResultsPage() {
   const [roast, setRoast] = useState<string>("");
   const [vc, setVc] = useState<any>(null);
   const [intensity, setIntensity] = useState<string>("");
-  const [pitchDeck, setPitchDeck] = useState<string>("");
 
   useEffect(() => {
     const data = sessionStorage.getItem("roastResult");
@@ -16,7 +15,6 @@ export default function ResultsPage() {
       setRoast(parsed.roast);
       setVc(parsed.vc);
       setIntensity(parsed.intensity);
-      setPitchDeck(parsed.pitchDeck);
     }
   }, []);
 
