@@ -12,35 +12,27 @@ function safeStringify(obj: any): string {
   });
 
   try {
-    // First try to stringify the object
-    const str = JSON.stringify(obj);
-    console.log('🔍 Serialization: Initial stringify result:', {
-      result: str,
-      length: str?.length
-    });
-
     // If it's already a string, return it
     if (typeof obj === 'string') {
       console.log('🔍 Serialization: Object is already a string');
       return obj;
     }
 
-    // If it's an object that stringifies to [object Object], handle it specially
-    if (str === '[object Object]') {
-      console.log('🔍 Serialization: Detected [object Object], applying special handling');
-      const cleanedObj = {
-        ...obj,
-        toString: undefined // Remove toString to prevent recursion
-      };
-      const result = JSON.stringify(cleanedObj);
-      console.log('🔍 Serialization: Special handling result:', {
-        result,
-        length: result?.length
-      });
-      return result;
-    }
+    // Create a clean copy of the object without any prototype methods
+    const cleanObj = Object.keys(obj || {}).reduce((acc, key) => {
+      if (typeof obj[key] !== 'function') {
+        acc[key] = obj[key];
+      }
+      return acc;
+    }, {} as Record<string, any>);
 
-    console.log('🔍 Serialization: Standard stringify successful');
+    // Stringify the clean object
+    const str = JSON.stringify(cleanObj);
+    console.log('🔍 Serialization: Clean object stringify result:', {
+      result: str,
+      length: str?.length
+    });
+
     return str;
   } catch (e) {
     console.error('❌ Serialization: Error during stringification:', {
@@ -60,7 +52,7 @@ export async function POST(req: NextRequest) {
     console.log('🔵 API: Request body received:', {
       hasPitchDeck: !!body.pitchDeck,
       pitchDeckLength: body.pitchDeck?.length,
-      vc: safeStringify(body.vc) // Safely stringify VC object
+      vc: safeStringify(body.vc)
     });
 
     if (!body.pitchDeck) {
@@ -88,8 +80,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log('🔵 API: Creating VC-specific prompt');
-    const prompt = `You are ${body.vc.name}, ${body.vc.knownFor}. ${body.vc.vibe}. Review this pitch deck and provide feedback: ${body.pitchDeck}`;
+    // Create a clean VC object
+    const cleanVc = {
+      id: body.vc.id || '',
+      name: body.vc.name || '',
+      knownFor: body.vc.knownFor || '',
+      vibe: body.vc.vibe || ''
+    };
+
+    console.log('🔵 API: Creating VC-specific prompt with clean VC object:', safeStringify(cleanVc));
+    const prompt = `You are ${cleanVc.name}, ${cleanVc.knownFor}. ${cleanVc.vibe}. Review this pitch deck and provide feedback: ${body.pitchDeck}`;
     console.log('🔵 API: Prompt created:', { promptLength: prompt.length });
 
     console.log('🔵 API: Calling OpenAI API');
@@ -126,26 +126,22 @@ export async function POST(req: NextRequest) {
     const roast = data.choices[0].message.content.trim();
     console.log('🔵 API: Roast generated:', { roastLength: roast.length });
 
+    // Create a clean result object
     const result = {
       roast,
-      vc: {
-        id: body.vc.id,
-        name: body.vc.name,
-        knownFor: body.vc.knownFor,
-        vibe: body.vc.vibe
-      }
+      vc: cleanVc
     };
 
     console.log('🔵 API: Final result object:', {
       roastLength: result.roast.length,
-      vc: safeStringify(result.vc) // Safely stringify VC object
+      vc: safeStringify(result.vc)
     });
 
     const serializedResult = safeStringify(result);
     console.log('🔵 API: Serialized result:', {
       length: serializedResult.length,
       preview: serializedResult.substring(0, 100) + '...',
-      fullResult: serializedResult // Log the full result for debugging
+      fullResult: serializedResult
     });
 
     return new Response(serializedResult, {

@@ -103,35 +103,27 @@ function safeStringify(obj: any): string {
   });
 
   try {
-    // First try to stringify the object
-    const str = JSON.stringify(obj);
-    console.log('🔍 Upload Serialization: Initial stringify result:', {
-      result: str,
-      length: str?.length
-    });
-
     // If it's already a string, return it
     if (typeof obj === 'string') {
       console.log('🔍 Upload Serialization: Object is already a string');
       return obj;
     }
 
-    // If it's an object that stringifies to [object Object], handle it specially
-    if (str === '[object Object]') {
-      console.log('🔍 Upload Serialization: Detected [object Object], applying special handling');
-      const cleanedObj = {
-        ...obj,
-        toString: undefined // Remove toString to prevent recursion
-      };
-      const result = JSON.stringify(cleanedObj);
-      console.log('🔍 Upload Serialization: Special handling result:', {
-        result,
-        length: result?.length
-      });
-      return result;
-    }
+    // Create a clean copy of the object without any prototype methods
+    const cleanObj = Object.keys(obj || {}).reduce((acc, key) => {
+      if (typeof obj[key] !== 'function') {
+        acc[key] = obj[key];
+      }
+      return acc;
+    }, {} as Record<string, any>);
 
-    console.log('🔍 Upload Serialization: Standard stringify successful');
+    // Stringify the clean object
+    const str = JSON.stringify(cleanObj);
+    console.log('🔍 Upload Serialization: Clean object stringify result:', {
+      result: str,
+      length: str?.length
+    });
+
     return str;
   } catch (e) {
     console.error('❌ Upload Serialization: Error during stringification:', {
@@ -185,10 +177,18 @@ function UploadContent() {
       return;
     }
 
+    // Create a clean VC object
+    const cleanVc = {
+      id: vc.id || '',
+      name: vc.name || '',
+      knownFor: vc.knownFor || '',
+      vibe: vc.vibe || ''
+    };
+
     console.log('🔵 Upload: Starting submission process', {
       fileName: file.name,
       fileSize: file.size,
-      vc: safeStringify(vc) // Safely stringify VC object
+      vc: safeStringify(cleanVc)
     });
 
     setLoading(true);
@@ -205,12 +205,12 @@ function UploadContent() {
       console.log('🔵 Upload: Preparing API request');
       const requestBody = safeStringify({
         pitchDeck: text,
-        vc: vc
+        vc: cleanVc
       });
       console.log('🔵 Upload: Request body prepared', {
         length: requestBody.length,
         preview: requestBody.substring(0, 100) + '...',
-        fullBody: requestBody // Log the full body for debugging
+        fullBody: requestBody
       });
 
       console.log('🔵 Upload: Sending API request');
@@ -279,7 +279,7 @@ function UploadContent() {
       };
       console.log('🔵 Upload: Result object created:', {
         roastLength: result.roast.length,
-        vc: safeStringify(result.vc) // Safely stringify VC object
+        vc: safeStringify(result.vc)
       });
 
       console.log('🔵 Upload: Storing result in session storage');
@@ -287,7 +287,7 @@ function UploadContent() {
       console.log('🔵 Upload: Serialized result:', {
         length: serializedResult.length,
         preview: serializedResult.substring(0, 100) + '...',
-        fullResult: serializedResult // Log the full result for debugging
+        fullResult: serializedResult
       });
       sessionStorage.setItem('roastResult', serializedResult);
       console.log('🔵 Upload: Result stored successfully');
