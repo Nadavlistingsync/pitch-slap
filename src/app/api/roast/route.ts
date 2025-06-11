@@ -3,17 +3,24 @@ import { NextRequest, NextResponse } from 'next/server';
 export const runtime = 'edge';
 
 export async function POST(req: NextRequest) {
-  const { pitchDeck, vc, intensity } = await req.json();
-  const apiKey = process.env.OPENAI_API_KEY;
-
-  if (!apiKey) {
-    return NextResponse.json({ error: 'OpenAI API key not set' }, { status: 500 });
-  }
-
-  // Build the prompt based on VC persona and intensity
-  const prompt = `You are ${vc.name}, a VC known for: ${vc.knownFor}. Your style: ${vc.vibe}. Roast this pitch deck with ${intensity} intensity.\n\nPitch Deck:\n${pitchDeck}`;
-
   try {
+    const { pitchDeck, vc, intensity } = await req.json();
+    const apiKey = process.env.OPENAI_API_KEY;
+
+    if (!apiKey) {
+      console.error('OpenAI API key is not set in environment variables');
+      return NextResponse.json({ error: 'OpenAI API key not set' }, { status: 500 });
+    }
+
+    if (!pitchDeck || !vc || !intensity) {
+      console.error('Missing required parameters:', { pitchDeck: !!pitchDeck, vc: !!vc, intensity });
+      return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 });
+    }
+
+    // Build the prompt based on VC persona and intensity
+    const prompt = `You are ${vc.name}, a VC known for: ${vc.knownFor}. Your style: ${vc.vibe}. Roast this pitch deck with ${intensity} intensity.\n\nPitch Deck:\n${pitchDeck}`;
+
+    console.log('Making request to OpenAI API...');
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -30,15 +37,42 @@ export async function POST(req: NextRequest) {
         temperature: 0.8,
       }),
     });
-    const data = await response.json();
+
+    console.log('OpenAI API response status:', response.status);
+    
     if (!response.ok) {
-      console.error('OpenAI API error:', data);
-      return NextResponse.json({ error: `OpenAI API error: ${data.error?.message || 'Unknown error'}` }, { status: response.status });
+      const errorData = await response.json().catch(() => ({ error: 'Failed to parse error response' }));
+      console.error('OpenAI API error:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorData,
+        headers: Object.fromEntries(response.headers.entries())
+      });
+      return NextResponse.json({ 
+        error: `OpenAI API error: ${errorData.error?.message || 'Unknown error'}`,
+        details: errorData
+      }, { status: response.status });
     }
-    const roast = data.choices?.[0]?.message?.content || 'No feedback generated.';
+
+    const data = await response.json();
+    
+    if (!data.choices?.[0]?.message?.content) {
+      console.error('Unexpected API response format:', data);
+      return NextResponse.json({ error: 'Unexpected response format from OpenAI' }, { status: 500 });
+    }
+
+    const roast = data.choices[0].message.content;
+    console.log('Successfully generated roast');
     return NextResponse.json({ roast });
   } catch (error) {
-    console.error('Error fetching from OpenAI:', error);
-    return NextResponse.json({ error: 'Failed to get feedback from OpenAI.' }, { status: 500 });
+    console.error('Error in roast API route:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack
+    });
+    return NextResponse.json({ 
+      error: 'Failed to get feedback from OpenAI.',
+      details: error.message
+    }, { status: 500 });
   }
 } 

@@ -156,6 +156,12 @@ function UploadContent() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ pitchDeck: pitchDeckText, vc, intensity }),
       });
+      
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ error: 'Failed to parse error response' }));
+        throw new Error(errorData.error || errorData.details || 'Failed to get feedback');
+      }
+
       const data = await res.json();
       if (data.roast) {
         // Store roast in sessionStorage for results page
