@@ -1,7 +1,7 @@
 /** @type {import('jest').Config} */
 const config = {
   testEnvironment: 'jsdom',
-  setupFilesAfterEnv: ['<rootDir>/src/app/__tests__/setup.tsx'],
+  setupFilesAfterEnv: ['./src/app/__tests__/setup.tsx'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1'
   },
@@ -10,7 +10,11 @@ const config = {
   ],
   transform: {
     '^.+\\.(ts|tsx)$': ['babel-jest', { presets: ['next/babel'] }]
-  }
+  },
+  testPathIgnorePatterns: [
+    '<rootDir>/node_modules/',
+    '<rootDir>/.next/'
+  ]
 };
 
 module.exports = config; 
