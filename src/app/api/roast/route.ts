@@ -75,9 +75,9 @@ export async function POST(request: Request) {
 
     // Adjust the prompt based on intensity
     const intensityLevel = {
-      gentle: 'Provide constructive feedback in a supportive and encouraging manner.',
-      balanced: 'Provide balanced feedback that highlights both strengths and areas for improvement.',
-      brutal: 'Provide brutally honest feedback that pulls no punches. Be direct and critical.'
+      gentle: 'Provide constructive feedback in a supportive and encouraging manner. Focus on strengths and opportunities for growth.',
+      balanced: 'Provide balanced feedback that highlights both strengths and areas for improvement. Be direct but constructive.',
+      brutal: 'Provide brutally honest feedback that pulls no punches. Be direct, critical, and challenge assumptions.'
     }[intensity] || intensityLevel.balanced;
 
     const prompt = `You are ${cleanVc.name} from ${cleanVc.firm}, known for ${cleanVc.knownFor}. 
@@ -88,19 +88,31 @@ ${intensityLevel}
 Please review this pitch deck and provide detailed feedback in the following format:
 
 EXECUTIVE SUMMARY:
-[Provide a brief overview of the pitch deck and your initial impressions]
+[Provide a brief overview of the pitch deck and your initial impressions. What's the core value proposition? Is it clear and compelling?]
+
+MARKET OPPORTUNITY:
+[Analyze the market size, timing, and competitive landscape. Is the opportunity big enough? Is the timing right?]
+
+PRODUCT & TECHNOLOGY:
+[Evaluate the product/technology. Is it innovative? Does it solve a real problem? What's the technical moat?]
+
+TEAM & EXECUTION:
+[Assess the team's capabilities and execution plan. Do they have the right experience? Is the go-to-market strategy solid?]
+
+FINANCIALS & METRICS:
+[Review the financial projections and key metrics. Are they realistic? What metrics matter most for this business?]
 
 KEY STRENGTHS:
-[What aspects of the pitch deck are particularly compelling?]
+[What aspects of the pitch deck are particularly compelling? What makes this opportunity unique?]
 
 AREAS FOR IMPROVEMENT:
-[What aspects need work? Be specific and constructive]
+[What aspects need work? Be specific and constructive. What's missing or unclear?]
 
 SPECIFIC RECOMMENDATIONS:
-[Provide actionable suggestions for improvement]
+[Provide actionable suggestions for improvement. What specific changes would make this more compelling?]
 
 OVERALL ASSESSMENT:
-[Final thoughts and whether you would invest]
+[Final thoughts and whether you would invest. What would it take to get you to invest?]
 
 Pitch Deck Content:
 ${pitchDeck}`;
@@ -117,7 +129,18 @@ ${pitchDeck}`;
         messages: [
           {
             role: 'system',
-            content: `You are a venture capitalist providing detailed feedback on pitch decks. ${intensityLevel}`
+            content: `You are a venture capitalist providing detailed feedback on pitch decks. ${intensityLevel}
+
+Key points to consider:
+1. Market size and timing
+2. Product/technology differentiation
+3. Team capabilities and execution
+4. Financial projections and metrics
+5. Go-to-market strategy
+6. Competitive advantage
+7. Risk factors and mitigation
+
+Provide specific, actionable feedback that helps founders improve their pitch.`
           },
           {
             role: 'user',
