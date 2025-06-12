@@ -1,52 +1,113 @@
 "use client";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+interface RoastResult {
+  roast: string;
+  vc: {
+    name: string;
+    firm: string;
+    knownFor: string;
+    vibe: string;
+  };
+}
 
 export default function ResultsPage() {
-  const router = useRouter();
-  const [roast, setRoast] = useState<string>("");
-  const [vc, setVc] = useState<any>(null);
-  const [intensity, setIntensity] = useState<string>("");
+  const searchParams = useSearchParams();
+  const [result, setResult] = useState<RoastResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const data = sessionStorage.getItem("roastResult");
-    if (data) {
-      const parsed = JSON.parse(data);
-      setRoast(parsed.roast);
-      setVc(parsed.vc);
-      setIntensity(parsed.intensity);
-    }
-  }, []);
+    const roast = searchParams.get('roast');
+    const storedResult = sessionStorage.getItem('roastResult');
 
-  if (!roast || !vc) {
+    if (storedResult) {
+      try {
+        setResult(JSON.parse(storedResult));
+      } catch (e) {
+        setError('Failed to load feedback. Please try again.');
+      }
+    } else if (roast) {
+      setResult({
+        roast: decodeURIComponent(roast),
+        vc: JSON.parse(sessionStorage.getItem('selectedVC') || '{}')
+      });
+    } else {
+      setError('No feedback found. Please try uploading your pitch deck again.');
+    }
+  }, [searchParams]);
+
+  if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-white">
-        <div>
-          <h2 className="text-2xl font-bold mb-4">No roast result found</h2>
-          <button className="bg-pink-500 px-4 py-2 rounded" onClick={() => router.push("/")}>Go Home</button>
+      <div className="min-h-screen bg-gray-900 text-white p-8">
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-red-500/10 border border-red-500 rounded-lg p-6">
+            <h2 className="text-xl font-semibold text-red-400 mb-2">Error</h2>
+            <p className="text-gray-300">{error}</p>
+          </div>
         </div>
       </div>
     );
   }
 
-  return (
-    <main className="min-h-screen bg-gray-900 text-white p-8">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold mb-4">Your VC Roast</h1>
-        <h2 className="mb-2">Roaster: <span className="text-pink-400 font-semibold">{vc.name}</span></h2>
-        <div className="mb-4">
-          <span className="bg-pink-700 px-3 py-1 rounded-full text-sm font-semibold">Intensity: {intensity}</span>
+  if (!result) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white p-8">
+        <div className="max-w-3xl mx-auto">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-700 rounded w-1/3 mb-4"></div>
+            <div className="space-y-3">
+              <div className="h-4 bg-gray-700 rounded"></div>
+              <div className="h-4 bg-gray-700 rounded w-5/6"></div>
+              <div className="h-4 bg-gray-700 rounded w-4/6"></div>
+            </div>
+          </div>
         </div>
-        <div className="bg-gray-800 rounded-lg p-6 mb-6 whitespace-pre-line">
-          {roast}
-        </div>
-        <button
-          className="bg-purple-600 px-6 py-2 rounded text-white font-bold"
-          onClick={() => router.push(`/ego-dump?vc=${vc.id}`)}
-        >
-          Go to Ego Dump
-        </button>
       </div>
-    </main>
+    );
+  }
+
+  const sections = result.roast.split('\n\n').filter(Boolean);
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-white p-8">
+      <div className="max-w-3xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Your Pitch Deck Feedback</h1>
+          <div className="flex items-center gap-2 text-gray-400">
+            <span>From</span>
+            <span className="text-pink-400 font-semibold">{result.vc.name}</span>
+            <span>at</span>
+            <span className="text-pink-400">{result.vc.firm}</span>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          {sections.map((section, index) => {
+            const [title, ...content] = section.split('\n');
+            return (
+              <div key={index} className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6">
+                <h2 className="text-xl font-semibold text-pink-400 mb-3">{title}</h2>
+                <div className="space-y-2 text-gray-300">
+                  {content.map((line, i) => (
+                    <p key={i} className="leading-relaxed">{line}</p>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="mt-8 flex justify-end">
+          <button
+            onClick={() => window.location.href = '/'}
+            className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 rounded-lg transition-colors"
+          >
+            Get Another Roast
+          </button>
+        </div>
+      </div>
+    </div>
   );
 } 

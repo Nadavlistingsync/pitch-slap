@@ -35,32 +35,42 @@ const FileUpload: React.FC<FileUploadProps> = ({
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
-      const newFiles = acceptedFiles.map((file) => ({
-        file,
-        preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : '',
-        progress: 0,
-      }));
+      try {
+        const newFiles = acceptedFiles.map((file) => ({
+          file,
+          preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : '',
+          progress: 0,
+        }));
 
-      setFiles((prev) => [...prev, ...newFiles].slice(0, maxFiles));
-      
-      // Simulate upload progress
-      setIsUploading(true);
-      let progress = 0;
-      uploadTimeoutRef.current = setInterval(() => {
-        progress += 10;
-        setFiles((prev) =>
-          prev.map((f) => ({
+        setFiles((prev) => [...prev, ...newFiles].slice(0, maxFiles));
+        
+        // Simulate upload progress
+        setIsUploading(true);
+        let progress = 0;
+        uploadTimeoutRef.current = setInterval(() => {
+          progress += 10;
+          setFiles((prev) =>
+            prev.map((f) => ({
+              ...f,
+              progress: Math.min(progress, 100),
+            }))
+          );
+
+          if (progress >= 100) {
+            clearInterval(uploadTimeoutRef.current);
+            setIsUploading(false);
+            onFileSelect(acceptedFiles[0]);
+          }
+        }, 200);
+      } catch (error) {
+        console.error('File upload error:', error);
+        setFiles((prev) => 
+          prev.map(f => ({
             ...f,
-            progress: Math.min(progress, 100),
+            error: error instanceof Error ? error.message : 'Failed to process file'
           }))
         );
-
-        if (progress >= 100) {
-          clearInterval(uploadTimeoutRef.current);
-          setIsUploading(false);
-          onFileSelect(acceptedFiles[0]);
-        }
-      }, 200);
+      }
     },
     [maxFiles, onFileSelect]
   );

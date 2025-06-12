@@ -1,25 +1,39 @@
 export const runtime = 'edge';
 
 export async function POST(request: Request) {
+  const requestId = Math.random().toString(36).substring(7);
+  const startTime = Date.now();
+
+  const log = (message: string, data?: any) => {
+    const timestamp = new Date().toISOString();
+    const logData = {
+      timestamp,
+      requestId,
+      message,
+      ...(data && { data })
+    };
+    console.log(JSON.stringify(logData));
+  };
+
   try {
-    console.log('🔵 API: Starting roast request processing');
+    log('Starting roast request processing');
     let body;
     try {
       const text = await request.text();
-      console.log('🔵 API: Raw request body length:', text.length);
+      log('Received request body', { length: text.length });
       body = JSON.parse(text);
     } catch (parseError) {
-      console.error('❌ API: Failed to parse request body:', parseError);
+      log('Failed to parse request body', { error: parseError.message });
       return new Response(
         JSON.stringify({ error: 'Invalid request format' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
-    const { pitchDeck, vc } = body;
+    const { pitchDeck, vc, intensity = 'balanced' } = body;
 
     if (!pitchDeck || typeof pitchDeck !== 'string') {
-      console.error('❌ API: Invalid pitch deck format:', typeof pitchDeck);
+      log('Invalid pitch deck format', { type: typeof pitchDeck });
       return new Response(
         JSON.stringify({ error: 'Invalid pitch deck format' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
@@ -27,19 +41,22 @@ export async function POST(request: Request) {
     }
 
     if (!vc || typeof vc !== 'object') {
-      console.error('❌ API: Invalid VC format:', typeof vc);
+      log('Invalid VC format', { type: typeof vc });
       return new Response(
         JSON.stringify({ error: 'Invalid VC format' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log('🔵 API: Pitch deck content length:', pitchDeck.length);
-    console.log('🔵 API: Pitch deck preview:', pitchDeck.substring(0, 200) + '...');
+    log('Processing pitch deck', { 
+      contentLength: pitchDeck.length,
+      preview: pitchDeck.substring(0, 200),
+      intensity
+    });
 
     const openaiApiKey = process.env.OPENAI_API_KEY;
     if (!openaiApiKey) {
-      console.error('❌ API: OpenAI API key not configured');
+      log('OpenAI API key not configured');
       return new Response(
         JSON.stringify({ error: 'Service configuration error' }),
         { status: 500, headers: { 'Content-Type': 'application/json' } }
@@ -54,12 +71,21 @@ export async function POST(request: Request) {
       vibe: vc.vibe
     };
 
-    console.log('🔵 API: Preparing OpenAI request with VC:', cleanVc);
+    log('Preparing OpenAI request', { vc: cleanVc });
+
+    // Adjust the prompt based on intensity
+    const intensityLevel = {
+      gentle: 'Provide constructive feedback in a supportive and encouraging manner.',
+      balanced: 'Provide balanced feedback that highlights both strengths and areas for improvement.',
+      brutal: 'Provide brutally honest feedback that pulls no punches. Be direct and critical.'
+    }[intensity] || intensityLevel.balanced;
 
     const prompt = `You are ${cleanVc.name} from ${cleanVc.firm}, known for ${cleanVc.knownFor}. 
 Your investment style is ${cleanVc.vibe}.
 
-Please review this pitch deck and provide detailed, constructive feedback in the following format:
+${intensityLevel}
+
+Please review this pitch deck and provide detailed feedback in the following format:
 
 EXECUTIVE SUMMARY:
 [Provide a brief overview of the pitch deck and your initial impressions]
@@ -79,7 +105,7 @@ OVERALL ASSESSMENT:
 Pitch Deck Content:
 ${pitchDeck}`;
 
-    console.log('🔵 API: Sending request to OpenAI');
+    log('Sending request to OpenAI');
     const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -91,34 +117,37 @@ ${pitchDeck}`;
         messages: [
           {
             role: 'system',
-            content: 'You are a venture capitalist providing detailed, constructive feedback on pitch decks. Be specific, actionable, and maintain a professional tone.'
+            content: `You are a venture capitalist providing detailed feedback on pitch decks. ${intensityLevel}`
           },
           {
             role: 'user',
             content: prompt
           }
         ],
-        temperature: 0.7,
+        temperature: intensity === 'brutal' ? 0.9 : intensity === 'gentle' ? 0.5 : 0.7,
         max_tokens: 2000,
         presence_penalty: 0.6,
         frequency_penalty: 0.3
       })
     });
 
-    console.log('🔵 API: OpenAI response status:', openaiResponse.status);
-    const openaiData = await openaiResponse.json();
-    console.log('🔵 API: OpenAI response:', JSON.stringify(openaiData, null, 2));
-
     if (!openaiResponse.ok) {
-      console.error('❌ API: OpenAI API error:', openaiData);
+      const errorData = await openaiResponse.json();
+      log('OpenAI API error', { 
+        status: openaiResponse.status,
+        error: errorData
+      });
       return new Response(
         JSON.stringify({ error: 'Failed to process pitch deck' }),
         { status: 500, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
+    const openaiData = await openaiResponse.json();
+    log('Received OpenAI response');
+
     if (!openaiData.choices?.[0]?.message?.content) {
-      console.error('❌ API: Invalid OpenAI response format:', openaiData);
+      log('Invalid OpenAI response format', { response: openaiData });
       return new Response(
         JSON.stringify({ error: 'Invalid response format from AI service' }),
         { status: 500, headers: { 'Content-Type': 'application/json' } }
@@ -126,8 +155,12 @@ ${pitchDeck}`;
     }
 
     const roast = openaiData.choices[0].message.content.trim();
-    console.log('🔵 API: Generated roast length:', roast.length);
-    console.log('🔵 API: Roast preview:', roast.substring(0, 200) + '...');
+    const processingTime = Date.now() - startTime;
+    
+    log('Generated roast', { 
+      length: roast.length,
+      processingTimeMs: processingTime
+    });
 
     return new Response(
       JSON.stringify({ roast, vc: cleanVc }),
@@ -140,7 +173,11 @@ ${pitchDeck}`;
       }
     );
   } catch (error) {
-    console.error('❌ API: Unexpected error:', error);
+    const processingTime = Date.now() - startTime;
+    log('Unexpected error', { 
+      error: error instanceof Error ? error.message : 'Unknown error',
+      processingTimeMs: processingTime
+    });
     return new Response(
       JSON.stringify({ error: 'An unexpected error occurred' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }

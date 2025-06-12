@@ -2,6 +2,7 @@
 import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import pdfParse from 'pdf-parse';
 
 const vcs = [
   {
@@ -93,6 +94,16 @@ const intensities = [
   { value: "brutal", label: "Brutal" },
 ];
 
+const log = (message: string, data?: any) => {
+  const timestamp = new Date().toISOString();
+  const logData = {
+    timestamp,
+    message,
+    ...(data && { data })
+  };
+  console.log(JSON.stringify(logData));
+};
+
 function UploadContent() {
   const router = useRouter();
   const params = useSearchParams();
@@ -106,6 +117,7 @@ function UploadContent() {
   const [error, setError] = useState<string | null>(null);
 
   if (!vc) {
+    log('No VC selected', { vcId });
     return (
       <div className="min-h-screen flex items-center justify-center text-white">
         <div>
@@ -118,50 +130,74 @@ function UploadContent() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+      const selectedFile = e.target.files[0];
+      log('File selected', { 
+        name: selectedFile.name,
+        type: selectedFile.type,
+        size: selectedFile.size
+      });
+      setFile(selectedFile);
       setText("");
     }
   };
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setText(e.target.value);
+    const newText = e.target.value;
+    log('Text input changed', { length: newText.length });
+    setText(newText);
     setFile(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file || !vc) {
-      setError('Please select a file and VC');
+    if (!file && !text) {
+      log('Validation error: No content provided');
+      setError('Please provide either a file or text content');
       return;
     }
 
     setLoading(true);
     setError(null);
+    const startTime = Date.now();
 
     try {
-      console.log('🔵 Upload: Starting file processing for:', file.name);
+      log('Starting file processing');
       let pitchDeckContent = '';
       
-      try {
-        if (file.type === 'application/pdf') {
-          console.log('🔵 Upload: Processing PDF file');
-          const arrayBuffer = await file.arrayBuffer();
-          pitchDeckContent = new TextDecoder().decode(arrayBuffer);
-          console.log('🔵 Upload: PDF content length:', pitchDeckContent.length);
-        } else {
-          console.log('🔵 Upload: Processing text file');
-          pitchDeckContent = await file.text();
-          console.log('🔵 Upload: Text content length:', pitchDeckContent.length);
-        }
+      if (file) {
+        try {
+          if (file.type === 'application/pdf') {
+            log('Processing PDF file', { name: file.name });
+            const arrayBuffer = await file.arrayBuffer();
+            const pdfData = new Uint8Array(arrayBuffer);
+            
+            try {
+              const pdfResult = await pdfParse(pdfData);
+              pitchDeckContent = pdfResult.text;
+              log('Successfully parsed PDF', { 
+                pages: pdfResult.numpages,
+                textLength: pdfResult.text.length
+              });
+            } catch (pdfError) {
+              log('PDF parsing error', { error: pdfError.message });
+              throw new Error('Failed to parse PDF file. Please make sure it\'s a valid PDF.');
+            }
+          } else {
+            log('Processing text file', { name: file.name });
+            pitchDeckContent = await file.text();
+          }
 
-        if (!pitchDeckContent || pitchDeckContent.trim().length === 0) {
-          throw new Error('The file appears to be empty or could not be read properly');
+          if (!pitchDeckContent || pitchDeckContent.trim().length === 0) {
+            log('Empty content error');
+            throw new Error('The file appears to be empty or could not be read properly');
+          }
+        } catch (readError) {
+          log('File reading error', { error: readError.message });
+          throw new Error('Failed to read the file. Please make sure it\'s a valid PDF or text file.');
         }
-
-        console.log('🔵 Upload: Content preview:', pitchDeckContent.substring(0, 200) + '...');
-      } catch (readError) {
-        console.error('❌ Upload: File reading error:', readError);
-        throw new Error('Failed to read the file. Please make sure it\'s a valid PDF or text file.');
+      } else {
+        pitchDeckContent = text;
+        log('Using text input', { length: text.length });
       }
 
       // Create a clean VC object
@@ -172,13 +208,19 @@ function UploadContent() {
         vibe: vc.vibe
       };
 
-      console.log('🔵 Upload: Preparing API request with VC:', cleanVc);
-      const requestBody = JSON.stringify({
-        pitchDeck: pitchDeckContent,
-        vc: cleanVc
+      log('Preparing API request', { 
+        vc: cleanVc,
+        intensity,
+        contentLength: pitchDeckContent.length
       });
 
-      console.log('🔵 Upload: Sending API request with content length:', requestBody.length);
+      const requestBody = JSON.stringify({
+        pitchDeck: pitchDeckContent,
+        vc: cleanVc,
+        intensity: intensity
+      });
+
+      log('Sending API request');
       const response = await fetch('/api/roast', {
         method: 'POST',
         headers: {
@@ -188,28 +230,21 @@ function UploadContent() {
         body: requestBody,
       });
 
-      console.log('🔵 Upload: Received API response status:', response.status);
-      let data;
-      try {
-        const responseText = await response.text();
-        console.log('🔵 Upload: Raw API response:', responseText.substring(0, 200) + '...');
-        data = JSON.parse(responseText);
-      } catch (parseError) {
-        console.error('❌ Upload: Failed to parse response:', parseError);
-        throw new Error('Invalid response from server. Please try again.');
-      }
-
       if (!response.ok) {
-        console.error('❌ Upload: API error:', data.error);
-        throw new Error(data.error || 'Failed to get feedback');
+        const errorData = await response.json();
+        log('API error', { 
+          status: response.status,
+          error: errorData
+        });
+        throw new Error(errorData.error || 'Failed to get feedback');
       }
 
-      if (!data.roast || typeof data.roast !== 'string') {
-        console.error('❌ Upload: Invalid feedback format:', data);
-        throw new Error('Invalid feedback format received');
-      }
-
-      console.log('🔵 Upload: Successfully received feedback, length:', data.roast.length);
+      const data = await response.json();
+      const processingTime = Date.now() - startTime;
+      log('Successfully received feedback', { 
+        processingTimeMs: processingTime,
+        roastLength: data.roast.length
+      });
 
       // Store the result
       const result = {
@@ -224,21 +259,12 @@ function UploadContent() {
       const encodedRoast = encodeURIComponent(data.roast);
       router.push(`/results?roast=${encodedRoast}`);
     } catch (error) {
-      console.error('❌ Upload: Error in submission process:', error);
-      
-      let errorMessage = 'Failed to process your pitch deck. Please try again.';
-      
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      } else if (typeof error === 'string') {
-        errorMessage = error;
-      } else if (error && typeof error === 'object') {
-        // Type guard for error object
-        const errorObj = error as { message?: string; error?: string };
-        errorMessage = errorObj.message || errorObj.error || 'An unexpected error occurred';
-      }
-      
-      setError(errorMessage);
+      const processingTime = Date.now() - startTime;
+      log('Error in submission process', { 
+        error: error instanceof Error ? error.message : 'Unknown error',
+        processingTimeMs: processingTime
+      });
+      setError(error instanceof Error ? error.message : 'An unexpected error occurred');
     } finally {
       setLoading(false);
     }
