@@ -18,6 +18,51 @@ interface VC {
 
 const vcs: VC[] = [
   {
+    id: "marc-andreessen",
+    name: "Marc Andreessen",
+    firm: "Andreessen Horowitz",
+    location: "🇺🇸 Silicon Valley",
+    knownFor: "investing in companies like Facebook, Twitter, and Airbnb",
+    stage: "Series A to Growth",
+    whyFoundersCare: "Technical expertise and contrarian thinking",
+    vibe: "aggressive and contrarian",
+    podcasts: [
+      "a16z Podcast",
+      "The Tim Ferriss Show",
+      "Lex Fridman Podcast"
+    ]
+  },
+  {
+    id: "mary-meeker",
+    name: "Mary Meeker",
+    firm: "Bond Capital",
+    location: "🇺🇸 Silicon Valley",
+    knownFor: "her annual Internet Trends report and investments in companies like Facebook and Twitter",
+    stage: "Growth Stage",
+    whyFoundersCare: "Data-driven insights and market analysis",
+    vibe: "data-driven and analytical",
+    podcasts: [
+      "The Twenty Minute VC",
+      "Masters of Scale",
+      "Invest Like The Best"
+    ]
+  },
+  {
+    id: "paul-graham",
+    name: "Paul Graham",
+    firm: "Y Combinator",
+    location: "🇺🇸 Silicon Valley",
+    knownFor: "founding Y Combinator and investing in companies like Dropbox and Airbnb",
+    stage: "Pre-seed to Series A",
+    whyFoundersCare: "Founder-focused approach and technical expertise",
+    vibe: "pragmatic and founder-focused",
+    podcasts: [
+      "Y Combinator Podcast",
+      "The Tim Ferriss Show",
+      "Invest Like The Best"
+    ]
+  },
+  {
     id: "jean-de-la-rochebrochard",
     name: "Jean de La Rochebrochard",
     firm: "Kima Ventures",
@@ -209,7 +254,7 @@ export default function VCPrompts() {
               if (typeof window !== 'undefined') {
                 localStorage.setItem('selectedVC', JSON.stringify(vc));
               }
-              router.push('/upload');
+              router.push(`/upload?vc=${vc.id}`);
             }}
           >
             <div className="flex items-start justify-between mb-4">

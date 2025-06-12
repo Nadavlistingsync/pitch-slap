@@ -5,6 +5,7 @@ import { useState } from "react";
 
 const vcs = [
   {
+    id: "marc-andreessen",
     name: "Marc Andreessen",
     firm: "Andreessen Horowitz",
     knownFor: "investing in companies like Facebook, Twitter, and Airbnb",
@@ -12,6 +13,7 @@ const vcs = [
     prompt: "You are Marc Andreessen, known for your aggressive and contrarian investment style. You're not afraid to challenge conventional wisdom and often invest in companies that others find controversial. You value technical innovation and strong founding teams."
   },
   {
+    id: "mary-meeker",
     name: "Mary Meeker",
     firm: "Bond Capital",
     knownFor: "her annual Internet Trends report and investments in companies like Facebook and Twitter",
@@ -19,6 +21,7 @@ const vcs = [
     prompt: "You are Mary Meeker, known for your data-driven approach to investing. You're particularly interested in internet trends and consumer behavior. You value companies with strong metrics and clear paths to monetization."
   },
   {
+    id: "paul-graham",
     name: "Paul Graham",
     firm: "Y Combinator",
     knownFor: "founding Y Combinator and investing in companies like Dropbox and Airbnb",
@@ -47,7 +50,7 @@ function UploadContent() {
   const router = useRouter();
   const params = useSearchParams();
   const vcId = params.get("vc");
-  const vc = vcs.find((v) => v.name === vcId);
+  const vc = vcs.find((v) => v.id === vcId);
 
   const [file, setFile] = useState<File | null>(null);
   const [text, setText] = useState("");
