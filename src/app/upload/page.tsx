@@ -169,19 +169,11 @@ function UploadContent() {
           if (file.type === 'application/pdf') {
             log('Processing PDF file', { name: file.name });
             const arrayBuffer = await file.arrayBuffer();
-            const pdfData = new Uint8Array(arrayBuffer);
-            
-            try {
-              const pdfResult = await pdfParse(pdfData);
-              pitchDeckContent = pdfResult.text;
-              log('Successfully parsed PDF', { 
-                pages: pdfResult.numpages,
-                textLength: pdfResult.text.length
-              });
-            } catch (pdfError) {
-              log('PDF parsing error', { error: pdfError.message });
-              throw new Error('Failed to parse PDF file. Please make sure it\'s a valid PDF.');
-            }
+            const uint8Array = new Uint8Array(arrayBuffer);
+            const buffer = Buffer.from(uint8Array);
+            const pdfData = await pdfParse(buffer);
+            pitchDeckContent = pdfData.text;
+            log('PDF processed successfully', { pages: pdfData.numpages });
           } else {
             log('Processing text file', { name: file.name });
             pitchDeckContent = await file.text();
@@ -191,9 +183,10 @@ function UploadContent() {
             log('Empty content error');
             throw new Error('The file appears to be empty or could not be read properly');
           }
-        } catch (readError) {
-          log('File reading error', { error: readError.message });
-          throw new Error('Failed to read the file. Please make sure it\'s a valid PDF or text file.');
+        } catch (error) {
+          const pdfError = error as Error;
+          log('Error processing PDF', { error: pdfError.message });
+          throw new Error(`Failed to process PDF: ${pdfError.message}`);
         }
       } else {
         pitchDeckContent = text;

@@ -22,10 +22,11 @@ export async function POST(request: Request) {
       const text = await request.text();
       log('Received request body', { length: text.length });
       body = JSON.parse(text);
-    } catch (parseError) {
-      log('Failed to parse request body', { error: parseError.message });
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      log('Failed to parse request body', { error: errorMessage });
       return new Response(
-        JSON.stringify({ error: 'Invalid request format' }),
+        JSON.stringify({ error: 'Failed to parse request body' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
@@ -33,7 +34,7 @@ export async function POST(request: Request) {
     const { pitchDeck, vc, intensity = 'balanced' } = body;
 
     if (!pitchDeck || typeof pitchDeck !== 'string') {
-      log('Invalid pitch deck format', { type: typeof pitchDeck });
+      log('Invalid pitch deck format');
       return new Response(
         JSON.stringify({ error: 'Invalid pitch deck format' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
@@ -41,7 +42,7 @@ export async function POST(request: Request) {
     }
 
     if (!vc || typeof vc !== 'object') {
-      log('Invalid VC format', { type: typeof vc });
+      log('Invalid VC format');
       return new Response(
         JSON.stringify({ error: 'Invalid VC format' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
@@ -73,12 +74,16 @@ export async function POST(request: Request) {
 
     log('Preparing OpenAI request', { vc: cleanVc });
 
-    // Adjust the prompt based on intensity
-    const intensityLevel = {
+    // Define intensity levels
+    const intensityLevels = {
       gentle: 'Provide constructive feedback in a supportive and encouraging manner. Focus on strengths and opportunities for growth.',
       balanced: 'Provide balanced feedback that highlights both strengths and areas for improvement. Be direct but constructive.',
       brutal: 'Provide brutally honest feedback that pulls no punches. Be direct, critical, and challenge assumptions.'
-    }[intensity] || intensityLevel.balanced;
+    } as const;
+
+    type IntensityType = keyof typeof intensityLevels;
+    const selectedIntensity = (intensity as IntensityType) || 'balanced';
+    const intensityLevel = intensityLevels[selectedIntensity];
 
     const prompt = `You are ${cleanVc.name} from ${cleanVc.firm}, known for ${cleanVc.knownFor}. 
 Your investment style is ${cleanVc.vibe}.
