@@ -1,27 +1,16 @@
-module.exports = {
+/** @type {import('jest').Config} */
+const config = {
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: ['<rootDir>/src/app/__tests__/setup.tsx'],
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1',
-    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
-    '\\.(jpg|jpeg|png|gif|webp|svg)$': '<rootDir>/src/app/__tests__/__mocks__/fileMock.js'
+    '^@/(.*)$': '<rootDir>/src/$1'
   },
+  testMatch: [
+    '**/__tests__/**/*.test.[jt]s?(x)'
+  ],
   transform: {
-    '^.+\\.(ts|tsx)$': ['@swc/jest']
-  },
-  transformIgnorePatterns: [
-    '/node_modules/(?!(@headlessui|@heroicons)/)'
-  ],
-  testPathIgnorePatterns: [
-    '<rootDir>/node_modules/',
-    '<rootDir>/.next/',
-    '<rootDir>/src/app/__tests__/setup.tsx',
-    '<rootDir>/src/app/__tests__/__mocks__/',
-    '<rootDir>/src/app/__tests__/types.d.ts'
-  ],
-  globals: {
-    'ts-jest': {
-      tsconfig: 'tsconfig.json'
-    }
+    '^.+\\.(ts|tsx)$': ['babel-jest', { presets: ['next/babel'] }]
   }
-}; 
+};
+
+module.exports = config; 
