@@ -20,6 +20,18 @@ const log = (message: string, data?: any) => {
   console.log(JSON.stringify(logData));
 };
 
+// Utility to ensure error is always a string
+function toErrorString(err: unknown): string {
+  if (!err) return 'Unknown error';
+  if (typeof err === 'string') return err;
+  if (err instanceof Error) return err.message;
+  try {
+    return JSON.stringify(err, null, 2);
+  } catch {
+    return String(err);
+  }
+}
+
 function UploadContent() {
   const router = useRouter();
   const params = useSearchParams();
@@ -186,7 +198,7 @@ function UploadContent() {
         error: error instanceof Error ? error.message : 'Unknown error',
         processingTimeMs: processingTime
       });
-      setError(error instanceof Error ? error.message : 'An unexpected error occurred');
+      setError(toErrorString(error));
     } finally {
       setLoading(false);
     }
