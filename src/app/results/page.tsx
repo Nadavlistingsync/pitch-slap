@@ -13,6 +13,18 @@ interface RoastResult {
   };
 }
 
+// Utility to ensure error is always a string
+function toErrorString(err: unknown): string {
+  if (!err) return 'Unknown error';
+  if (typeof err === 'string') return err;
+  if (err instanceof Error) return err.message;
+  try {
+    return JSON.stringify(err, null, 2);
+  } catch {
+    return String(err);
+  }
+}
+
 export default function ResultsPage() {
   const searchParams = useSearchParams();
   const [result, setResult] = useState<RoastResult | null>(null);
@@ -24,15 +36,27 @@ export default function ResultsPage() {
 
     if (storedResult) {
       try {
-        setResult(JSON.parse(storedResult));
+        const parsed = JSON.parse(storedResult);
+        if (!parsed || typeof parsed !== 'object' || !parsed.roast || !parsed.vc) {
+          throw new Error('Malformed feedback data.');
+        }
+        setResult(parsed);
       } catch (e) {
-        setError('Failed to load feedback. Please try again.');
+        setError(toErrorString(e));
       }
     } else if (roast) {
-      setResult({
-        roast: decodeURIComponent(roast),
-        vc: JSON.parse(sessionStorage.getItem('selectedVC') || '{}')
-      });
+      try {
+        const vc = JSON.parse(sessionStorage.getItem('selectedVC') || '{}');
+        if (!vc || typeof vc !== 'object' || !vc.name) {
+          throw new Error('Malformed VC data.');
+        }
+        setResult({
+          roast: decodeURIComponent(roast),
+          vc
+        });
+      } catch (e) {
+        setError(toErrorString(e));
+      }
     } else {
       setError('No feedback found. Please try uploading your pitch deck again.');
     }
