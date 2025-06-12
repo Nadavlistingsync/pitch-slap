@@ -1,8 +1,13 @@
 "use client";
 import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
-import pdfParse from 'pdf-parse';
+import { useState, useCallback } from "react";
+import { useDropzone } from 'react-dropzone';
+import { vcList } from '@/lib/vc-prompts';
+import * as pdfjsLib from 'pdfjs-dist';
+
+// Initialize PDF.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 const vcs = [
   {
@@ -165,28 +170,41 @@ function UploadContent() {
       let pitchDeckContent = '';
       
       if (file) {
-        try {
-          if (file.type === 'application/pdf') {
-            log('Processing PDF file', { name: file.name });
+        if (file.type === 'application/pdf') {
+          try {
             const arrayBuffer = await file.arrayBuffer();
             const uint8Array = new Uint8Array(arrayBuffer);
-            const buffer = Buffer.from(uint8Array);
-            const pdfData = await pdfParse(buffer);
-            pitchDeckContent = pdfData.text;
-            log('PDF processed successfully', { pages: pdfData.numpages });
-          } else {
-            log('Processing text file', { name: file.name });
+            
+            // Convert PDF to text using a simple approach
+            const textDecoder = new TextDecoder('utf-8');
+            const text = textDecoder.decode(uint8Array);
+            
+            // Remove non-printable characters and normalize whitespace
+            pitchDeckContent = text
+              .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
+              .replace(/\s+/g, ' ')
+              .trim();
+            
+            log('PDF processed successfully');
+          } catch (error) {
+            const pdfError = error as Error;
+            log('Error processing PDF', { error: pdfError.message });
+            throw new Error(`Failed to process PDF: ${pdfError.message}`);
+          }
+        } else {
+          try {
             pitchDeckContent = await file.text();
+            log('Text file processed successfully');
+          } catch (error) {
+            const readError = error as Error;
+            log('Error reading file', { error: readError.message });
+            throw new Error(`Failed to read file: ${readError.message}`);
           }
+        }
 
-          if (!pitchDeckContent || pitchDeckContent.trim().length === 0) {
-            log('Empty content error');
-            throw new Error('The file appears to be empty or could not be read properly');
-          }
-        } catch (error) {
-          const pdfError = error as Error;
-          log('Error processing PDF', { error: pdfError.message });
-          throw new Error(`Failed to process PDF: ${pdfError.message}`);
+        if (!pitchDeckContent || pitchDeckContent.trim().length === 0) {
+          log('Empty content error');
+          throw new Error('The file appears to be empty or could not be read properly');
         }
       } else {
         pitchDeckContent = text;
