@@ -43,6 +43,9 @@ function UploadContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const MAX_SIZE_MB = 4;
+  const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
+
   if (!vc) {
     log('No VC selected', { vcId });
     return (
@@ -58,6 +61,11 @@ function UploadContent() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
+      if (selectedFile.size > MAX_SIZE_BYTES) {
+        setError(`File is too large. Maximum allowed size is ${MAX_SIZE_MB}MB.`);
+        setFile(null);
+        return;
+      }
       log('File selected', { 
         name: selectedFile.name,
         type: selectedFile.type,
