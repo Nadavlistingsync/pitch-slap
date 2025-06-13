@@ -39,7 +39,6 @@ function UploadContent() {
   const vc = vcs.find((v) => v.id === vcId);
 
   const [file, setFile] = useState<File | null>(null);
-  const [text, setText] = useState("");
   const [intensity, setIntensity] = useState("balanced");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -65,22 +64,14 @@ function UploadContent() {
         size: selectedFile.size
       });
       setFile(selectedFile);
-      setText("");
     }
-  };
-
-  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newText = e.target.value;
-    log('Text input changed', { length: newText.length });
-    setText(newText);
-    setFile(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file && !text) {
-      log('Validation error: No content provided');
-      setError('Please provide either a file or text content');
+    if (!file) {
+      log('Validation error: No file provided');
+      setError('Please upload a PDF or text file');
       return;
     }
 
@@ -92,46 +83,41 @@ function UploadContent() {
       log('Starting file processing');
       let pitchDeckContent = '';
       
-      if (file) {
-        if (file.type === 'application/pdf') {
-          try {
-            const arrayBuffer = await file.arrayBuffer();
-            const uint8Array = new Uint8Array(arrayBuffer);
-            
-            // Convert PDF to text using a simple approach
-            const textDecoder = new TextDecoder('utf-8');
-            const text = textDecoder.decode(uint8Array);
-            
-            // Remove non-printable characters and normalize whitespace
-            pitchDeckContent = text
-              .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
-              .replace(/\s+/g, ' ')
-              .trim();
-            
-            log('PDF processed successfully');
-          } catch (error) {
-            const pdfError = error as Error;
-            log('Error processing PDF', { error: pdfError.message });
-            throw new Error(`Failed to process PDF: ${pdfError.message}`);
-          }
-        } else {
-          try {
-            pitchDeckContent = await file.text();
-            log('Text file processed successfully');
-          } catch (error) {
-            const readError = error as Error;
-            log('Error reading file', { error: readError.message });
-            throw new Error(`Failed to read file: ${readError.message}`);
-          }
-        }
-
-        if (!pitchDeckContent || pitchDeckContent.trim().length === 0) {
-          log('Empty content error');
-          throw new Error('The file appears to be empty or could not be read properly');
+      if (file.type === 'application/pdf') {
+        try {
+          const arrayBuffer = await file.arrayBuffer();
+          const uint8Array = new Uint8Array(arrayBuffer);
+          
+          // Convert PDF to text using a simple approach
+          const textDecoder = new TextDecoder('utf-8');
+          const text = textDecoder.decode(uint8Array);
+          
+          // Remove non-printable characters and normalize whitespace
+          pitchDeckContent = text
+            .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
+            .replace(/\s+/g, ' ')
+            .trim();
+          
+          log('PDF processed successfully');
+        } catch (error) {
+          const pdfError = error as Error;
+          log('Error processing PDF', { error: pdfError.message });
+          throw new Error(`Failed to process PDF: ${pdfError.message}`);
         }
       } else {
-        pitchDeckContent = text;
-        log('Using text input', { length: text.length });
+        try {
+          pitchDeckContent = await file.text();
+          log('Text file processed successfully');
+        } catch (error) {
+          const readError = error as Error;
+          log('Error reading file', { error: readError.message });
+          throw new Error(`Failed to read file: ${readError.message}`);
+        }
+      }
+
+      if (!pitchDeckContent || pitchDeckContent.trim().length === 0) {
+        log('Empty content error');
+        throw new Error('The file appears to be empty or could not be read properly');
       }
 
       // Create a clean VC object
@@ -220,15 +206,6 @@ function UploadContent() {
             />
           </div>
           <div>
-            <label className="block mb-2">Or paste your pitch deck text:</label>
-            <textarea
-              value={text}
-              onChange={handleTextChange}
-              className="w-full h-32 p-2 border border-gray-600 rounded bg-gray-800"
-              placeholder="Paste your pitch deck content here..."
-            />
-          </div>
-          <div>
             <label className="block mb-2">Feedback Intensity:</label>
             <select
               value={intensity}
@@ -249,9 +226,9 @@ function UploadContent() {
           )}
           <button
             type="submit"
-            disabled={loading || (!file && !text)}
+            disabled={loading || !file}
             className={`w-full py-2 px-4 rounded ${
-              loading || (!file && !text)
+              loading || !file
                 ? 'bg-gray-600 cursor-not-allowed'
                 : 'bg-pink-500 hover:bg-pink-600'
             }`}
