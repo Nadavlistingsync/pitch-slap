@@ -64,6 +64,9 @@ function UploadContent() {
         size: selectedFile.size
       });
       setFile(selectedFile);
+    } else {
+      log('No file selected');
+      setFile(null);
     }
   };
 
@@ -205,6 +208,11 @@ function UploadContent() {
               className="w-full p-2 border border-gray-600 rounded bg-gray-800"
             />
           </div>
+          {file && (
+            <div className="text-gray-400 mt-2">
+              Selected file: <span className="font-semibold">{file.name}</span>
+            </div>
+          )}
           <div>
             <label className="block mb-2">Feedback Intensity:</label>
             <select
