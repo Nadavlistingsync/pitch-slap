@@ -70,6 +70,17 @@ const vcs = [
   }
 ];
 
+// Utility to ensure feedback is always a string
+function toFeedbackString(val: unknown): string {
+  if (!val) return '';
+  if (typeof val === 'string') return val;
+  try {
+    return JSON.stringify(val, null, 2);
+  } catch {
+    return String(val);
+  }
+}
+
 export default function RoastPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const [pitchDeck, setPitchDeck] = useState<File | null>(null);
@@ -238,7 +249,7 @@ export default function RoastPage({ params }: { params: { id: string } }) {
                 style={{ width: `${roastLevel}%` }}
               />
             </div>
-            <p className="text-gray-300 mb-4">{feedback}</p>
+            <p className="text-gray-300 mb-4">{toFeedbackString(feedback)}</p>
             <p className="text-sm text-gray-500 italic">
               {roastLevel < 30
                 ? "Not bad, but there's room for improvement..."
