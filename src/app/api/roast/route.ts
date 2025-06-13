@@ -166,7 +166,7 @@ Provide specific, actionable feedback that helps founders improve their pitch.`
         error: errorData
       });
       return new Response(
-        JSON.stringify({ error: 'Failed to process pitch deck' }),
+        JSON.stringify({ error: errorData.error || JSON.stringify(errorData) }),
         { status: 500, headers: { 'Content-Type': 'application/json' } }
       );
     }
