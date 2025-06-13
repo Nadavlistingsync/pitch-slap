@@ -159,7 +159,12 @@ function UploadContent() {
           status: response.status,
           error: errorData
         });
-        throw new Error(errorData.error || 'Failed to get feedback');
+        console.log('API errorData:', errorData);
+        throw new Error(
+          typeof errorData.error === 'string'
+            ? errorData.error
+            : JSON.stringify(errorData.error) || 'Failed to get feedback'
+        );
       }
 
       const data = await response.json();
