@@ -71,7 +71,7 @@ function UploadContent() {
     e.preventDefault();
     if (!file) {
       log('Validation error: No file provided');
-      setError('Please upload a PDF or text file');
+      setError(toErrorString('Please upload a PDF or text file'));
       return;
     }
 
@@ -221,7 +221,7 @@ function UploadContent() {
           </div>
           {error && (
             <div className="text-red-500">
-              {typeof error === 'string' ? error : JSON.stringify(error)}
+              {toErrorString(error)}
             </div>
           )}
           <button
